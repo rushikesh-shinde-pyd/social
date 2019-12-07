@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="6cd9b2df-6a36-4fcf-9b09-c0f6ef94f252" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/social/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/social/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social/static/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/social/static/css/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social/templates/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/social/templates/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/social/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/social/views.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1UHFcS9sY8pU5iafrYOxmbVzPDc" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Sjain\Desktop\pypsi\social_module\social\templates\registration" />
+    </key>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6cd9b2df-6a36-4fcf-9b09-c0f6ef94f252" name="Default Changelist" comment="" />
+      <created>1557306666715</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1557306666715</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="166" y="0" key="CommitChangelistDialog2" timestamp="1575723359487">
+      <screen x="0" y="0" width="1024" height="728" />
+    </state>
+    <state x="166" y="0" key="CommitChangelistDialog2/0.0.1024.728@0.0.1024.728" timestamp="1575723359487" />
+    <state x="13" y="5" key="SettingsEditor" timestamp="1575673242108">
+      <screen x="0" y="0" width="1024" height="728" />
+    </state>
+    <state x="13" y="5" key="SettingsEditor/0.0.1024.728@0.0.1024.728" timestamp="1575673242108" />
+    <state x="213" y="186" key="com.intellij.ide.util.TipDialog" timestamp="1575741478317">
+      <screen x="0" y="0" width="1024" height="728" />
+    </state>
+    <state x="213" y="186" key="com.intellij.ide.util.TipDialog/0.0.1024.728@0.0.1024.728" timestamp="1575741478317" />
+  </component>
+</project>
