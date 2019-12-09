@@ -27,3 +27,24 @@ def get_like_obj(post_id, user_id):
        return False
 
 
+@register.simple_tag
+def get_comments(queryset):
+    return queryset.order_by('-commented_at')
+
+
+
+@register.simple_tag
+def get_replies(queryset):
+    return queryset.order_by('-commented_at')
+
+
+@register.filter(name='pluralize_reply')
+def pluralize_reply(value):
+    if value == 1:
+        return str(value) + ' ' + 'reply'
+    else:
+        return str(value) + ' ' + 'replies'
+
+
+
+

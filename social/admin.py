@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile,Post, Like, Comment
+from .models import Profile,Post, Like, Comment, Replies
 
 # Register your models here.
 admin.autodiscover()
@@ -11,4 +11,4 @@ admin.site.register(Profile, ProfileAdmin)
 admin.site.register(Post)
 admin.site.register(Like)
 admin.site.register(Comment)
-# admin.site.register(Replies)
+admin.site.register(Replies)

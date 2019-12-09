@@ -335,7 +335,7 @@
                                            <strong id="post-author">
                                                {{ post.author.first_name | title }} {{ post.author.last_name | title }}</strong> :
                                            <span id="post-published">
-                                               {{ post.published_date }}
+                                               {{ post.published_date|timesince:timezone.now }} ago
                                            </span>
                                        </div>
                                    </div>
@@ -370,7 +370,7 @@
                                         <i onclick="comment({{ post.id }})" style="transform:scale(1.5,1.5); cursor:pointer;" class="glyphicon glyphicon-comment" aria-hidden="true"></i>
                                     </li>
                                     <li class="list-group-item">
-                                        <strong id="comment-count">{{ post.comments.count }}</strong>
+                                        <strong id="comment-count">{{ post.comment_set.count }}</strong>
                                     </li>
                                 </ul>
                                 <div class="write-comment" style="display: none;">
@@ -378,17 +378,40 @@
                                         {% csrf_token %}
                                         <input type="hidden" name="post-id" value="{{ post.id }}">
                                         <textarea maxlength="160" style="margin: 10px 0px; border: none;" class="comment-box form-control" placeholder="Comment here..."></textarea>
-                                        <input type="submit" name="comment" class="btn btn-primary" value="Comment">
+                                        <input type="button" name="close-comment" class="btn" value="Close">
+                                        <input type="submit" disabled name="comment" style="display:none;" class="btn btn-primary" value="Comment">
                                     </form>
-                                    <div>
-                                        <ul class="list-group">
-                                        {% for c in post.comment_set.all %}
-                                        {{c.user.first_name|title}} {{c.user.last_name|title}} commented at: {{c.commented_at}}
-                                            <ul>
-                                            <li class="list-group-item">{{ c.message }}</li>
-                                            </ul>
-                                        {% endfor %}
+                                    <div class="comments-replies">
+                                        {% get_comments post.comment_set.all as qs %}
+                                        <h5>Comments</h5>
+                                        {% for each_comment in qs %}
+                                        {{ each_comment.user.first_name|title }} {{ each_comment.user.last_name|title }} {{ each_comment.commented_at|timesince }} ago
+                                        <ul class="list-group comment-div" id="comment-id-{{each_comment.id}}">
+                                            <li class="list-group-item" style="display:inline-block;">
+                                                {{ each_comment.message|title }}
+                                                <input type="button" onclick="reply_to_comment({{each_comment.id}}, {{post.id}})" name="reply-button" value="Reply">
+                                            </li>
+                                            <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
+                                                {% csrf_token %}
+                                                <textarea class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
+                                                <br>
+                                                <input class="btn btn-primary" type="submit" style="display:none" disabled name="reply" value="Reply">
+                                            </form>
+                                            <br>
+                                                {% get_replies each_comment.parent.all as rqs %}
+                                                {%if rqs %}
+                                                   <button name="show-replies">show replies</button>
+
+                                                    <h5 style="padding:15px;">{{ rqs.count|pluralize_reply }}</h5>
+                                                    {% for each_reply in rqs %}
+                                                        <ul  style="display:none;margin-left:50px" class="list-group reply-div">
+                                                            {{ each_reply.user.first_name|title }} {{ each_reply.user.last_name|title }} {{ each_reply.commented_at|timesince }}<br>
+                                                            <li class="list-group-item" style="display:inline-block;">{{ each_reply.reply|title }}</li>
+                                                        </ul>
+                                                    {% endfor %}
+                                                {% endif %}
                                         </ul>
+                                        {% endfor %}
                                     </div>
                                 </div>
                             </div>
@@ -621,7 +644,7 @@
         </div>
       </div>
 
-  <!--delete message modal-->
+  <!--deletion message modal-->
     <div class="modal fade" id="delete_message" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -638,7 +661,7 @@
     </div>
 
 
-    <!--update message modal-->
+    <!--updation message modal-->
     <div class="modal fade" id="update_message" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -794,11 +817,72 @@
             console.log('nav ' + nav + ' to: ' + to.month + '/' + to.year);
         }
 
+     $('button[name="show-replies"]').click(function(){
+        if ($(this).text().trim() == 'Hide replies'){
+           $('.reply-div').hide();
+           $(this).text('show-replies');
+
+        }else{
+            $('.reply-div').hide();
+            $(this).parent().find('.reply-div').fadeToggle();
+            $(this).text('Hide replies');
+        }
+
+     });
+
+    // replying comments
+    function reply_to_comment(comment_id, post_id){
+        $('#comment-id-' + comment_id).find('input[name="reply-button"]').fadeOut();
+        console.log("reply")
+        $('form[name="reply-to-comment"]').fadeOut();
+        $("#comment-id-" + comment_id).find('textarea[name="reply-area"]').parent().fadeIn();
+            $('textarea[name="reply-area"]').keyup(function(){
+                var char_len = $(this).val().trim().length;
+                if (char_len > 0){
+                    $(this).parent().find('input[type="submit"]').attr('disabled', false).fadeIn();
+                }else if(char_len == 0){
+                    $(this).parent().find('input[type="submit"]').attr('disabled', true).fadeOut();
+                }
+            });
+            $('form[name="reply-to-comment"]').submit(function(event){
+                event.preventdefault;
+                var reply = $(this).find('textarea[name="reply-area"]').val().trim();
+                console.log(reply);
+                $.ajax({
+                    url: "{% url 'social:reply-to-comment' %}",
+                    type: "POST",
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                        'comment_id': comment_id,
+                        'reply': reply,
+                    },
+                    success: function(data){
+                        console.log(data.result);
+                    },
+                    error: function(data){
+                    },
+                    complete: function(data){
+                    }
+                });
+                $('form[name="reply-to-comment"]').trigger("reset");
+                return false;
+            });
+            return false;
+    }
+
 
     // commenting post
     function comment(id){
         $(".write-comment").fadeOut();
-        $("#post-id-" + id).find(".write-comment").fadeIn();
+        $("#post-id-" + id).find(".write-comment").fadeToggle();
+        $(".write-comment").find('.comment-box').keyup(function(){
+            var char_len = $(this).val().trim().length;
+            if (char_len > 0){
+                $(".write-comment").find('input[type="submit"]').attr('disabled', false).fadeIn();
+            }else if(char_len == 0){
+                $(".write-comment").find('input[type="submit"]').attr('disabled', true).fadeOut();
+            }
+        });
         $("#comment-form-" + id).submit(function(event){
             event.preventdefault;
             var post_id = $("#comment-form-" + id).find('input[name="post-id"]').val().trim();
@@ -813,10 +897,7 @@
                         'comment': post_comment,
                     },
                     success: function(data){
-                        console.log(data)
-                        if (data.deleted){
-                            $("#post-id-" + id).remove();
-                        }
+
                     },
                     error: function(data){
                     },
@@ -827,6 +908,7 @@
         $("#comment-form-" + id).trigger("reset");
         return false;
     });
+    return false;
     }
 
 
@@ -967,6 +1049,10 @@
     $("#post-id-" + id).find(".dislike").attr("onclick", "like(" + id + ")");
     $("#post-id-" + id).find(".dislike").removeClass("dislike").addClass("like");
     }
+
+    $('input[name="close-comment"]').click(function(){
+        $(this).parent().parent().fadeOut();
+    });
 
 
     </script>

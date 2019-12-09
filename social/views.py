@@ -1,8 +1,8 @@
-from django.shortcuts import render,redirect,reverse
+from django.shortcuts import render,redirect,reverse, get_object_or_404
 from django.contrib.auth import authenticate,login as auth_login,logout
 from .forms import SignUpForm,PhotoForm
 from django.contrib.auth.models import User
-from .models import Profile,Post, Like, Comment
+from .models import Profile,Post, Like, Comment, Replies
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
@@ -71,7 +71,7 @@ def dashboard(request):
     user = request.user
     posts = Post.objects.filter(is_active=True).order_by("-published_date")
     # posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
-    return render(request,'dashboard.html',{'user': user, 'posts': posts, 'dt': dt.now})
+    return render(request,'dashboard.html',{'user': user, 'posts': posts, 'dt': dt.now, 'timezone':timezone})
 
 # @login_required()
 def profile(request):
@@ -238,3 +238,20 @@ class CommentView(View):
         #
         # }
         return JsonResponse({'result': 'OK'})
+
+
+@method_decorator(login_required, name='dispatch')
+class ReplyToCommentView(View):
+    def post(self, request, *args, **kwargs):
+        comment_id = request.POST.get('comment_id').strip()
+        comment_obj = get_object_or_404(Comment, id=comment_id)
+        user_obj = User.objects.get(id=request.user.id)
+        reply = request.POST.get('reply').strip()
+
+
+        obj = Replies(user=user_obj, parent=comment_obj, reply=reply)
+        obj.save()
+        data = {
+            'result': True
+        }
+        return JsonResponse(data)

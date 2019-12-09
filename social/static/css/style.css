@@ -2296,3 +2296,14 @@ label {
 .dlikes{
    margin-bottom: 0px !important;
 }
+
+.comments-replies  .list-group-item{
+    background: transparent;
+    border: none;
+}
+.comment-div{
+    /*box-shadow: 1px 1px 10px #000;*/
+    border-radius: 10px;
+    background: #ffffff;
+    overflow: hidden;
+}

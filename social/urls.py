@@ -23,6 +23,6 @@ urlpatterns = [
     path('likedislike_requests/', views.LikeDislike.as_view(), name='likedislike-requests'),
 
     path('comment/', views.CommentView.as_view(), name="comment"),
-
+    path('reply-to-comment/', views.ReplyToCommentView.as_view(), name="reply-to-comment"),
 
 ]
