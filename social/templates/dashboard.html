@@ -857,6 +857,10 @@
             </div>
         `)
         $("#post-id-" + post_id).find("#reply-count").text(data.total_replies);
+        $('.reply-div').show();
+        $('button[name="show-replies"]').text('Hide replies');
+        $(".replies").fadeIn();
+
     }
 
     function reply_to_comment(comment_id, post_id){
