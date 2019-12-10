@@ -335,7 +335,7 @@
                                            <strong id="post-author">
                                                {{ post.author.first_name | title }} {{ post.author.last_name | title }}</strong> :
                                            <span id="post-published">
-                                               {{ post.published_date|timesince:timezone.now }} ago
+                                               {{ post.published_date|timesince }} ago
                                            </span>
                                        </div>
                                    </div>
@@ -378,40 +378,54 @@
                                         {% csrf_token %}
                                         <input type="hidden" name="post-id" value="{{ post.id }}">
                                         <textarea maxlength="160" style="margin: 10px 0px; border: none;" class="comment-box form-control" placeholder="Comment here..."></textarea>
-                                        <input type="button" name="close-comment" class="btn" value="Close">
+                                        <input type="button" name="close-comment" class="btn" value="Cancel">
                                         <input type="submit" disabled name="comment" style="display:none;" class="btn btn-primary" value="Comment">
                                     </form>
                                     <div class="comments-replies">
                                         {% get_comments post.comment_set.all as qs %}
+                                        {% if qs%}
                                         <h5>Comments</h5>
-                                        {% for each_comment in qs %}
-                                        {{ each_comment.user.first_name|title }} {{ each_comment.user.last_name|title }} {{ each_comment.commented_at|timesince }} ago
-                                        <ul class="list-group comment-div" id="comment-id-{{each_comment.id}}">
-                                            <li class="list-group-item" style="display:inline-block;">
-                                                {{ each_comment.message|title }}
-                                                <input type="button" onclick="reply_to_comment({{each_comment.id}}, {{post.id}})" name="reply-button" value="Reply">
-                                            </li>
-                                            <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
-                                                {% csrf_token %}
-                                                <textarea class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
+                                        {% endif %}
+                                        <div class="comment-wrapper">
+                                            {% for each_comment in qs %}
+                                            <div style="margin:10px 10px;"><strong class="commenter">{{ each_comment.user.first_name|title }} {{ each_comment.user.last_name|title }}</strong> commented <span class="comment-timestamp">
+                                            {% if each_comment.commented_at|timesince == '0 minutes' %}
+                                            <small> just now </small>
+                                            {% else %}
+                                                <small> {{ each_comment.commented_at|timesince }} ago</small>
+                                            {% endif %}
+                                            </div>
+                                            <ul class="list-group comment-div" id="comment-id-{{each_comment.id}}">
+                                                <li class="list-group-item" style="display:inline-block;">
+                                                    {{ each_comment.message|title }}
+                                                    <input type="button" style="margin-bottom:0px; background-color:#fff; color: #2b6eff; border:none; padding:0px;" class="" onclick="reply_to_comment({{each_comment.id}}, {{post.id}})" name="reply-button" value="Reply">
+                                                </li>
+                                                <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
+                                                    {% csrf_token %}
+                                                    <textarea style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
+                                                    {% comment %} <br> {% endcomment %}
+                                                    <input class="btn btn-primary" style="margin:10px 0px; display:none" type="submit" disabled name="reply" value="Reply">
+                                                </form>
                                                 <br>
-                                                <input class="btn btn-primary" type="submit" style="display:none" disabled name="reply" value="Reply">
-                                            </form>
-                                            <br>
-                                                {% get_replies each_comment.parent.all as rqs %}
-                                                {%if rqs %}
-                                                   <button name="show-replies">show replies</button>
+                                                    {% get_replies each_comment.parent.all as reply_queryset %}
+                                                    {%if reply_queryset %}
+                                                    <button style="background-color:transparent; color: #2b6eff; border:none; margin-left: 10px;" name="show-replies">show replies</button>
 
-                                                    <h5 style="padding:15px;">{{ rqs.count|pluralize_reply }}</h5>
-                                                    {% for each_reply in rqs %}
-                                                        <ul  style="display:none;margin-left:50px" class="list-group reply-div">
-                                                            {{ each_reply.user.first_name|title }} {{ each_reply.user.last_name|title }} {{ each_reply.commented_at|timesince }}<br>
-                                                            <li class="list-group-item" style="display:inline-block;">{{ each_reply.reply|title }}</li>
-                                                        </ul>
-                                                    {% endfor %}
-                                                {% endif %}
-                                        </ul>
-                                        {% endfor %}
+                                                        <h5 id="reply-count" style="padding:15px;">{{ reply_queryset.count|pluralize_reply }}</h5>
+                                                        <div class="replies">
+                                                            {% for each_reply in reply_queryset %}
+                                                                <div class="reply-wrapper">
+                                                                    <ul  style="display:none;margin-left:50px" class="list-group reply-div">
+                                                                        <div style="margin:10px 0px;"><strong class="replier">{{ each_reply.user.first_name|title }} {{ each_reply.user.last_name|title }}</strong> replied <span class="reply-timestamp"><small>{{ each_reply.commented_at|timesince }}</span> ago</small><br></div>
+                                                                        <li class="list-group-item" style="display:inline-block;">{{ each_reply.reply|title }}</li>
+                                                                    </ul>
+                                                                </div>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% endif %}
+                                            </ul>
+                                            {% endfor %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -419,7 +433,7 @@
                      </div>
                          {% endfor %}
                      </div>
-				<div class="row mt">
+				{% comment %} <div class="row mt">
                       <!--CUSTOM CHART START -->
                       <div class="border-head">
                           <h3>VISITS</h3>
@@ -463,7 +477,7 @@
                           </div>
                       </div>
                       <!--custom chart end-->
-					</div><!-- /row -->	
+					</div><!-- /row -->	 {% endcomment %}
 					
                   </div><!-- /col-lg-9 END SECTION MIDDLE -->
                   
@@ -831,6 +845,20 @@
      });
 
     // replying comments
+    function add_reply_to_page(comment_id, post_id, data){
+        console.log(data);
+        console.log(data.reply_message);
+        $("#post-id-" + post_id).find(".replies").prepend(`
+            <div class="reply-wrapper">
+                <ul  style="display:none;margin-left:50px" class="list-group reply-div">
+                    <div style="margin:10px 0px;"><strong class="replier">${data.reply_user_fname} ${data.reply_user_lname}</strong> replied <span class="reply-timestamp"><small>just now</small></span><br></div>
+                    <li class="list-group-item" style="display:inline-block;">${data.reply_message}</li>
+                </ul>
+            </div>
+        `)
+        $("#post-id-" + post_id).find("#reply-count").text(data.total_replies);
+    }
+
     function reply_to_comment(comment_id, post_id){
         $('#comment-id-' + comment_id).find('input[name="reply-button"]').fadeOut();
         console.log("reply")
@@ -858,6 +886,7 @@
                     },
                     success: function(data){
                         console.log(data.result);
+                        add_reply_to_page(comment_id, post_id, data);
                     },
                     error: function(data){
                     },
@@ -872,6 +901,40 @@
 
 
     // commenting post
+    function add_comment_to_page(id, data){
+        console.log(data);
+        console.log(data.comment_message);
+        $("#post-id-" + id).find("#comment-count").text(data.total_comments);
+        $("#post-id-" + id).find(".comment-wrapper").prepend(`
+            <div style="margin:10px 10px;"><strong class="commenter">${data.comment_user_fname} ${data.comment_user_lname}</strong> commented <span class="comment-timestamp"> just now</span></div>
+            <ul class="list-group comment-div" id="comment-id-${data.comment_id}">
+                <li class="list-group-item" style="display:inline-block;">
+                    ${data.comment_message}
+                    <input type="button" style="margin-bottom:0px; background-color:#fff; color: #2b6eff; border:none; padding:0px;" class="" onclick="reply_to_comment(${data.comment_id}, ${id})" name="reply-button" value="Reply">
+                </li>
+                <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
+                    {% csrf_token %}
+                    <textarea style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
+                    {% comment %} <br> {% endcomment %}
+                    <input class="btn btn-primary" type="submit" style="display:none" disabled name="reply" value="Reply">
+                </form>
+                {% comment %} <br> {% endcomment %}
+                    {% comment %} {% get_replies each_comment.parent.all as reply_queryset %}
+                    {%if reply_queryset %}
+                    <button style="background-color:transparent; color: #2b6eff; border:none; margin-left: 10px;" name="show-replies">show replies</button>
+
+                        <h5 style="padding:15px;">{{ reply_queryset.count|pluralize_reply }}</h5>
+                        {% for each_reply in reply_queryset %}
+                            <ul  style="display:none;margin-left:50px" class="list-group reply-div">
+                                <div style="margin:10px 0px;"><strong class="replier">{{ each_reply.user.first_name|title }} {{ each_reply.user.last_name|title }}</strong> replied <span class="reply-timestamp">{{ each_reply.commented_at|timesince }}</span> ago<br></div>
+                                <li class="list-group-item" style="display:inline-block;">{{ each_reply.reply|title }}</li>
+                            </ul>
+                        {% endfor %}
+                    {% endif %} {% endcomment %}
+            </ul>
+        `)
+    }
+
     function comment(id){
         $(".write-comment").fadeOut();
         $("#post-id-" + id).find(".write-comment").fadeToggle();
@@ -897,7 +960,7 @@
                         'comment': post_comment,
                     },
                     success: function(data){
-
+                        add_comment_to_page(id, data);
                     },
                     error: function(data){
                     },

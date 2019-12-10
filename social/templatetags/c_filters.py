@@ -36,6 +36,7 @@ def get_comments(queryset):
 @register.simple_tag
 def get_replies(queryset):
     return queryset.order_by('-commented_at')
+    # return queryset
 
 
 @register.filter(name='pluralize_reply')

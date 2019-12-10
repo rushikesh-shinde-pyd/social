@@ -35,12 +35,12 @@ class Post(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     text = models.TextField()
-    created_date = models.DateTimeField(default=dt.now)
+    created_date = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
 
     def publish(self):
-        self.published_date = dt.now()
+        self.published_date = timezone.now()
         self.save()
 
     def __str__(self):
@@ -64,7 +64,7 @@ class Comment(models.Model):
     # reply = models.ForeignKey('self', on_delete=models.CASCADE, related_name='replies')
     is_approved = models.BooleanField(default=True)
     is_rejected = models.BooleanField(default=False)
-    commented_at = models.DateTimeField(default=dt.now, verbose_name='Created at')
+    commented_at = models.DateTimeField(default=timezone.now, verbose_name='Created at')
     # custom_objects = CustomCommentManager()
 
     def approve(self):
@@ -84,7 +84,7 @@ class Replies(models.Model):
     reply = models.CharField(max_length=160)
     is_approved = models.BooleanField(default=True)
     is_rejected = models.BooleanField(default=False)
-    commented_at = models.DateTimeField(default=dt.now, verbose_name='Created at')
+    commented_at = models.DateTimeField(default=timezone.now, verbose_name='Created at')
 
 
 

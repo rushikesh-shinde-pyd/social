@@ -161,7 +161,7 @@ def create_post(request):
                 author= user_obj,
                 title = title.strip(),
                 text = post.strip(),
-                created_date = dt.now(),
+                created_date = timezone.now(),
                 # published_date = timezone.now()
             )
             obj.save()
@@ -234,10 +234,17 @@ class CommentView(View):
         print(post_obj, user_obj)
         obj = Comment(post_id=post_obj.id, user_id=user_obj.id, message=comment_message)
         obj.save()
-        # data = {
-        #
-        # }
-        return JsonResponse({'result': 'OK'})
+        print(obj.commented_at)
+        data = {
+            'comment_id': obj.id,
+            'comment_user_fname': obj.user.first_name.title(),
+            'comment_user_lname': obj.user.last_name.title(),
+            'comment_message': obj.message,
+            'comment_commented_at': obj.commented_at,
+            'total_comments': post_obj.comment_set.all().count()
+        }
+        print(data)
+        return JsonResponse(data)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -247,11 +254,24 @@ class ReplyToCommentView(View):
         comment_obj = get_object_or_404(Comment, id=comment_id)
         user_obj = User.objects.get(id=request.user.id)
         reply = request.POST.get('reply').strip()
-
-
         obj = Replies(user=user_obj, parent=comment_obj, reply=reply)
         obj.save()
+        print(obj)
+        counts = comment_obj.parent.all().count()
+        print(counts)
+        reply_count = ''
+        if counts > 1:
+            reply_count += str(counts) + ' replies'
+        elif counts == 1:
+            reply_count += str(counts) + ' reply'
+        print(reply_count)
         data = {
-            'result': True
+            'reply_id': obj.id,
+            'reply_user_fname': obj.user.first_name.title(),
+            'reply_user_lname': obj.user.last_name.title(),
+            'reply_message': obj.reply,
+            'reply_commented_at': obj.commented_at,
+            'total_replies': reply_count
+
         }
         return JsonResponse(data)
