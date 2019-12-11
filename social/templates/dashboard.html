@@ -335,7 +335,7 @@
                                            <strong id="post-author">
                                                {{ post.author.first_name | title }} {{ post.author.last_name | title }}</strong> :
                                            <span id="post-published">
-                                               {{ post.published_date|timesince }} ago
+                                               <small>{{ post.published_date|timesince }} ago</small>
                                            </span>
                                        </div>
                                    </div>
@@ -352,20 +352,42 @@
                             </div>
                             <div class="panel-heading">
                                 <ul class="dlikes list-group" >
-
                                     {% get_like_obj post.id request.user.id as obj %}
                                     {% if obj %}
                                     <li class="list-group-item">
-                                        <i onclick="dislike({{ post.id }})" style="transform:scale(1.5,1.5); cursor:pointer;" class="dislike glyphicon glyphicon-thumbs-down" aria-hidden="true"></i>
+                                        <i onclick="undolike({{ post.id }})" style="transform:scale(1.5,1.5); cursor:pointer;" class="undolike likedislikeclass glyphicon glyphicon-thumbs-up" aria-hidden="true"></i>
                                     </li>
                                     {% else %}
                                         <li class="list-group-item">
                                             <i onclick="like({{ post.id }})" style="transform:scale(1.5,1.5);cursor:pointer;" class="like glyphicon glyphicon-thumbs-up" aria-hidden="true"></i>
                                         </li>
-                                    {%endif%}
+                                    {%endif%}    
+
                                     <li class="list-group-item">
                                         <strong id="like-count">{{ post.likes.count }}</strong>
                                     </li>
+
+                                    {% get_dislike_obj post.id request.user.id as obj %}
+                                    {% if obj %}
+                                    <li class="list-group-item">
+                                        <i onclick="undodislike({{ post.id }})" style="transform:scale(1.5,1.5); cursor:pointer;" class="undodislike likedislikeclass glyphicon glyphicon-thumbs-down" aria-hidden="true"></i>
+                                    </li>
+                                    {% else %}
+                                        <li class="list-group-item">
+                                            <i onclick="dislike({{ post.id }})" style="transform:scale(1.5,1.5);cursor:pointer;" class="dislike glyphicon glyphicon-thumbs-down" aria-hidden="true"></i>
+                                        </li>
+                                    {%endif%}    
+
+                                    {% if post.dislikes.count > 0 %}    
+                                        <li class="list-group-item">
+                                            <strong id="dislike-count">{{ post.dislikes.count }}</strong>
+                                        </li>
+                                    {% else %}
+                                        <li class="list-group-item">
+                                            <strong id="dislike-count"></strong>
+                                        </li>
+                                    {% endif %}    
+
                                     <li class="list-group-item">
                                         <i onclick="comment({{ post.id }})" style="transform:scale(1.5,1.5); cursor:pointer;" class="glyphicon glyphicon-comment" aria-hidden="true"></i>
                                     </li>
@@ -404,7 +426,7 @@
                                                     {% csrf_token %}
                                                     <textarea style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
                                                     {% comment %} <br> {% endcomment %}
-                                                    <input class="btn btn-primary" style="margin:10px 0px; display:none" type="submit" disabled name="reply" value="Reply">
+                                                    <input class="btn btn-primary" style="display:none" type="submit" disabled name="reply" value="Reply">
                                                 </form>
                                                 <br>
                                                     {% get_replies each_comment.parent.all as reply_queryset %}
@@ -713,7 +735,7 @@
                <div class="col-md-12">
                    <div style="border-bottom:1px solid #666;padding-bottom:5px;">
                        POSTED BY  <strong id="post-view-author" style="font-size:16px;"></strong>
-                       AT <span id="post-view-published" style="font-size:16px;"></span>
+                        <small id="post-view-published"></small>
                    </div>
                 <div  id="post-view-text" style="margin:10px 0px;"></div>
                </div>
@@ -848,7 +870,7 @@
     function add_reply_to_page(comment_id, post_id, data){
         console.log(data);
         console.log(data.reply_message);
-        $("#post-id-" + post_id).find(".replies").prepend(`
+        $("#comment-id-" + comment_id).append(`
             <div class="reply-wrapper">
                 <ul  style="display:none;margin-left:50px" class="list-group reply-div">
                     <div style="margin:10px 0px;"><strong class="replier">${data.reply_user_fname} ${data.reply_user_lname}</strong> replied <span class="reply-timestamp"><small>just now</small></span><br></div>
@@ -856,10 +878,13 @@
                 </ul>
             </div>
         `)
-        $("#post-id-" + post_id).find("#reply-count").text(data.total_replies);
         $('.reply-div').show();
+        $("#comment-id-" + comment_id).find("#reply-count").text(data.total_replies);
         $('button[name="show-replies"]').text('Hide replies');
-        $(".replies").fadeIn();
+        {% comment %} $(".comment-div").fadeIn(); {% endcomment %}
+        $(".comments-replies").fadeIn();
+        $("#comment-id-" + comment_id).find("#hidden-reply-count").fadeIn().text(data.total_replies);
+        
 
     }
 
@@ -871,7 +896,7 @@
             $('textarea[name="reply-area"]').keyup(function(){
                 var char_len = $(this).val().trim().length;
                 if (char_len > 0){
-                    $(this).parent().find('input[type="submit"]').attr('disabled', false).fadeIn();
+                    $(this).parent().find('input[type="submit"]').attr('disabled', false).fadeIn().css('margin-bottom', '10px');
                 }else if(char_len == 0){
                     $(this).parent().find('input[type="submit"]').attr('disabled', true).fadeOut();
                 }
@@ -1057,16 +1082,27 @@
 
 
 
-    <!--post-view modal-->
+    // post-view modal
     function show_post(id){
         var title = $("#post-id-" + id).find("#post-title").text().trim();
-        var content = $("#post-id-" + id).find("#post-text").text().trim();
         var author = $("#post-id-" + id).find("#post-author").text().trim();
         var published = $("#post-id-" + id).find("#post-published").text().trim();
-        $("#post_view_modalLongTitle").text(title);
-        $("#post-view-text").text(content);
-        $("#post-view-author").text(author);
-        $("#post-view-published").text(published);
+        $.ajax({
+            url: "{% url 'social:show-post-details' %}",
+            data: {
+                'post_id': id
+            },
+            type: "GET",
+            success: function(data){
+                console.log(data.content)
+                $("#post-view-text").text(data.content);
+                $("#post_view_modalLongTitle").text(title);
+                $("#post-view-author").text(author);
+                $("#post-view-published").text(published);
+            }
+
+        });
+        
         $('#post_view_modal').modal('hide');
         $('.modal-backdrop').remove();
         return false;
@@ -1074,7 +1110,7 @@
 
     // like posts
     function like(id){
-    $("#post-id-" + id).find(".like").removeClass("glyphicon-thumbs-up").addClass("glyphicon-thumbs-down");
+    $("#post-id-" + id).find(".like").addClass("likedislikeclass");
         $.ajax({
                 url: "{% url 'social:likedislike-requests' %}",
                 type: "POST",
@@ -1090,13 +1126,13 @@
                     console.log(data);
                 }
             });
-    $("#post-id-" + id).find(".like").attr("onclick", "dislike(" + id + ")");
-    $("#post-id-" + id).find(".like").removeClass("like").addClass("dislike");
+    $("#post-id-" + id).find(".like").attr("onclick", "undolike(" + id + ")");
+    $("#post-id-" + id).find(".like").removeClass("like").addClass("undolike");
     }
 
-    // dislike posts
-    function dislike(id){
-    $("#post-id-" + id).find(".dislike").removeClass("glyphicon-thumbs-down").addClass("glyphicon-thumbs-up");
+    // undolike posts
+    function undolike(id){
+    $("#post-id-" + id).find(".undolike").removeClass("likedislikeclass");
 
         $.ajax({
                 url: "{% url 'social:likedislike-requests' %}",
@@ -1113,9 +1149,56 @@
                     console.log(data);
                 }
             });
-    $("#post-id-" + id).find(".dislike").attr("onclick", "like(" + id + ")");
-    $("#post-id-" + id).find(".dislike").removeClass("dislike").addClass("like");
+    $("#post-id-" + id).find(".undolike").attr("onclick", "like(" + id + ")");
+    $("#post-id-" + id).find(".undolike").removeClass("undolike").addClass("like");
     }
+
+    // dislike posts
+    function dislike(id){
+    $("#post-id-" + id).find(".dislike").addClass("likedislikeclass");
+        $.ajax({
+                url: "{% url 'social:dislike-requests' %}",
+                type: "POST",
+                data: {
+                    'post_id': id,
+                    'action': 'like',
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success: function(data){
+                    $("#post-id-" + id).find("#dislike-count").text(data.counts);
+                },
+                error: function(data){
+                    console.log(data);
+                }
+            });
+    $("#post-id-" + id).find(".dislike").attr("onclick", "undodislike(" + id + ")");
+    $("#post-id-" + id).find(".dislike").removeClass("dislike").addClass("undodislike");
+    }
+
+    // undodislike posts
+    function undodislike(id){
+    $("#post-id-" + id).find(".undodislike").removeClass("likedislikeclass");
+
+        $.ajax({
+                url: "{% url 'social:dislike-requests' %}",
+                type: "POST",
+                data: {
+                    'post_id': id,
+                    'action': 'dislike',
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success: function(data){
+                    $("#post-id-" + id).find("#dislike-count").text(data.counts);
+                },
+                error: function(data){
+                    console.log(data);
+                }
+            });
+    $("#post-id-" + id).find(".undodislike").attr("onclick", "dislike(" + id + ")");
+    $("#post-id-" + id).find(".undodislike").removeClass("undodislike").addClass("dislike");
+    }
+
+
 
     $('input[name="close-comment"]').click(function(){
         $(this).parent().parent().fadeOut();

@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect,reverse, get_object_or_404
 from django.contrib.auth import authenticate,login as auth_login,logout
 from .forms import SignUpForm,PhotoForm
 from django.contrib.auth.models import User
-from .models import Profile,Post, Like, Comment, Replies
+from .models import Profile,Post, Like, Dislike, Comment, Replies
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
@@ -223,6 +223,23 @@ class LikeDislike(View):
 
 
 @method_decorator(login_required, name="dispatch")
+class DislikeView(View):
+    def post(self, request, *args, **kwargs):
+        post_id = request.POST.get('post_id')
+        user_id = request.user.id
+        action = request.POST.get('action')
+        post_obj = Post.objects.get(id=post_id)
+        user_obj = User.objects.get(id=user_id)
+        if action == "like":
+            Dislike.objects.create(post=post_obj, user=user_obj)
+        elif action == "dislike":
+            obj = Dislike.objects.filter(Q(post=post_obj) & Q(user=user_obj))
+            if obj:
+                obj.delete()
+        return JsonResponse({'result': True, 'counts': post_obj.dislikes.count()})
+
+
+@method_decorator(login_required, name="dispatch")
 class CommentView(View):
     def post(self, request, *args, **kwargs):
         print("request came")
@@ -275,3 +292,11 @@ class ReplyToCommentView(View):
 
         }
         return JsonResponse(data)
+
+def show_post_details(request):
+    post_id = request.GET.get('post_id').strip()
+    post_obj = get_object_or_404(Post, id=post_id)
+    data = {
+        'content': post_obj.text
+    }
+    return JsonResponse(data)

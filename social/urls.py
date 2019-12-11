@@ -21,8 +21,12 @@ urlpatterns = [
     path('ajax_requests/', views.AjaxRequests.as_view(), name='ajax_requests'),
     # post like-dislike
     path('likedislike_requests/', views.LikeDislike.as_view(), name='likedislike-requests'),
+    path('dislike_requests/', views.DislikeView.as_view(), name='dislike-requests'),
 
     path('comment/', views.CommentView.as_view(), name="comment"),
     path('reply-to-comment/', views.ReplyToCommentView.as_view(), name="reply-to-comment"),
+
+    # showing pop-up post-details
+    path('show-post-details/', views.show_post_details, name="show-post-details"),
 
 ]

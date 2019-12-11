@@ -1,5 +1,5 @@
 from django import template
-from social.models import Like
+from social.models import Like, Dislike
 
 from django.template.defaultfilters import stringfilter
 register = template.Library()
@@ -24,6 +24,15 @@ def get_like_obj(post_id, user_id):
         if obj:
             return True
     except Like.DoesNotExist:
+       return False
+
+@register.simple_tag
+def get_dislike_obj(post_id, user_id):
+    try:
+        obj = Dislike.objects.filter(post=post_id, user=user_id)
+        if obj:
+            return True
+    except Dislike.DoesNotExist:
        return False
 
 
