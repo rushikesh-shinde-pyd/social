@@ -216,21 +216,40 @@ class LikeDislike(View):
         dislike = False
         try:
             dislike_obj = get_object_or_404(Dislike, post=post_obj, user=user_obj)
-            dislike = True
+            if dislike_obj:
+                dislike = True
+            else:
+                dislike = False
         except:
             dislike = False
 
         if action == "like":
+            Like.objects.create(post=post_obj, user=user_obj)
+            like_counts = post_obj.likes.count()
+
             if dislike:
                 dislike_obj.delete()
-                dislike_counts = post_obj.dislikes.counts()
-            Like.objects.create(post=post_obj, user=user_obj)
+                dislike_counts = post_obj.dislikes.count()
+                print(dislike_counts)
+                data = {
+                    'dislike_count': dislike_counts,
+                    'like_count': like_counts,
+                    'dislike': True
+                }
+                return JsonResponse(data)
+            else:
+                data = {
+                    'like_count': like_counts,
+                }
+                return JsonResponse(data)
         elif action == "dislike":
             obj = Like.objects.filter(Q(post=post_obj) & Q(user=user_obj))
             if obj:
                 obj.delete()
-            like_counts = post_obj.likes.count()
-        return JsonResponse({'result': True, })
+            data = {
+                    'like_count': post_obj.likes.count(),
+                }
+            return JsonResponse(data)
 
 
 @method_decorator(login_required, name="dispatch")

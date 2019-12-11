@@ -1125,6 +1125,7 @@
 
     // like posts
     function like(id){
+        console.log('ok')
     $("#post-id-" + id).find(".like").addClass("likedislikeclass");
         $.ajax({
                 url: "{% url 'social:likedislike-requests' %}",
@@ -1135,6 +1136,18 @@
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                 },
                 success: function(data){
+                    console.log(data);
+                    if (data.dislike){
+                        console.log("this is true ");
+                        $("#post-id-" + id).find("#dislike-count").show().text(data.dislike_count);
+                        $("#post-id-" + id).find("#like-count").show().text(data.like_count);
+                        $("#post-id-" + id).find(".undodislike").attr("onclick", "dislike(" + id + ")");
+                        $("#post-id-" + id).find(".undodislike").removeClass("likedislikeclass").addClass("dislike");
+
+                    }else{
+                        console.log("this is false");
+                        $("#post-id-" + id).find("#like-count").show().text(data.like_count);
+                    }
                     $("#post-id-" + id).find("#like-count").show().text(data.counts);
                 },
                 error: function(data){
