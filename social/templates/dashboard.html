@@ -363,9 +363,15 @@
                                         </li>
                                     {%endif%}    
 
-                                    <li class="list-group-item">
-                                        <strong id="like-count">{{ post.likes.count }}</strong>
-                                    </li>
+                                    {% if post.likes.count > 0 %}    
+                                        <li class="list-group-item">
+                                            <strong id="like-count">{{ post.likes.count }}</strong>
+                                        </li>
+                                    {% else %}
+                                        <li class="list-group-item">
+                                            <strong id="like-count"></strong>
+                                        </li>
+                                    {% endif %}    
 
                                     {% get_dislike_obj post.id request.user.id as obj %}
                                     {% if obj %}
@@ -391,15 +397,22 @@
                                     <li class="list-group-item">
                                         <i onclick="comment({{ post.id }})" style="transform:scale(1.5,1.5); cursor:pointer;" class="glyphicon glyphicon-comment" aria-hidden="true"></i>
                                     </li>
-                                    <li class="list-group-item">
-                                        <strong id="comment-count">{{ post.comment_set.count }}</strong>
-                                    </li>
+                                    
+                                    {% if post.comment_set.count > 0 %}    
+                                        <li class="list-group-item">
+                                            <strong id="comment-count">{{ post.comment_set.count }}</strong>
+                                        </li>
+                                    {% else %}
+                                        <li class="list-group-item">
+                                            <strong id="comment-count"></strong>
+                                        </li>
+                                    {% endif %}    
                                 </ul>
                                 <div class="write-comment" style="display: none;">
                                     <form id="comment-form-{{ post.id }}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="post-id" value="{{ post.id }}">
-                                        <textarea maxlength="160" style="margin: 10px 0px; border: none;" class="comment-box form-control" placeholder="Comment here..."></textarea>
+                                        <textarea autofocus maxlength="160" style="margin: 10px 0px; border: none;" class="comment-box form-control" placeholder="Comment here..."></textarea>
                                         <input type="button" name="close-comment" class="btn" value="Cancel">
                                         <input type="submit" disabled name="comment" style="display:none;" class="btn btn-primary" value="Comment">
                                     </form>
@@ -424,7 +437,7 @@
                                                 </li>
                                                 <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
                                                     {% csrf_token %}
-                                                    <textarea style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
+                                                    <textarea autofocus style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
                                                     {% comment %} <br> {% endcomment %}
                                                     <input class="btn btn-primary" style="display:none" type="submit" disabled name="reply" value="Reply">
                                                 </form>
@@ -673,7 +686,7 @@
                 <p id="delete_title"></p>
             <div class="modal-footer">
                 <button type="button" id="delete_confirm" class="btn btn-danger" >DELETE</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
             </div>
             </div>
           </div>
@@ -721,11 +734,11 @@
           <div class="modal-header">
               <div class="row">
                   <div class="col-md-12">
-                    <h5 style="float:left;" class="modal-title" id="post_view_modalLongTitle"></h5>
+                    <h5 style="" class="modal-title" id="post_view_modalLongTitle"></h5>
                   </div>
                   <!--<div class="col-md-1">-->
-                    <button type="button" style="float:right;" class="close" data-dismiss="modal" aria-label="Close">
-                      <i aria-hidden="true" style="padding-right:10px; float:right; cursor:pointer;" class="glyphicon glyphicon-remove"></i>
+                    <button type="button" style="position:absolute; right:10px; top:10px;" class="close" data-dismiss="modal" aria-label="Close">
+                     x {% comment %} <i aria-hidden="true" style="padding-right:10px; float:right; cursor:pointer;" class="glyphicon glyphicon-remove"></i> {% endcomment %}
                     </button>
                   <!--</div>-->
               </div>
@@ -935,7 +948,7 @@
         console.log(data.comment_message);
         $("#post-id-" + id).find("#comment-count").text(data.total_comments);
         $("#post-id-" + id).find(".comment-wrapper").prepend(`
-            <div style="margin:10px 10px;"><strong class="commenter">${data.comment_user_fname} ${data.comment_user_lname}</strong> commented <span class="comment-timestamp"> just now</span></div>
+            <div style="margin:10px 10px;"><strong class="commenter">${data.comment_user_fname} ${data.comment_user_lname}</strong> commented <span class="comment-timestamp"><small>just now</small></span></div>
             <ul class="list-group comment-div" id="comment-id-${data.comment_id}">
                 <li class="list-group-item" style="display:inline-block;">
                     ${data.comment_message}
@@ -1120,7 +1133,7 @@
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                 },
                 success: function(data){
-                    $("#post-id-" + id).find("#like-count").text(data.counts);
+                    $("#post-id-" + id).find("#like-count").show().text(data.counts);
                 },
                 error: function(data){
                     console.log(data);
@@ -1143,7 +1156,11 @@
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                 },
                 success: function(data){
-                    $("#post-id-" + id).find("#like-count").text(data.counts);
+                    if (data.counts > 0){
+                        alert(data.counts);
+                    }else{
+                        $("#post-id-" + id).find("#like-count").hide();
+                    }
                 },
                 error: function(data){
                     console.log(data);
@@ -1165,7 +1182,8 @@
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                 },
                 success: function(data){
-                    $("#post-id-" + id).find("#dislike-count").text(data.counts);
+                    {% comment %} $("#post-id-" + id).find("#dislike-count").hide(); {% endcomment %}
+                    $("#post-id-" + id).find("#dislike-count").show().text(data.counts);
                 },
                 error: function(data){
                     console.log(data);
@@ -1188,7 +1206,12 @@
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                 },
                 success: function(data){
-                    $("#post-id-" + id).find("#dislike-count").text(data.counts);
+                    console.log(data.counts);
+                    if (data.counts > 0){
+                        alert(data.counts);
+                    }else{
+                        $("#post-id-" + id).find("#dislike-count").hide();
+                    }
                 },
                 error: function(data){
                     console.log(data);
