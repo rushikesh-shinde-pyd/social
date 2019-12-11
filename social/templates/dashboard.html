@@ -352,29 +352,31 @@
                             </div>
                             <div class="panel-heading">
                                 <ul class="dlikes list-group" >
-                                    {% get_like_obj post.id request.user.id as obj %}
-                                    {% if obj %}
-                                    <li class="list-group-item">
-                                        <i onclick="undolike({{ post.id }})" style="transform:scale(1.5,1.5); cursor:pointer;" class="undolike likedislikeclass glyphicon glyphicon-thumbs-up" aria-hidden="true"></i>
-                                    </li>
-                                    {% else %}
+                                    {% get_like_obj post.id request.user.id as like_obj %}
+                                    {% get_dislike_obj post.id request.user.id as dislike_obj %}
+                                    {% comment %} {% if dislike_obj == False%} {% endcomment %}
+                                        {% if like_obj %}
                                         <li class="list-group-item">
-                                            <i onclick="like({{ post.id }})" style="transform:scale(1.5,1.5);cursor:pointer;" class="like glyphicon glyphicon-thumbs-up" aria-hidden="true"></i>
+                                            <i onclick="undolike({{ post.id }})" style="transform:scale(1.5,1.5); cursor:pointer;" class="undolike likedislikeclass glyphicon glyphicon-thumbs-up" aria-hidden="true"></i>
                                         </li>
-                                    {%endif%}    
+                                        {% else %}
+                                            <li class="list-group-item">
+                                                <i onclick="like({{ post.id }})" style="transform:scale(1.5,1.5);cursor:pointer;" class="like glyphicon glyphicon-thumbs-up" aria-hidden="true"></i>
+                                            </li>
+                                        {%endif%}    
 
-                                    {% if post.likes.count > 0 %}    
-                                        <li class="list-group-item">
-                                            <strong id="like-count">{{ post.likes.count }}</strong>
-                                        </li>
-                                    {% else %}
-                                        <li class="list-group-item">
-                                            <strong id="like-count"></strong>
-                                        </li>
-                                    {% endif %}    
+                                        {% if post.likes.count > 0 %}    
+                                            <li class="list-group-item">
+                                                <strong id="like-count">{{ post.likes.count }}</strong>
+                                            </li>
+                                        {% else %}
+                                            <li class="list-group-item">
+                                                <strong id="like-count"></strong>
+                                            </li>
+                                        {% endif %}   
+                                    {% comment %} {% endif %}  {% endcomment %}
 
-                                    {% get_dislike_obj post.id request.user.id as obj %}
-                                    {% if obj %}
+                                    {% if dislike_obj %}
                                     <li class="list-group-item">
                                         <i onclick="undodislike({{ post.id }})" style="transform:scale(1.5,1.5); cursor:pointer;" class="undodislike likedislikeclass glyphicon glyphicon-thumbs-down" aria-hidden="true"></i>
                                     </li>
@@ -698,8 +700,8 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-              <button type="button" style="float:right;" class="close" data-dismiss="modal" aria-label="Close">
-               <i style="top:-5px" aria-hidden="true" style="padding-right:10px; float:right; cursor:pointer;" class="glyphicon glyphicon-remove"></i>
+              <button type="button" style="position:absolute; right:10px; top:10px;" class="close" data-dismiss="modal" aria-label="Close">x
+               {% comment %} <i style="top:-5px" aria-hidden="true" style="padding-right:10px; float:right; cursor:pointer;" class="glyphicon glyphicon-remove"></i> {% endcomment %}
               </button>
           </div>
           <div class="modal-body">
@@ -715,8 +717,8 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-              <button type="button" style="float:right;" class="close" data-dismiss="modal" aria-label="Close">
-               <i style="top:-5px" aria-hidden="true" style="padding-right:10px; float:right; cursor:pointer;" class="glyphicon glyphicon-remove"></i>
+              <button type="button" style="position:absolute; right:10px; top:10px;" class="close" data-dismiss="modal" aria-label="Close">x
+               {% comment %} <i style="top:-5px" aria-hidden="true" style="padding-right:10px; float:right; cursor:pointer;" class="glyphicon glyphicon-remove"></i> {% endcomment %}
               </button>
           </div>
           <div class="modal-body">
@@ -1051,7 +1053,7 @@
     function update_to_page(id, data){
       $("#post-id-" + id).find("#post-title").text(data.title);
       $("#post-id-" + id).find("#post-text").text(data.text);
-      $("#post-id-" + id).find("#post-published").text(data.published_date);
+      $("#post-id-" + id).find("#post-published").text({{data.published_date|timesince}});
     }
 
     function update_post(id){
@@ -1156,9 +1158,7 @@
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                 },
                 success: function(data){
-                    if (data.counts > 0){
-                        alert(data.counts);
-                    }else{
+                    if (data.counts == 0){
                         $("#post-id-" + id).find("#like-count").hide();
                     }
                 },

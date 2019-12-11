@@ -4,10 +4,9 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.conf import settings
-from datetime import  datetime as dt
-# Create your models here.
+
+
 class Profile(models.Model):
-    # user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='profile/',default='default_pic.png')
     country = models.CharField(default='',max_length=100)
@@ -21,10 +20,12 @@ class Profile(models.Model):
     def __str__(self):
         return f'{self.user.username} Profile'
 
+
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
+
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
@@ -51,25 +52,19 @@ class Like(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
+
 class Dislike(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='dislikes')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-
-
-class CustomCommentManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().order_by('-commented_at')
 
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     message = models.CharField(max_length=160, verbose_name="Comment")
-    # reply = models.ForeignKey('self', on_delete=models.CASCADE, related_name='replies')
     is_approved = models.BooleanField(default=True)
     is_rejected = models.BooleanField(default=False)
     commented_at = models.DateTimeField(default=timezone.now, verbose_name='Created at')
-    # custom_objects = CustomCommentManager()
 
     def approve(self):
         self.is_approved = True

@@ -2279,7 +2279,7 @@ label {
     z-index: 999999;
     position: absolute;
     width: 50%;
-    margin: 0px 25% 0px 15%;
+    margin: 0px 25% 0px 25%;
     /*margin-left: -70px;*/
 }
 #gritter-notice-wrapper{
