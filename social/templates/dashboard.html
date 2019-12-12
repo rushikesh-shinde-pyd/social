@@ -314,8 +314,10 @@
 
                       </div><!-- /row mt --><hr/>
                   
+                        {% comment %} ****************************************
+                                              BLOG MODULE 
+                        **************************************** {% endcomment %}
                      <div class="row">
-						<!-- TWITTER PANEL -->
                          {% for post in posts %}
                        <div class="col-md-12 col-sm-12 mb" id="post-id-{{ post.id }}">
 						<div class="panel panel-info ">
@@ -469,8 +471,17 @@
                        </div>
                      </div>
                          {% endfor %}
+
+                        <div class="row">
+                            <div class="col-lg-10" style="text-align:center;margin: 0px 50px; padding:10px 15px;">
+                                <strong data-showmorecount="10" class="btn btn-info" id="show_more">Show more</strong>
+                                <strong data-showmorecount="10" style="display:none;" class="btn btn-info" id="show_less">Show less</strong>
+                            </div>
+                        </div>
                      </div>
-				{% comment %} <div class="row mt">
+
+
+				<div class="row mt">
                       <!--CUSTOM CHART START -->
                       <div class="border-head">
                           <h3>VISITS</h3>
@@ -514,7 +525,7 @@
                           </div>
                       </div>
                       <!--custom chart end-->
-					</div><!-- /row -->	 {% endcomment %}
+					</div><!-- /row -->	
 					
                   </div><!-- /col-lg-9 END SECTION MIDDLE -->
                   
@@ -868,23 +879,28 @@
             console.log('nav ' + nav + ' to: ' + to.month + '/' + to.year);
         }
 
+
+    /* ****************************************
+                    POST MODULE 
+       **************************************** */
+
+    // show/hide post comment's reply panel
      $('button[name="show-replies"]').click(function(){
         if ($(this).text().trim() == 'Hide replies'){
-           $('.reply-div').hide();
+           $('.reply-div').slideUp();
            $(this).text('show-replies');
 
         }else{
             $('.reply-div').hide();
-            $(this).parent().find('.reply-div').fadeToggle();
+            $(this).parent().find('.reply-div').slideDown();
             $(this).text('Hide replies');
         }
 
      });
 
+
     // replying comments
     function add_reply_to_page(comment_id, post_id, data){
-        console.log(data);
-        console.log(data.reply_message);
         $("#comment-id-" + comment_id).append(`
             <div class="reply-wrapper">
                 <ul  style="display:none;margin-left:50px" class="list-group reply-div">
@@ -896,24 +912,22 @@
         $('.reply-div').show();
         $("#comment-id-" + comment_id).find("#reply-count").text(data.total_replies);
         $('button[name="show-replies"]').text('Hide replies');
-        {% comment %} $(".comment-div").fadeIn(); {% endcomment %}
         $(".comments-replies").fadeIn();
-        $("#comment-id-" + comment_id).find("#hidden-reply-count").fadeIn().text(data.total_replies);
+        $("#comment-id-" + comment_id).find("#hidden-reply-count").slideDown().text(data.total_replies);
         
 
     }
 
     function reply_to_comment(comment_id, post_id){
-        $('#comment-id-' + comment_id).find('input[name="reply-button"]').fadeOut();
-        console.log("reply")
+        $('#comment-id-' + comment_id).find('input[name="reply-button"]').slideUp();
         $('form[name="reply-to-comment"]').fadeOut();
-        $("#comment-id-" + comment_id).find('textarea[name="reply-area"]').parent().fadeIn();
+        $("#comment-id-" + comment_id).find('textarea[name="reply-area"]').parent().slideDown();
             $('textarea[name="reply-area"]').keyup(function(){
                 var char_len = $(this).val().trim().length;
                 if (char_len > 0){
-                    $(this).parent().find('input[type="submit"]').attr('disabled', false).fadeIn().css('margin-bottom', '10px');
+                    $(this).parent().find('input[type="submit"]').attr('disabled', false).slideDown().css('margin-bottom', '10px');
                 }else if(char_len == 0){
-                    $(this).parent().find('input[type="submit"]').attr('disabled', true).fadeOut();
+                    $(this).parent().find('input[type="submit"]').attr('disabled', true).slideUp();
                 }
             });
             $('form[name="reply-to-comment"]').submit(function(event){
@@ -933,8 +947,10 @@
                         add_reply_to_page(comment_id, post_id, data);
                     },
                     error: function(data){
+                        console.log(data);
                     },
                     complete: function(data){
+                        console.log(data);
                     }
                 });
                 $('form[name="reply-to-comment"]').trigger("reset");
@@ -946,8 +962,6 @@
 
     // commenting post
     function add_comment_to_page(id, data){
-        console.log(data);
-        console.log(data.comment_message);
         $("#post-id-" + id).find("#comment-count").text(data.total_comments);
         $("#post-id-" + id).find(".comment-wrapper").prepend(`
             <div style="margin:10px 10px;"><strong class="commenter">${data.comment_user_fname} ${data.comment_user_lname}</strong> commented <span class="comment-timestamp"><small>just now</small></span></div>
@@ -962,39 +976,28 @@
                     {% comment %} <br> {% endcomment %}
                     <input class="btn btn-primary" type="submit" style="display:none" disabled name="reply" value="Reply">
                 </form>
-                {% comment %} <br> {% endcomment %}
-                    {% comment %} {% get_replies each_comment.parent.all as reply_queryset %}
-                    {%if reply_queryset %}
-                    <button style="background-color:transparent; color: #2b6eff; border:none; margin-left: 10px;" name="show-replies">show replies</button>
-
-                        <h5 style="padding:15px;">{{ reply_queryset.count|pluralize_reply }}</h5>
-                        {% for each_reply in reply_queryset %}
-                            <ul  style="display:none;margin-left:50px" class="list-group reply-div">
-                                <div style="margin:10px 0px;"><strong class="replier">{{ each_reply.user.first_name|title }} {{ each_reply.user.last_name|title }}</strong> replied <span class="reply-timestamp">{{ each_reply.commented_at|timesince }}</span> ago<br></div>
-                                <li class="list-group-item" style="display:inline-block;">{{ each_reply.reply|title }}</li>
-                            </ul>
-                        {% endfor %}
-                    {% endif %} {% endcomment %}
             </ul>
-        `)
+        `);
     }
 
     function comment(id){
-        $(".write-comment").fadeOut();
-        $("#post-id-" + id).find(".write-comment").fadeToggle();
+        {% comment %} $("#post-id-" + id).find(".glyphicon-comment").click(function(){
+        }); {% endcomment %}
+        $("#post-id-" + id).find(".write-comment").slideUp();    
+        $(".write-comment").slideUp();
+        $("#post-id-" + id).find(".write-comment").slideDown();
         $(".write-comment").find('.comment-box').keyup(function(){
             var char_len = $(this).val().trim().length;
             if (char_len > 0){
-                $(".write-comment").find('input[type="submit"]').attr('disabled', false).fadeIn();
+                $(".write-comment").find('input[type="submit"]').attr('disabled', false).slideDown();
             }else if(char_len == 0){
-                $(".write-comment").find('input[type="submit"]').attr('disabled', true).fadeOut();
+                $(".write-comment").find('input[type="submit"]').attr('disabled', true).slideUp();
             }
         });
         $("#comment-form-" + id).submit(function(event){
             event.preventdefault;
             var post_id = $("#comment-form-" + id).find('input[name="post-id"]').val().trim();
             var post_comment = $("#comment-form-" + id).find('.comment-box').val().trim();
-            console.log(post_id, post_comment)
             $.ajax({
                     url: "{% url 'social:comment' %}",
                     type: "POST",
@@ -1007,11 +1010,11 @@
                         add_comment_to_page(id, data);
                     },
                     error: function(data){
+                        console.log(data);
                     },
                     complete: function(data){
                     }
         });
-
         $("#comment-form-" + id).trigger("reset");
         return false;
     });
@@ -1046,8 +1049,8 @@
             $("#deletepromptmodal").modal("hide");
             $("#delete_message").modal("show");
         });
-
     }
+
 
     // post updation
     function update_to_page(id, data){
@@ -1055,6 +1058,7 @@
       $("#post-id-" + id).find("#post-text").text(data.text);
       $("#post-id-" + id).find("#post-published").text({{data.published_date|timesince}});
     }
+
 
     function update_post(id){
         var title = $("#post-id-" + id).find("#post-title").text().trim();
@@ -1077,9 +1081,7 @@
                     'request_type': 'update',
                 },
                 success: function(data){
-                    <!--console.log(data)-->
                     if (data.updated){
-                        console.log(data)
                         update_to_page(id, data);
                     }
                 },
@@ -1109,7 +1111,6 @@
             },
             type: "GET",
             success: function(data){
-                console.log(data.content)
                 $("#post-view-text").text(data.content);
                 $("#post_view_modalLongTitle").text(title);
                 $("#post-view-author").text(author);
@@ -1123,9 +1124,9 @@
         return false;
        }
 
+
     // like posts
     function like(id){
-        console.log('ok')
     $("#post-id-" + id).find(".like").addClass("likedislikeclass");
         $.ajax({
                 url: "{% url 'social:likedislike-requests' %}",
@@ -1136,19 +1137,17 @@
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                 },
                 success: function(data){
-                    console.log(data);
                     if (data.dislike){
                         if (data.dislike_count == 0){
-                            $("#post-id-" + id).find("#dislike-count").show().text('');
+                            $("#post-id-" + id).find("#dislike-count").text('');
                         }else{
-                            $("#post-id-" + id).find("#dislike-count").show().text(data.dislike_count);
+                            $("#post-id-" + id).find("#dislike-count").text(data.dislike_count);
                         }
-                        $("#post-id-" + id).find("#like-count").show().text(data.like_count);
+                        $("#post-id-" + id).find("#like-count").text(data.like_count);
                         $("#post-id-" + id).find(".undodislike").attr("onclick", "dislike(" + id + ")");
                         $("#post-id-" + id).find(".undodislike").removeClass("likedislikeclass").addClass("dislike");
                     }else{
-                        console.log("this is false");
-                        $("#post-id-" + id).find("#like-count").show().text(data.like_count);
+                        $("#post-id-" + id).find("#like-count").text(data.like_count);
                     }
                 },
                 error: function(data){
@@ -1158,6 +1157,7 @@
     $("#post-id-" + id).find(".like").attr("onclick", "undolike(" + id + ")");
     $("#post-id-" + id).find(".like").removeClass("like").addClass("undolike");
     }
+
 
     // undolike posts
     function undolike(id){
@@ -1171,9 +1171,8 @@
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                 },
                 success: function(data){
-                    console.log(data)
                     if (data.like_count == 0){
-                        $("#post-id-" + id).find("#like-count").hide();
+                        $("#post-id-" + id).find("#like-count").text('');
                     }else{
                         $("#post-id-" + id).find("#like-count").text(data.like_count);
                     }
@@ -1186,9 +1185,9 @@
     $("#post-id-" + id).find(".undolike").removeClass("undolike").addClass("like");
     }
 
+
     // dislike posts
     function dislike(id){
-        console.log('ok')
     $("#post-id-" + id).find(".dislike").addClass("likedislikeclass");
         $.ajax({
                 url: "{% url 'social:dislike-requests' %}",
@@ -1199,20 +1198,18 @@
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                 },
                 success: function(data){
-                    console.log(data);
                     if (data.like){
                         if (data.like_count == 0){
-                            $("#post-id-" + id).find("#like-count").show().text('');
+                            $("#post-id-" + id).find("#like-count").text('');
                         }else{
-                            $("#post-id-" + id).find("#like-count").show().text(data.like_count);
+                            $("#post-id-" + id).find("#like-count").text(data.like_count);
                         }
-                        $("#post-id-" + id).find("#dislike-count").show().text(data.dislike_count);
+                        $("#post-id-" + id).find("#dislike-count").text(data.dislike_count);
                         $("#post-id-" + id).find(".undolike").attr("onclick", "like(" + id + ")");
                         $("#post-id-" + id).find(".undolike").removeClass("likedislikeclass").addClass("like");
 
                     }else{
-                        console.log("this is false");
-                        $("#post-id-" + id).find("#dislike-count").show().text(data.dislike_count);
+                        $("#post-id-" + id).find("#dislike-count").text(data.dislike_count);
                     }
                 },
                 error: function(data){
@@ -1237,7 +1234,6 @@
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                 },
                 success: function(data){
-                    console.log(data.dislike_count);
                     if (data.dislike_count == 0){
                         $("#post-id-" + id).find("#dislike-count").hide();
                     }else{
@@ -1253,11 +1249,49 @@
     }
 
 
-
+    // closing comment panel
     $('input[name="close-comment"]').click(function(){
-        $(this).parent().parent().fadeOut();
+        $(this).parent().parent().slideUp();
     });
 
+
+    // show less posts
+    {% comment %} function show_less(){
+        $(".mb").slice(5).hide();
+    } {% endcomment %}
+
+    $("#show_less").click(function(){
+        $(".mb").slice(5).hide();
+        window.scrollTo(0, 0); 
+        $("#show_more").show();
+        $("#show_more").attr('data-showmorecount', 10);
+        $(this).hide();
+    });
+
+    // show more posts
+    $("#show_more").click(function(){
+        var num_posts = $(".mb").length;
+        var count = parseInt($(this).attr('data-showmorecount'));
+        console.log(num_posts, count);
+        if (num_posts < count){
+            // $("#show_less").slideDown();
+            $(this).hide();
+            // $("#show_more").text("Show less");
+            $("#show_less").css('display', 'inline-block');
+            $(this).attr('data-showmorecount', 10);
+            // $(".mb").slice(5).hide();
+            
+        }else{
+            $(".mb").slice(0,count).slideDown();
+            $(".mb").slice(count).slideUp();
+            $(this).attr('data-showmorecount', count+5);
+        }
+        
+    });
+
+    $(document).ready(function(){
+        $(".mb").slice(5).hide();
+    });
 
     </script>
   
