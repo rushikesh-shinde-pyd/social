@@ -1138,17 +1138,18 @@
                 success: function(data){
                     console.log(data);
                     if (data.dislike){
-                        console.log("this is true ");
-                        $("#post-id-" + id).find("#dislike-count").show().text(data.dislike_count);
+                        if (data.dislike_count == 0){
+                            $("#post-id-" + id).find("#dislike-count").show().text('');
+                        }else{
+                            $("#post-id-" + id).find("#dislike-count").show().text(data.dislike_count);
+                        }
                         $("#post-id-" + id).find("#like-count").show().text(data.like_count);
                         $("#post-id-" + id).find(".undodislike").attr("onclick", "dislike(" + id + ")");
                         $("#post-id-" + id).find(".undodislike").removeClass("likedislikeclass").addClass("dislike");
-
                     }else{
                         console.log("this is false");
                         $("#post-id-" + id).find("#like-count").show().text(data.like_count);
                     }
-                    $("#post-id-" + id).find("#like-count").show().text(data.counts);
                 },
                 error: function(data){
                     console.log(data);
@@ -1161,7 +1162,6 @@
     // undolike posts
     function undolike(id){
     $("#post-id-" + id).find(".undolike").removeClass("likedislikeclass");
-
         $.ajax({
                 url: "{% url 'social:likedislike-requests' %}",
                 type: "POST",
@@ -1171,8 +1171,11 @@
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                 },
                 success: function(data){
-                    if (data.counts == 0){
+                    console.log(data)
+                    if (data.like_count == 0){
                         $("#post-id-" + id).find("#like-count").hide();
+                    }else{
+                        $("#post-id-" + id).find("#like-count").text(data.like_count);
                     }
                 },
                 error: function(data){
@@ -1185,6 +1188,7 @@
 
     // dislike posts
     function dislike(id){
+        console.log('ok')
     $("#post-id-" + id).find(".dislike").addClass("likedislikeclass");
         $.ajax({
                 url: "{% url 'social:dislike-requests' %}",
@@ -1195,8 +1199,21 @@
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                 },
                 success: function(data){
-                    {% comment %} $("#post-id-" + id).find("#dislike-count").hide(); {% endcomment %}
-                    $("#post-id-" + id).find("#dislike-count").show().text(data.counts);
+                    console.log(data);
+                    if (data.like){
+                        if (data.like_count == 0){
+                            $("#post-id-" + id).find("#like-count").show().text('');
+                        }else{
+                            $("#post-id-" + id).find("#like-count").show().text(data.like_count);
+                        }
+                        $("#post-id-" + id).find("#dislike-count").show().text(data.dislike_count);
+                        $("#post-id-" + id).find(".undolike").attr("onclick", "like(" + id + ")");
+                        $("#post-id-" + id).find(".undolike").removeClass("likedislikeclass").addClass("like");
+
+                    }else{
+                        console.log("this is false");
+                        $("#post-id-" + id).find("#dislike-count").show().text(data.dislike_count);
+                    }
                 },
                 error: function(data){
                     console.log(data);
@@ -1205,6 +1222,7 @@
     $("#post-id-" + id).find(".dislike").attr("onclick", "undodislike(" + id + ")");
     $("#post-id-" + id).find(".dislike").removeClass("dislike").addClass("undodislike");
     }
+
 
     // undodislike posts
     function undodislike(id){
@@ -1219,11 +1237,11 @@
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                 },
                 success: function(data){
-                    console.log(data.counts);
-                    if (data.counts > 0){
-                        alert(data.counts);
-                    }else{
+                    console.log(data.dislike_count);
+                    if (data.dislike_count == 0){
                         $("#post-id-" + id).find("#dislike-count").hide();
+                    }else{
+                        $("#post-id-" + id).find("#dislike-count").text(data.dislike_count);
                     }
                 },
                 error: function(data){

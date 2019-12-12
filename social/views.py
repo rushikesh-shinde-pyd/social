@@ -224,6 +224,7 @@ class LikeDislike(View):
             dislike = False
 
         if action == "like":
+            print('request came like')
             Like.objects.create(post=post_obj, user=user_obj)
             like_counts = post_obj.likes.count()
 
@@ -243,6 +244,8 @@ class LikeDislike(View):
                 }
                 return JsonResponse(data)
         elif action == "dislike":
+            print('request came dislike')
+
             obj = Like.objects.filter(Q(post=post_obj) & Q(user=user_obj))
             if obj:
                 obj.delete()
@@ -255,18 +258,48 @@ class LikeDislike(View):
 @method_decorator(login_required, name="dispatch")
 class DislikeView(View):
     def post(self, request, *args, **kwargs):
+        
         post_id = request.POST.get('post_id')
         user_id = request.user.id
         action = request.POST.get('action')
         post_obj = Post.objects.get(id=post_id)
         user_obj = User.objects.get(id=user_id)
+        like = False
+        try:
+            like_obj = get_object_or_404(Like, post=post_obj, user=user_obj)
+            if like_obj:
+                like = True
+            else:
+                like = False
+        except:
+            like = False
         if action == "like":
             Dislike.objects.create(post=post_obj, user=user_obj)
+            dislike_counts = post_obj.dislikes.count()
+
+            if like:
+                like_obj.delete()
+                like_counts = post_obj.likes.count()
+                print(like_counts)
+                data = {
+                    'dislike_count': dislike_counts,
+                    'like_count': like_counts,
+                    'like': True
+                }
+                return JsonResponse(data)
+            else:
+                data = {
+                    'dislike_count': dislike_counts,
+                }
+                return JsonResponse(data)
         elif action == "dislike":
             obj = Dislike.objects.filter(Q(post=post_obj) & Q(user=user_obj))
             if obj:
                 obj.delete()
-        return JsonResponse({'result': True, 'counts': post_obj.dislikes.count()})
+            data = {
+                    'dislike_count': post_obj.dislikes.count(),
+                }
+            return JsonResponse(data)
 
 
 @method_decorator(login_required, name="dispatch")
