@@ -61,7 +61,7 @@ class Dislike(models.Model):
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    message = models.CharField(max_length=160, verbose_name="Comment")
+    message = models.CharField(max_length=500, verbose_name="Comment")
     is_approved = models.BooleanField(default=True)
     is_rejected = models.BooleanField(default=False)
     commented_at = models.DateTimeField(default=timezone.now, verbose_name='Created at')
@@ -80,7 +80,7 @@ class Replies(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     parent = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='parent')
     parent_reply = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
-    reply = models.CharField(max_length=160)
+    reply = models.CharField(max_length=500)
     is_approved = models.BooleanField(default=True)
     is_rejected = models.BooleanField(default=False)
     commented_at = models.DateTimeField(default=timezone.now, verbose_name='Created at')

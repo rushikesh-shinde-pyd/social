@@ -437,7 +437,7 @@
                                             <ul class="list-group comment-div" id="comment-id-{{each_comment.id}}">
                                                 <li class="list-group-item" style="display:inline-block;">
                                                     {{ each_comment.message|title }}
-                                                    <input type="button" style="margin-bottom:0px; background-color:#fff; color: #2b6eff; border:none; padding:0px;" class="" onclick="reply_to_comment({{each_comment.id}}, {{post.id}})" name="reply-button" value="Reply">
+                                                    <input type="button" style="margin-bottom:0px; background-color:#fff; color: #2b6eff; border:none; padding:0px;"  onclick="reply_to_comment({{each_comment.id}}, {{post.id}})" name="reply-button" value="Reply">
                                                 </li>
                                                 <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
                                                     {% csrf_token %}
@@ -886,12 +886,15 @@
 
     // show/hide post comment's reply panel
      $('button[name="show-replies"]').click(function(){
+         console.log('clicking')
+        
         if ($(this).text().trim() == 'Hide replies'){
            $('.reply-div').slideUp();
            $(this).text('show-replies');
 
         }else{
-            $('.reply-div').hide();
+            $('button[name="show-replies"]').text("show-replies");
+            $('.reply-div').slideUp();
             $(this).parent().find('.reply-div').slideDown();
             $(this).text('Hide replies');
         }
@@ -901,18 +904,19 @@
 
     // replying comments
     function add_reply_to_page(comment_id, post_id, data){
-        $("#comment-id-" + comment_id).append(`
+        console.log(data)
+        $("#post-id-" + post_id).find("#comment-id-" + comment_id).find('.replies').prepend(`
             <div class="reply-wrapper">
-                <ul  style="display:none;margin-left:50px" class="list-group reply-div">
+                <ul  style="margin-left:50px" class="list-group reply-div">
                     <div style="margin:10px 0px;"><strong class="replier">${data.reply_user_fname} ${data.reply_user_lname}</strong> replied <span class="reply-timestamp"><small>just now</small></span><br></div>
                     <li class="list-group-item" style="display:inline-block;">${data.reply_message}</li>
                 </ul>
             </div>
         `)
-        $('.reply-div').show();
+        $("#comment-id-" + comment_id).find('.reply-div').show();
         $("#comment-id-" + comment_id).find("#reply-count").text(data.total_replies);
-        $('button[name="show-replies"]').text('Hide replies');
-        $(".comments-replies").fadeIn();
+        $("#comment-id-" + comment_id).find('button[name="show-replies"]').text('Hide replies');
+        $("#comment-id-" + comment_id).find(".comments-replies").slideDown();
         $("#comment-id-" + comment_id).find("#hidden-reply-count").slideDown().text(data.total_replies);
         
 
@@ -920,6 +924,10 @@
 
     function reply_to_comment(comment_id, post_id){
         $('#comment-id-' + comment_id).find('input[name="reply-button"]').slideUp();
+        $("#post-id-" + post_id).find(".reply-div").slideUp();
+        $('button[name="show-replies"]').text("show-replies");
+        $("#post-id-" + post_id).find('#comment-id-' + comment_id).find(".replies").slideDown();
+        $('input[name="reply-button"]').slideDown();
         $('form[name="reply-to-comment"]').fadeOut();
         $("#comment-id-" + comment_id).find('textarea[name="reply-area"]').parent().slideDown();
             $('textarea[name="reply-area"]').keyup(function(){
@@ -930,10 +938,10 @@
                     $(this).parent().find('input[type="submit"]').attr('disabled', true).slideUp();
                 }
             });
-            $('form[name="reply-to-comment"]').submit(function(event){
+            $('#comment-id-' + comment_id).find('form[name="reply-to-comment"]').submit(function(event){
                 event.preventdefault;
                 var reply = $(this).find('textarea[name="reply-area"]').val().trim();
-                console.log(reply);
+                console.log('reply');
                 $.ajax({
                     url: "{% url 'social:reply-to-comment' %}",
                     type: "POST",
@@ -943,7 +951,6 @@
                         'reply': reply,
                     },
                     success: function(data){
-                        console.log(data.result);
                         add_reply_to_page(comment_id, post_id, data);
                     },
                     error: function(data){
@@ -1198,6 +1205,7 @@
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                 },
                 success: function(data){
+                    console.log(data);
                     if (data.like){
                         if (data.like_count == 0){
                             $("#post-id-" + id).find("#like-count").text('');
@@ -1224,7 +1232,6 @@
     // undodislike posts
     function undodislike(id){
     $("#post-id-" + id).find(".undodislike").removeClass("likedislikeclass");
-
         $.ajax({
                 url: "{% url 'social:dislike-requests' %}",
                 type: "POST",
@@ -1235,7 +1242,7 @@
                 },
                 success: function(data){
                     if (data.dislike_count == 0){
-                        $("#post-id-" + id).find("#dislike-count").hide();
+                        $("#post-id-" + id).find("#dislike-count").text("");
                     }else{
                         $("#post-id-" + id).find("#dislike-count").text(data.dislike_count);
                     }
@@ -1256,10 +1263,6 @@
 
 
     // show less posts
-    {% comment %} function show_less(){
-        $(".mb").slice(5).hide();
-    } {% endcomment %}
-
     $("#show_less").click(function(){
         $(".mb").slice(5).hide();
         window.scrollTo(0, 0); 
