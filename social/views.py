@@ -348,6 +348,22 @@ class ReplyToCommentView(View):
         }
         return JsonResponse(data)
 
+def remove_comment(request):
+    print("*"*20)
+    post_id = request.POST.get('post_id')
+    comment_id = request.POST.get('comment_id')
+    post_obj = get_object_or_404(Post, id=post_id)
+    obj = get_object_or_404(Comment, id=comment_id, post=post_obj)
+    obj.delete()
+    data = {
+        'deleted': True,
+        'total_comments': post_obj.comment_set.all().count()
+    }
+    return JsonResponse(data)
+
+
+
+
 def show_post_details(request):
     post_id = request.GET.get('post_id').strip()
     post_obj = get_object_or_404(Post, id=post_id)

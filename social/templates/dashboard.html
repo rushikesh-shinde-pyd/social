@@ -427,7 +427,7 @@
                                         {% endif %}
                                         <div class="comment-wrapper">
                                             {% for each_comment in qs %}
-                                            <div class="commnet-div">
+                                            <div class="commnet-div" id="comment-div-id-{{ each_comment.id }}">
                                                 <div style="margin:10px 10px;"><strong class="commenter">{{ each_comment.user.first_name|title }} {{ each_comment.user.last_name|title }}</strong> commented <span class="comment-timestamp">
                                                 {% if each_comment.commented_at|timesince == '0 minutes' %}
                                                 <small> just now </small>
@@ -439,13 +439,15 @@
                                                     <li class="list-group-item" style="display:inline-block;">
                                                         {{ each_comment.message }}
                                                     </li>
-                                                    <input type="button" style="margin-bottom:0px; background-color:#fff; color: #2b6eff; border:none; padding:0px;"  onclick="reply_to_comment({{each_comment.id}}, {{post.id}})" name="reply-button" value="Reply">
+                                                    {% comment %} <input type="button" style="margin-bottom:0px; background-color:#fff; color: #2b6eff; border:none; padding:0px;"    value="Reply"> {% endcomment %}
+                                                    <i style="cursor:pointer;" onclick="reply_to_comment({{each_comment.id}}, {{post.id}})" class="fa fa-reply remove-comment" aria-hidden="true"></i>
+                                                    <i style="cursor:pointer;" onclick="remove_comment({{each_comment.id}}, {{post.id}})" class="fa fa-trash" aria-hidden="true"></i>
                                                     <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
                                                         {% csrf_token %}
                                                         <textarea autofocus style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
                                                         <br>
                                                         <input class="btn btn-primary" style="display:none" type="submit" disabled name="reply" value="Reply">
-                                                        <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                                        
 
                                                     </form>
                                                     {% comment %} <br> {% endcomment %}
@@ -906,6 +908,43 @@
                     POST MODULE 
        **************************************** */
 
+
+    // removing comments
+    function remove_comment_from_page(comment_id, post_id, data){
+        if (data.total_comments==0){
+            $("#post-id-" + post_id).find("#comment-count").text('');
+            $("#post-id-" + post_id).find(".comments-replies").find("h5").slideUp();
+            $("#post-id-" + post_id).find("#comment-div-id-" + comment_id).slideUp();
+        }else{
+            $("#post-id-" + post_id).find("#comment-div-id-" + comment_id).slideUp();
+            $("#post-id-" + post_id).find("#comment-count").text(data.total_comments);
+        }
+        
+    }
+
+
+    function remove_comment(comment_id, post_id){
+        $.ajax({
+            url: "{% url 'social:remove-comment' %}",
+            type: "POST",
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                'comment_id': comment_id,
+                'post_id': post_id,
+            },
+            success: function(data){
+                remove_comment_from_page(comment_id, post_id, data);
+            },
+            error: function(data){
+                console.log(data);
+            },
+            complete: function(data){
+                console.log(data);
+            }
+        });
+    }
+
+
     // show/hide post comment's reply panel
      $(document).on('click', 'button[name="show-replies"]', function(){
         if ($(this).text().trim() == 'Hide replies'){
@@ -960,8 +999,8 @@
 
 
     function reply_to_comment(comment_id, post_id){
-        $('input[name="reply-button"]').slideDown();
-        $('#comment-id-' + comment_id).find('input[name="reply-button"]').slideUp();
+        $(".remove-comment").slideDown();
+        $('#comment-id-' + comment_id).find(".remove-comment").slideUp();
         $("#post-id-" + post_id).find(".reply-div").slideUp();
         $('button[name="show-replies"]').text("show-replies");
         $("#post-id-" + post_id).find('#comment-id-' + comment_id).find(".replies").slideDown();
@@ -1006,21 +1045,48 @@
     // commenting post
     function add_comment_to_page(id, data){
         $("#post-id-" + id).find("#comment-count").text(data.total_comments);
-        $("#post-id-" + id).find(".comment-wrapper").prepend(`
-            <div style="margin:10px 10px;"><strong class="commenter">${data.comment_user_fname} ${data.comment_user_lname}</strong> commented <span class="comment-timestamp"><small>just now</small></span></div>
-            <ul class="list-group comment-div" id="comment-id-${data.comment_id}">
-                <li class="list-group-item" style="display:inline-block;">
-                    ${data.comment_message}
-                </li>
-                <input type="button" style="margin-bottom:0px; background-color:#fff; color: #2b6eff; border:none; padding:0px;" class="" onclick="reply_to_comment(${data.comment_id}, ${id})" name="reply-button" value="Reply">
-                <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
-                    {% csrf_token %}
-                    <textarea style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
-                    {% comment %} <br> {% endcomment %}
-                    <input class="btn btn-primary" type="submit" style="display:none" disabled name="reply" value="Reply">
-                </form>
-            </ul>
+        if (data.total_comments == 1){
+            $("#post-id-" + id).find(".comments-replies").prepend(`
+                <h5>Comments</h5>
+            `);
+            $("#post-id-" + id).find(".comment-wrapper").prepend(`
+            <div class="commnet-div" id="comment-div-id-${data.comment_id}">
+                <div style="margin:10px 10px;"><strong class="commenter">${data.comment_user_fname} ${data.comment_user_lname}</strong> commented <span class="comment-timestamp"><small>just now</small></span></div>
+                <ul class="list-group comment-div" id="comment-div-id-${data.comment_id}">
+                    <li class="list-group-item" style="display:inline-block;">
+                        ${data.comment_message}
+                    </li>
+                    <i style="cursor:pointer;" onclick="reply_to_comment(${data.comment_id}, ${id})" class="fa fa-reply remove-comment" aria-hidden="true"></i>
+                    <i style="cursor:pointer;" onclick="remove_comment(${data.comment_id}, ${id})" class="fa fa-trash" aria-hidden="true"></i>
+                    <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
+                        {% csrf_token %}
+                        <textarea style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
+                        {% comment %} <br> {% endcomment %}
+                        <input class="btn btn-primary" type="submit" style="display:none" disabled name="reply" value="Reply">
+                    </form>
+                </ul>
+            </div>
         `);
+        }else{
+            $("#post-id-" + id).find(".comment-wrapper").prepend(`
+            <div class="commnet-div" id="comment-div-id-${data.comment_id}">
+                <div style="margin:10px 10px;"><strong class="commenter">${data.comment_user_fname} ${data.comment_user_lname}</strong> commented <span class="comment-timestamp"><small>just now</small></span></div>
+                <ul class="list-group comment-div" id="comment-div-id-${data.comment_id}">
+                    <li class="list-group-item" style="display:inline-block;">
+                        ${data.comment_message}
+                    </li>
+                    <i style="cursor:pointer;" onclick="reply_to_comment(${data.comment_id}, ${id})" class="fa fa-reply remove-comment" aria-hidden="true"></i>
+                    <i style="cursor:pointer;" onclick="remove_comment(${data.comment_id}, ${id})" class="fa fa-trash" aria-hidden="true"></i>
+                    <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
+                        {% csrf_token %}
+                        <textarea style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
+                        {% comment %} <br> {% endcomment %}
+                        <input class="btn btn-primary" type="submit" style="display:none" disabled name="reply" value="Reply">
+                    </form>
+                </ul>
+            </div>
+        `);    
+        }
     }
 
     function comment(id){
