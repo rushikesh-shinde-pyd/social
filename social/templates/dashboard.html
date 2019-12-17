@@ -427,41 +427,45 @@
                                         {% endif %}
                                         <div class="comment-wrapper">
                                             {% for each_comment in qs %}
-                                            <div style="margin:10px 10px;"><strong class="commenter">{{ each_comment.user.first_name|title }} {{ each_comment.user.last_name|title }}</strong> commented <span class="comment-timestamp">
-                                            {% if each_comment.commented_at|timesince == '0 minutes' %}
-                                            <small> just now </small>
-                                            {% else %}
-                                                <small> {{ each_comment.commented_at|timesince }} ago</small>
-                                            {% endif %}
-                                            </div>
-                                            <ul class="list-group comment-div" id="comment-id-{{each_comment.id}}">
-                                                <li class="list-group-item" style="display:inline-block;">
-                                                    {{ each_comment.message|title }}
-                                                    <input type="button" style="margin-bottom:0px; background-color:#fff; color: #2b6eff; border:none; padding:0px;"  onclick="reply_to_comment({{each_comment.id}}, {{post.id}})" name="reply-button" value="Reply">
-                                                </li>
-                                                <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
-                                                    {% csrf_token %}
-                                                    <textarea autofocus style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
-                                                    {% comment %} <br> {% endcomment %}
-                                                    <input class="btn btn-primary" style="display:none" type="submit" disabled name="reply" value="Reply">
-                                                </form>
-                                                <br>
-                                                {% get_replies each_comment.parent.all as reply_queryset %}
-                                                {%if reply_queryset %}
-                                                <button style="background-color:transparent; color: #2b6eff; border:none; margin-left: 10px;" name="show-replies">show replies</button>
-                                                <h5 id="reply-count" style="padding:15px;">{{ reply_queryset.count|pluralize_reply }}</h5>
-                                                <div class="replies">
-                                                    {% for each_reply in reply_queryset %}
-                                                        <div class="reply-wrapper">
-                                                            <ul  style="display:none;margin-left:50px" class="list-group reply-div">
-                                                                <div style="margin:10px 0px;"><strong class="replier">{{ each_reply.user.first_name|title }} {{ each_reply.user.last_name|title }}</strong> replied <span class="reply-timestamp"><small>{{ each_reply.commented_at|timesince }}</span> ago</small><br></div>
-                                                                <li class="list-group-item" style="display:inline-block;">{{ each_reply.reply|title }}</li>
-                                                            </ul>
-                                                        </div>
-                                                    {% endfor %}
-                                                </div>
+                                            <div class="commnet-div">
+                                                <div style="margin:10px 10px;"><strong class="commenter">{{ each_comment.user.first_name|title }} {{ each_comment.user.last_name|title }}</strong> commented <span class="comment-timestamp">
+                                                {% if each_comment.commented_at|timesince == '0 minutes' %}
+                                                <small> just now </small>
+                                                {% else %}
+                                                    <small> {{ each_comment.commented_at|timesince }} ago</small>
                                                 {% endif %}
-                                            </ul>
+                                                </div>
+                                                <ul class="list-group comment-div" id="comment-id-{{each_comment.id}}">
+                                                    <li class="list-group-item" style="display:inline-block;">
+                                                        {{ each_comment.message }}
+                                                    </li>
+                                                    <input type="button" style="margin-bottom:0px; background-color:#fff; color: #2b6eff; border:none; padding:0px;"  onclick="reply_to_comment({{each_comment.id}}, {{post.id}})" name="reply-button" value="Reply">
+                                                    <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
+                                                        {% csrf_token %}
+                                                        <textarea autofocus style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
+                                                        <br>
+                                                        <input class="btn btn-primary" style="display:none" type="submit" disabled name="reply" value="Reply">
+                                                        <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+
+                                                    </form>
+                                                    {% comment %} <br> {% endcomment %}
+                                                    {% get_replies each_comment.parent.all as reply_queryset %}
+                                                    {%if reply_queryset %}
+                                                    <button style="background-color:transparent; color: #2b6eff; border:none; margin-left: 10px;" name="show-replies">show replies</button>
+                                                    <h5 id="reply-count" style="padding:0px 15px;">{{ reply_queryset.count|pluralize_reply }}</h5>
+                                                    <div class="replies">
+                                                        {% for each_reply in reply_queryset %}
+                                                            <div class="reply-wrapper">
+                                                                <ul  style="margin-left:50px;display:none;" class="list-group reply-div">
+                                                                    <div style="margin:10px 0px;"><strong class="replier">{{ each_reply.user.first_name|title }} {{ each_reply.user.last_name|title }}</strong> replied <span class="reply-timestamp"><small>{{ each_reply.commented_at|timesince }}</span> ago</small><br></div>
+                                                                    <li class="list-group-item" style="display:inline-block;">{{ each_reply.reply }}</li>
+                                                                </ul>
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
                                             {% endfor %}
                                         </div>
                                     </div>
@@ -906,12 +910,11 @@
      $(document).on('click', 'button[name="show-replies"]', function(){
         if ($(this).text().trim() == 'Hide replies'){
            $('.reply-div').slideUp();
-           //$('.replies').hide();
            $(this).text('show-replies');
         }else{
-            $('button[name="show-replies"]').text("show-replies");
             $('.reply-div').slideUp();
             $(this).parent().find('.reply-div').slideDown();
+            $('button[name="show-replies"]').text("show-replies");
             $(this).text('Hide replies');
         }
      });
@@ -922,9 +925,8 @@
         if (data.total_replies == "1 reply"){
             console.log('reply added');
             $("#post-id-" + post_id).find("#comment-id-" + comment_id).append(`
-            <br>
             <button style="background-color:transparent; color: #2b6eff; border:none; margin-left: 10px;" name="show-replies">show replies</button>
-            <h5 id="reply-count" style="padding:15px;">${data.total_replies}</h5>
+            <h5 id="reply-count" style="padding:0px 15px;">${data.total_replies}</h5>
             <div class="replies">
                 <div class="reply-wrapper">
                     <ul  style="margin-left:50px" class="list-group reply-div">
@@ -1009,8 +1011,8 @@
             <ul class="list-group comment-div" id="comment-id-${data.comment_id}">
                 <li class="list-group-item" style="display:inline-block;">
                     ${data.comment_message}
-                    <input type="button" style="margin-bottom:0px; background-color:#fff; color: #2b6eff; border:none; padding:0px;" class="" onclick="reply_to_comment(${data.comment_id}, ${id})" name="reply-button" value="Reply">
                 </li>
+                <input type="button" style="margin-bottom:0px; background-color:#fff; color: #2b6eff; border:none; padding:0px;" class="" onclick="reply_to_comment(${data.comment_id}, ${id})" name="reply-button" value="Reply">
                 <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
                     {% csrf_token %}
                     <textarea style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
