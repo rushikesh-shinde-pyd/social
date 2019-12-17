@@ -3,7 +3,7 @@
 {% load mathfilters %}
 {% load c_filters %}
 {% block content %}
-{% if request.user.is_authenticated %}
+{% comment %} {% if request.user.is_authenticated %} {% endcomment %}
 
   <body>
 
@@ -446,22 +446,21 @@
                                                     <input class="btn btn-primary" style="display:none" type="submit" disabled name="reply" value="Reply">
                                                 </form>
                                                 <br>
-                                                    {% get_replies each_comment.parent.all as reply_queryset %}
-                                                    {%if reply_queryset %}
-                                                    <button style="background-color:transparent; color: #2b6eff; border:none; margin-left: 10px;" name="show-replies">show replies</button>
-
-                                                        <h5 id="reply-count" style="padding:15px;">{{ reply_queryset.count|pluralize_reply }}</h5>
-                                                        <div class="replies">
-                                                            {% for each_reply in reply_queryset %}
-                                                                <div class="reply-wrapper">
-                                                                    <ul  style="display:none;margin-left:50px" class="list-group reply-div">
-                                                                        <div style="margin:10px 0px;"><strong class="replier">{{ each_reply.user.first_name|title }} {{ each_reply.user.last_name|title }}</strong> replied <span class="reply-timestamp"><small>{{ each_reply.commented_at|timesince }}</span> ago</small><br></div>
-                                                                        <li class="list-group-item" style="display:inline-block;">{{ each_reply.reply|title }}</li>
-                                                                    </ul>
-                                                                </div>
-                                                            {% endfor %}
+                                                {% get_replies each_comment.parent.all as reply_queryset %}
+                                                {%if reply_queryset %}
+                                                <button style="background-color:transparent; color: #2b6eff; border:none; margin-left: 10px;" name="show-replies">show replies</button>
+                                                <h5 id="reply-count" style="padding:15px;">{{ reply_queryset.count|pluralize_reply }}</h5>
+                                                <div class="replies">
+                                                    {% for each_reply in reply_queryset %}
+                                                        <div class="reply-wrapper">
+                                                            <ul  style="display:none;margin-left:50px" class="list-group reply-div">
+                                                                <div style="margin:10px 0px;"><strong class="replier">{{ each_reply.user.first_name|title }} {{ each_reply.user.last_name|title }}</strong> replied <span class="reply-timestamp"><small>{{ each_reply.commented_at|timesince }}</span> ago</small><br></div>
+                                                                <li class="list-group-item" style="display:inline-block;">{{ each_reply.reply|title }}</li>
+                                                            </ul>
                                                         </div>
-                                                    {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
                                             </ul>
                                             {% endfor %}
                                         </div>
@@ -471,11 +470,30 @@
                        </div>
                      </div>
                          {% endfor %}
-
                         <div class="row">
-                            <div class="col-lg-10" style="text-align:center;margin: 0px 50px; padding:10px 15px;">
-                                <strong data-showmorecount="10" class="btn btn-info" id="show_more">Show more</strong>
-                                <strong data-showmorecount="10" style="display:none;" class="btn btn-info" id="show_less">Show less</strong>
+                            <div class="col-lg-10">
+                                <nav aria-label="..." style="margin-left:50%">
+                                    <ul class="pagination">
+                                        {% if posts.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=1">First</a>
+                                        </li>
+                                        <li class="page-item"><a class="page-link" href="?page={{ posts.previous_page_number }}">{{ posts.previous_page_number }}</a></li>
+                                        {% endif %}
+                                        <li class="page-item active">
+                                        <a class="page-link" href="?page={{ posts.number }}">{{ posts.number }} <span class="sr-only">(current)</span></a>
+                                        </li>
+                                        
+                                        {% if posts.has_next %}
+                                            <li class="page-item">
+                                               <a class="page-link" href="?page={{ posts.next_page_number }}">{{ posts.next_page_number }}</a>
+                                            </li>
+                                            <li class="page-item">
+                                               <a class="page-link" href="?page={{ total_pages }}">Last</a>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </nav>
                             </div>
                         </div>
                      </div>
@@ -885,50 +903,67 @@
        **************************************** */
 
     // show/hide post comment's reply panel
-     $('button[name="show-replies"]').click(function(){
-         console.log('clicking')
-        
+     $(document).on('click', 'button[name="show-replies"]', function(){
         if ($(this).text().trim() == 'Hide replies'){
            $('.reply-div').slideUp();
+           //$('.replies').hide();
            $(this).text('show-replies');
-
         }else{
             $('button[name="show-replies"]').text("show-replies");
             $('.reply-div').slideUp();
             $(this).parent().find('.reply-div').slideDown();
             $(this).text('Hide replies');
         }
-
      });
 
 
     // replying comments
     function add_reply_to_page(comment_id, post_id, data){
-        console.log(data)
-        $("#post-id-" + post_id).find("#comment-id-" + comment_id).find('.replies').prepend(`
+        if (data.total_replies == "1 reply"){
+            console.log('reply added');
+            $("#post-id-" + post_id).find("#comment-id-" + comment_id).append(`
+            <br>
+            <button style="background-color:transparent; color: #2b6eff; border:none; margin-left: 10px;" name="show-replies">show replies</button>
+            <h5 id="reply-count" style="padding:15px;">${data.total_replies}</h5>
+            <div class="replies">
+                <div class="reply-wrapper">
+                    <ul  style="margin-left:50px" class="list-group reply-div">
+                        <div style="margin:10px 0px;"><strong class="replier">${data.reply_user_fname} ${data.reply_user_lname}</strong> replied <span class="reply-timestamp"><small>just now</small></span><br></div>
+                        <li class="list-group-item" style="display:inline-block;">${data.reply_message}</li>
+                    </ul>
+                </div>
+            </div>
+        `);
+        }else{
+            $("#post-id-" + post_id).find("#comment-id-" + comment_id).find('.replies').prepend(`
             <div class="reply-wrapper">
                 <ul  style="margin-left:50px" class="list-group reply-div">
                     <div style="margin:10px 0px;"><strong class="replier">${data.reply_user_fname} ${data.reply_user_lname}</strong> replied <span class="reply-timestamp"><small>just now</small></span><br></div>
                     <li class="list-group-item" style="display:inline-block;">${data.reply_message}</li>
                 </ul>
             </div>
-        `)
-        $("#comment-id-" + comment_id).find('.reply-div').show();
+            `)
+            
+        }
+        $("#comment-id-" + comment_id).find('.reply-div').slideDown();
+        //$("#comment-id-" + comment_id).find('.replies').slideDown();
         $("#comment-id-" + comment_id).find("#reply-count").text(data.total_replies);
         $("#comment-id-" + comment_id).find('button[name="show-replies"]').text('Hide replies');
-        $("#comment-id-" + comment_id).find(".comments-replies").slideDown();
+        //$("#comment-id-" + comment_id).find(".comments-replies").slideDown();
         $("#comment-id-" + comment_id).find("#hidden-reply-count").slideDown().text(data.total_replies);
-        
-
+        return false;
     }
 
+
+
+
     function reply_to_comment(comment_id, post_id){
+        $('input[name="reply-button"]').slideDown();
         $('#comment-id-' + comment_id).find('input[name="reply-button"]').slideUp();
         $("#post-id-" + post_id).find(".reply-div").slideUp();
         $('button[name="show-replies"]').text("show-replies");
         $("#post-id-" + post_id).find('#comment-id-' + comment_id).find(".replies").slideDown();
-        $('input[name="reply-button"]').slideDown();
-        $('form[name="reply-to-comment"]').fadeOut();
+        $('form[name="reply-to-comment"]').slideUp();
         $("#comment-id-" + comment_id).find('textarea[name="reply-area"]').parent().slideDown();
             $('textarea[name="reply-area"]').keyup(function(){
                 var char_len = $(this).val().trim().length;
@@ -941,7 +976,6 @@
             $('#comment-id-' + comment_id).find('form[name="reply-to-comment"]').submit(function(event){
                 event.preventdefault;
                 var reply = $(this).find('textarea[name="reply-area"]').val().trim();
-                console.log('reply');
                 $.ajax({
                     url: "{% url 'social:reply-to-comment' %}",
                     type: "POST",
@@ -1263,7 +1297,7 @@
 
 
     // show less posts
-    $("#show_less").click(function(){
+    {% comment %} $("#show_less").click(function(){
         $(".mb").slice(5).hide();
         window.scrollTo(0, 0); 
         $("#show_more").show();
@@ -1290,14 +1324,14 @@
             $(this).attr('data-showmorecount', count+5);
         }
         
-    });
+    }); {% endcomment %}
 
-    $(document).ready(function(){
+    {% comment %} $(document).ready(function(){
         $(".mb").slice(5).hide();
-    });
+    }); {% endcomment %}
 
     </script>
   
   </body>
-{% endif %}
+{% comment %} {% endif %} {% endcomment %}
 {% endblock %}

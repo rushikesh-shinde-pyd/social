@@ -14,6 +14,7 @@ from datetime import datetime as dt
 import datetime
 from django.utils.decorators import method_decorator
 from django.db.models import Q
+from django.core.paginator import Paginator
 
 # Create your views here.
 def index(request):
@@ -71,7 +72,11 @@ def dashboard(request):
     user = request.user
     posts = Post.objects.filter(is_active=True).order_by("-published_date")
     # posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
-    return render(request,'dashboard.html',{'user': user, 'posts': posts, 'dt': dt.now, 'timezone':timezone})
+    paginator_obj = Paginator(posts, 5)
+    page = request.GET.get('page')
+    posts = paginator_obj.get_page(page)
+    total_pages = paginator_obj.num_pages
+    return render(request,'dashboard.html',{'user': user, 'posts': posts, 'dt': dt.now, 'timezone':timezone, 'total_pages':total_pages})
 
 # @login_required()
 def profile(request):
@@ -304,10 +309,8 @@ class CommentView(View):
         user_id = request.user.id
         post_obj = Post.objects.get(id=post_id)
         user_obj = User.objects.get(id=user_id)
-        print(post_obj, user_obj)
         obj = Comment(post_id=post_obj.id, user_id=user_obj.id, message=comment_message)
         obj.save()
-        print(obj.commented_at)
         data = {
             'comment_id': obj.id,
             'comment_user_fname': obj.user.first_name.title(),
@@ -316,29 +319,24 @@ class CommentView(View):
             'comment_commented_at': obj.commented_at,
             'total_comments': post_obj.comment_set.all().count()
         }
-        print(data)
         return JsonResponse(data)
 
 
 @method_decorator(login_required, name='dispatch')
 class ReplyToCommentView(View):
     def post(self, request, *args, **kwargs):
-        print('o yeah!')
         comment_id = request.POST.get('comment_id').strip()
         comment_obj = get_object_or_404(Comment, id=comment_id)
         user_obj = User.objects.get(id=request.user.id)
         reply = request.POST.get('reply').strip()
         obj = Replies(user=user_obj, parent=comment_obj, reply=reply)
         obj.save()
-        print(obj)
         counts = comment_obj.parent.all().count()
-        print(counts)
         reply_count = ''
         if counts > 1:
             reply_count += str(counts) + ' replies'
         elif counts == 1:
             reply_count += str(counts) + ' reply'
-        print(reply_count)
         data = {
             'reply_id': obj.id,
             'reply_user_fname': obj.user.first_name.title(),
@@ -357,3 +355,7 @@ def show_post_details(request):
         'content': post_obj.text
     }
     return JsonResponse(data)
+
+
+
+
