@@ -1035,6 +1035,7 @@
                         console.log(data);
                     }
                 });
+                $(this).find('input[type="submit"]').attr('disabled', true).slideUp();
                 $('form[name="reply-to-comment"]').trigger("reset");
                 return false;
             });
@@ -1098,9 +1099,9 @@
         $(".write-comment").find('.comment-box').keyup(function(){
             var char_len = $(this).val().trim().length;
             if (char_len > 0){
-                $(".write-comment").find('input[type="submit"]').attr('disabled', false).slideDown();
+                $('input[name="comment"]').attr('disabled', false).slideDown();
             }else if(char_len == 0){
-                $(".write-comment").find('input[type="submit"]').attr('disabled', true).slideUp();
+                $('input[name="comment"]').attr('disabled', true).slideUp();
             }
         });
         $("#comment-form-" + id).submit(function(event){
@@ -1124,6 +1125,7 @@
                     complete: function(data){
                     }
         });
+        $(this).find('input[type="submit"]').attr('disabled', false).slideUp();
         $("#comment-form-" + id).trigger("reset");
         return false;
     });
