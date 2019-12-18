@@ -266,54 +266,68 @@
               <div class="row">
                   <div class="col-lg-9 main-chart">
                       <div>
-
                        <form class="post-create-form" method="post" action="{% url 'social:post-create' %}">
                            {% csrf_token %}
                            <div class="form-group">
-                               <p><input type="text" name="post-title" class="form-control" placeholder="Post Title"></p>
-                               <p><textarea style="resize:none;" name="post-content" class="form-control" rows="3" placeholder="What's on your mind!"></textarea></p>
-                               <p><button class="btn btn-sm btn-primary" type="submit" style="margin-top:10px;">POST</button></p>
+                                <p>
+                                    <select name="category" class="form-control" required>
+                                        <option value="None">---Select Category---</option>
+                                        {% for value, category in categories %}
+                                            <option value="{{ value }}">{{ category|title }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </p>
+                                <p>
+                                    <select name="subcategory" class="form-control" required>
+                                    <option value="None">---Select Subcategory---</option>
+                                        {% comment %} <option value="None">---Select subcategory---</option> {% endcomment %}
+                                    </select>
+                                </p>
+                                <p><input type="text" name="post-title" class="form-control" placeholder="Post Title"></p>
+                                <p><textarea style="resize:none;" name="post-content" class="form-control" rows="3" placeholder="What's on your mind!"></textarea></p>
+                                <p><button class="btn btn-sm btn-primary" type="submit" style="margin-top:10px;">POST</button></p>
                            </div>
                        </form>
-                  	<!--<div class="row mtbox">-->
-                  		<!--<div class="col-md-2 col-sm-2 col-md-offset-1 box0">-->
-                  			<!--<div class="box1">-->
-					  			<!--<span class="li_heart"></span>-->
-					  			<!--<h3>933</h3>-->
-                  			<!--</div>-->
-					  			<!--<p>933 People liked your page the last 24hs. Whoohoo!</p>-->
-                  		<!--</div>-->
-                  		<!--<div class="col-md-2 col-sm-2 box0">-->
-                  			<!--<div class="box1">-->
-					  			<!--<span class="li_cloud"></span>-->
-					  			<!--<h3>+48</h3>-->
-                  			<!--</div>-->
-					  			<!--<p>48 New files were added in your cloud storage.</p>-->
-                  		<!--</div>-->
-                  		<!--<div class="col-md-2 col-sm-2 box0">-->
-                  			<!--<div class="box1">-->
-					  			<!--<span class="li_stack"></span>-->
-					  			<!--<h3>23</h3>-->
-                  			<!--</div>-->
-					  			<!--<p>You have 23 unread messages in your inbox.</p>-->
-                  		<!--</div>-->
-                  		<!--<div class="col-md-2 col-sm-2 box0">-->
-                  			<!--<div class="box1">-->
-					  			<!--<span class="li_news"></span>-->
-					  			<!--<h3>+10</h3>-->
-                  			<!--</div>-->
-					  			<!--<p>More than 10 news were added in your reader.</p>-->
-                  		<!--</div>-->
-                  		<!--<div class="col-md-2 col-sm-2 box0">-->
-                  			<!--<div class="box1">-->
-					  			<!--<span class="li_data"></span>-->
-					  			<!--<h3>OK!</h3>-->
-                  			<!--</div>-->
-					  			<!--<p>Your server is working perfectly. Relax & enjoy.</p>-->
-                  		<!--</div>-->
+                  	{% comment %} <div class="row mtbox">
+                  		<div class="col-md-2 col-sm-2 col-md-offset-1 box0">
+                  			<div class="box1">
+					  			<span class="li_heart"></span>
+					  			<h3>933</h3>
+                  			</div>
+					  			<p>933 People liked your page the last 24hs. Whoohoo!</p>
+                  		</div>
+                  		<div class="col-md-2 col-sm-2 box0">
+                  			<div class="box1">
+					  			<span class="li_cloud"></span>
+					  			<h3>+48</h3>
+                  			</div>
+					  			<p>48 New files were added in your cloud storage.</p>
+                  		</div>
+                  		<div class="col-md-2 col-sm-2 box0">
+                  			<div class="box1">
+					  			<span class="li_stack"></span>
+					  			<h3>23</h3>
+                  			</div>
+					  			<p>You have 23 unread messages in your inbox.</p>
+                  		</div>
+                  		<div class="col-md-2 col-sm-2 box0">
+                  			<div class="box1">
+					  			<span class="li_news"></span>
+					  			<h3>+10</h3>
+                  			</div>
+					  			<p>More than 10 news were added in your reader.</p>
+                  		</div>
+                  		<div class="col-md-2 col-sm-2 box0">
+                  			<div class="box1">
+					  			<span class="li_data"></span>
+					  			<h3>OK!</h3>
+                  			</div>
+					  			<p>Your server is working perfectly. Relax & enjoy.</p>
+                  		</div>
 
-                      </div><!-- /row mt --><hr/>
-                  
+                      </div><!-- /row mt -->
+                      <hr/>
+                   {% endcomment %}
                         {% comment %} ****************************************
                                               BLOG MODULE 
                         **************************************** {% endcomment %}
@@ -324,8 +338,8 @@
                             <input type="hidden" name="id" value="{{ post.id }}">
                             <div class="panel-heading"><a href="#" onclick="show_post({{ post.id }})" data-toggle="modal" data-target="#post_view_modal"><span id="post-title">{{ post.title | title }}</span></a>
                                 {% if user.first_name == post.author.first_name and user.last_name == post.author.last_name %}
-                                <div  style="float:right">
-                                    <i onclick="update_post({{ post.id }})" data-toggle="modal" data-target="#updateModal" style="transform:scale(1.3,1.3);margin:0px 8px;cursor:pointer" class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                <div class="post-actions" style="border-top-right-radius: 3px; background-color: rgba(0,0,0,.5); position: absolute; display: none; top: 0px; right: 15px; padding: 7px;">
+                                    <i onclick="update_post({{ post.id }})" data-toggle="modal" data-target="#updateModal" style="margin-right: 7px; transform:scale(1.3,1.3);cursor:pointer" class="fa fa-pencil-square-o" aria-hidden="true"></i>
                                     <i onclick="delete_post({{ post.id }})" style="transform:scale(1.3,1.3);cursor:pointer" class="glyphicon glyphicon-remove"></i>
                                 </div>
                                 {% endif %}
@@ -427,7 +441,7 @@
                                         {% endif %}
                                         <div class="comment-wrapper">
                                             {% for each_comment in qs %}
-                                            <div class="commnet-div" id="comment-div-id-{{ each_comment.id }}">
+                                            <div id="comment-div-id-{{ each_comment.id }}">
                                                 <div style="margin:10px 10px;"><strong class="commenter">{{ each_comment.user.first_name|title }} {{ each_comment.user.last_name|title }}</strong> commented <span class="comment-timestamp">
                                                 {% if each_comment.commented_at|timesince == '0 minutes' %}
                                                 <small> just now </small>
@@ -441,19 +455,19 @@
                                                     </li>
                                                     {% comment %} <input type="button" style="margin-bottom:0px; background-color:#fff; color: #2b6eff; border:none; padding:0px;"    value="Reply"> {% endcomment %}
                                                     <i style="cursor:pointer;" onclick="reply_to_comment({{each_comment.id}}, {{post.id}})" class="fa fa-reply remove-comment" aria-hidden="true"></i>
-                                                    <i style="cursor:pointer;" onclick="remove_comment({{each_comment.id}}, {{post.id}})" class="fa fa-trash" aria-hidden="true"></i>
+                                                    {% verify_user_for_deletion post.author.username each_comment.user.username request.user as its_user %}
+                                                    {% if its_user == True %}
+                                                        <i style="cursor:pointer;" onclick="remove_comment({{each_comment.id}}, {{post.id}})" class="fa fa-trash" aria-hidden="true"></i>
+                                                    {% endif %}
                                                     <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
                                                         {% csrf_token %}
                                                         <textarea autofocus style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
-                                                        <br>
                                                         <input class="btn btn-primary" style="display:none" type="submit" disabled name="reply" value="Reply">
-                                                        
-
                                                     </form>
                                                     {% comment %} <br> {% endcomment %}
                                                     {% get_replies each_comment.parent.all as reply_queryset %}
                                                     {%if reply_queryset %}
-                                                    <button style="background-color:transparent; color: #2b6eff; border:none; margin-left: 10px;" name="show-replies">show replies</button>
+                                                    <button style="background-color:transparent; color: #2b6eff; border:none; margin-left: 10px; margin-top: 5px;" name="show-replies">show replies</button>
                                                     <h5 id="reply-count" style="padding:0px 15px;">{{ reply_queryset.count|pluralize_reply }}</h5>
                                                     <div class="replies">
                                                         {% for each_reply in reply_queryset %}
@@ -914,9 +928,9 @@
         if (data.total_comments==0){
             $("#post-id-" + post_id).find("#comment-count").text('');
             $("#post-id-" + post_id).find(".comments-replies").find("h5").slideUp();
-            $("#post-id-" + post_id).find("#comment-div-id-" + comment_id).slideUp();
+            $("#post-id-" + post_id).find("#comment-div-id-" + comment_id).remove();
         }else{
-            $("#post-id-" + post_id).find("#comment-div-id-" + comment_id).slideUp();
+            $("#post-id-" + post_id).find("#comment-div-id-" + comment_id).remove();
             $("#post-id-" + post_id).find("#comment-count").text(data.total_comments);
         }
         
@@ -1009,7 +1023,7 @@
             $('textarea[name="reply-area"]').keyup(function(){
                 var char_len = $(this).val().trim().length;
                 if (char_len > 0){
-                    $(this).parent().find('input[type="submit"]').attr('disabled', false).slideDown().css('margin-bottom', '10px');
+                    $(this).parent().find('input[type="submit"]').attr('disabled', false).slideDown();
                 }else if(char_len == 0){
                     $(this).parent().find('input[type="submit"]').attr('disabled', true).slideUp();
                 }
@@ -1051,9 +1065,9 @@
                 <h5>Comments</h5>
             `);
             $("#post-id-" + id).find(".comment-wrapper").prepend(`
-            <div class="commnet-div" id="comment-div-id-${data.comment_id}">
+            <div id="comment-div-id-${data.comment_id}">
                 <div style="margin:10px 10px;"><strong class="commenter">${data.comment_user_fname} ${data.comment_user_lname}</strong> commented <span class="comment-timestamp"><small>just now</small></span></div>
-                <ul class="list-group comment-div" id="comment-div-id-${data.comment_id}">
+                <ul class="list-group comment-div" id="comment-id-${data.comment_id}">
                     <li class="list-group-item" style="display:inline-block;">
                         ${data.comment_message}
                     </li>
@@ -1062,7 +1076,6 @@
                     <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
                         {% csrf_token %}
                         <textarea style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
-                        {% comment %} <br> {% endcomment %}
                         <input class="btn btn-primary" type="submit" style="display:none" disabled name="reply" value="Reply">
                     </form>
                 </ul>
@@ -1070,9 +1083,9 @@
         `);
         }else{
             $("#post-id-" + id).find(".comment-wrapper").prepend(`
-            <div class="commnet-div" id="comment-div-id-${data.comment_id}">
+            <div id="comment-div-id-${data.comment_id}">
                 <div style="margin:10px 10px;"><strong class="commenter">${data.comment_user_fname} ${data.comment_user_lname}</strong> commented <span class="comment-timestamp"><small>just now</small></span></div>
-                <ul class="list-group comment-div" id="comment-div-id-${data.comment_id}">
+                <ul class="list-group comment-div" id="comment-id-${data.comment_id}">
                     <li class="list-group-item" style="display:inline-block;">
                         ${data.comment_message}
                     </li>
@@ -1081,7 +1094,6 @@
                     <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
                         {% csrf_token %}
                         <textarea style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
-                        {% comment %} <br> {% endcomment %}
                         <input class="btn btn-primary" type="submit" style="display:none" disabled name="reply" value="Reply">
                     </form>
                 </ul>
@@ -1399,6 +1411,36 @@
     {% comment %} $(document).ready(function(){
         $(".mb").slice(5).hide();
     }); {% endcomment %}
+
+
+    // show/hide posts actions
+    $(document).on("mouseenter mouseleave", ".mb", function(){
+        //$(this).find(".post-actions").find("i").css("color", "#ffffff");
+        $(this).find(".post-actions").fadeToggle().find("i").css("color", "#ffffff");
+    });
+
+    // dynamically adding subcategories to category
+    $('select[name="category"]').change(function(){
+        $.ajax({
+                url: "{% url 'social:add-subcategory' %}",
+                type: "GET",
+                data: {
+                    'category': $(this).val().trim()
+                },
+                success: function(data){
+                    console.log(data);
+                    var html = "";
+                    $.each(data.subcategories, function (key, value) {
+                        html += "<option value="+value[0]+">"+value[1]+"</option>";
+                    });
+                    $('select[name="subcategory"]').html('<option value="None">---Select subcategory---</option>' + html);
+            
+                },
+                error: function(data){
+                    console.log(data);
+                }
+            });
+    });
 
     </script>
   

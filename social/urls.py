@@ -28,7 +28,8 @@ urlpatterns = [
     path('remove-comment/', views.remove_comment, name='remove-comment'),
 
 
-    # showing pop-up post-details
+    # showing pop-up post-details 
     path('show-post-details/', views.show_post_details, name="show-post-details"),
+    path('add-subcategory/', views.add_subcategory, name="add-subcategory"),
 
 ]

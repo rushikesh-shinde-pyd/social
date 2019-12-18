@@ -1,5 +1,6 @@
+from django.shortcuts import render,redirect,reverse, get_object_or_404
 from django import template
-from social.models import Like, Dislike
+from social.models import Like, Dislike, Post, Comment
 
 from django.template.defaultfilters import stringfilter
 register = template.Library()
@@ -57,4 +58,13 @@ def pluralize_reply(value):
 
 
 
+
+@register.simple_tag
+def verify_user_for_deletion(blogger, commentor, current_user):
+    if str(current_user) == str(blogger) or str(current_user) == str(commentor):
+        return True
+    else:
+        return False
+
+   
 

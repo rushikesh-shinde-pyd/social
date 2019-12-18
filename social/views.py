@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect,reverse, get_object_or_404
 from django.contrib.auth import authenticate,login as auth_login,logout
 from .forms import SignUpForm,PhotoForm
 from django.contrib.auth.models import User
-from .models import Profile,Post, Like, Dislike, Comment, Replies
+from .models import Profile,Post, Like, Dislike, Comment, Replies, CATEGORIES, SPORTS, FOOD
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
@@ -69,14 +69,20 @@ def login(request):
 
 # @login_required()
 def dashboard(request):
-    user = request.user
     posts = Post.objects.filter(is_active=True).order_by("-published_date")
     # posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
     paginator_obj = Paginator(posts, 5)
     page = request.GET.get('page')
     posts = paginator_obj.get_page(page)
-    total_pages = paginator_obj.num_pages
-    return render(request,'dashboard.html',{'user': user, 'posts': posts, 'dt': dt.now, 'timezone':timezone, 'total_pages':total_pages})
+    context = {
+                'user': request.user, 
+                'posts': posts, 'dt': dt.now, 
+                'timezone':timezone, 
+                'total_pages':paginator_obj.num_pages,
+                # 'categories': Category.objects.all().order_by('category_name')
+                'categories': CATEGORIES
+            }
+    return render(request,'dashboard.html', context)
 
 # @login_required()
 def profile(request):
@@ -158,8 +164,10 @@ def forgot_password(request):
 
 def create_post(request):
     if request.method == "POST":
+        category = request.POST.get('category')
         post = request.POST.get('post-content')
         title = request.POST.get('post-title')
+        print(category)
         if post and title:
             user_obj = User.objects.get(username=request.user)
             obj = Post(
@@ -167,7 +175,8 @@ def create_post(request):
                 title = title.strip(),
                 text = post.strip(),
                 created_date = timezone.now(),
-                # published_date = timezone.now()
+                # published_date = timezone.now(),
+                category = category
             )
             obj.save()
             obj.publish()
@@ -375,3 +384,7 @@ def show_post_details(request):
 
 
 
+def add_subcategory(request):
+    category = request.GET.get('category').strip()
+    data = {'subcategories': FOOD}
+    return JsonResponse(data)

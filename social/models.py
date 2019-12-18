@@ -6,6 +6,26 @@ from django.utils import timezone
 from django.conf import settings
 
 
+CATEGORIES = (
+        ('adventure', 'Adventure'),
+        ('fitness', 'Fitness'),
+        ('health', 'Health'),
+        ('food', 'Food'),
+        ('sports', 'Sports'),
+    )
+
+SPORTS = (
+        ('cricket', 'Cricket'),
+        ('football', 'Football'),
+        ('baseball', 'Baseball'),
+)
+
+FOOD = (
+        ('indian', 'indian'),
+        ('chinese', 'chinese'),
+        ('japanese', 'japanese'),
+)
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='profile/',default='default_pic.png')
@@ -32,7 +52,22 @@ def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
 
+# class Category(models.Model):
+#     # post =  models.ForeignKey(Post, on_delete=models.CASCADE)
+#     name = models.CharField(choices=CATEGORIES, max_length=256, null=True, blank=True)
+    
+
+#     class Meta:
+#         verbose_name = "category"
+#         verbose_name_plural = "categories"
+
+#     def __str__(self):
+#         return self.name
+
+
 class Post(models.Model):
+    # category =  models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True, related_name='category')
+    category = models.CharField(choices=CATEGORIES, max_length=256, null=True, blank=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     text = models.TextField()
@@ -87,8 +122,19 @@ class Replies(models.Model):
 
 
 
+# class Subcategory(models.Model):
+#     SUBCATEGORIES = (
+#         ('subone', 'Subone'),
+#         ('subtwo', 'Subtwo'),
+#     )
+#     post =  models.ForeignKey(Post, on_delete=models.CASCADE)
+#     category_name =  models.ForeignKey(Category, on_delete=models.CASCADE)
+#     subcategory_name = models.CharField(choices=SUBCATEGORIES, max_length=256)
+    
 
+#     class Meta:
+#         verbose_name = "subcategory"
+#         verbose_name_plural = "subcategories"
 
-
-
-
+#     def __str__(self):
+#         return self.subcategory_name
