@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect,reverse, get_object_or_404
 from django.contrib.auth import authenticate,login as auth_login,logout
 from .forms import SignUpForm,PhotoForm
 from django.contrib.auth.models import User
-from .models import Profile,Post, Like, Dislike, Comment, Replies, CATEGORIES, SPORTS, FOOD
+from .models import Profile,Post, Like, Dislike, Comment, Replies, CATEGORIES, SUBCATEGORIES
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
@@ -385,6 +385,8 @@ def show_post_details(request):
 
 
 def add_subcategory(request):
-    category = request.GET.get('category').strip()
-    data = {'subcategories': FOOD}
+    category = request.GET.get('category').strip().upper()
+    data = {
+        'subcategories': sorted(SUBCATEGORIES.get(category, None))
+    }
     return JsonResponse(data)

@@ -271,16 +271,15 @@
                            <div class="form-group">
                                 <p>
                                     <select name="category" class="form-control" required>
-                                        <option value="None">---Select Category---</option>
+                                        <option selected value="None">---Select Category---</option>
                                         {% for value, category in categories %}
                                             <option value="{{ value }}">{{ category|title }}</option>
                                         {% endfor %}
                                     </select>
                                 </p>
                                 <p>
-                                    <select name="subcategory" class="form-control" required>
-                                    <option value="None">---Select Subcategory---</option>
-                                        {% comment %} <option value="None">---Select subcategory---</option> {% endcomment %}
+                                    <select name="subcategory" class="form-control" required placeholder="Subcategory">
+                                        <option selected value="None">---Select Subcategory---</option>
                                     </select>
                                 </p>
                                 <p><input type="text" name="post-title" class="form-control" placeholder="Post Title"></p>

@@ -14,17 +14,42 @@ CATEGORIES = (
         ('sports', 'Sports'),
     )
 
-SPORTS = (
+SUBCATEGORIES = {
+    'SPORTS': (
         ('cricket', 'Cricket'),
         ('football', 'Football'),
         ('baseball', 'Baseball'),
-)
+    ),
 
-FOOD = (
-        ('indian', 'indian'),
-        ('chinese', 'chinese'),
-        ('japanese', 'japanese'),
-)
+    'FOOD': (
+            ('indian', 'Indian'),
+            ('chinese', 'Chinese'),
+            ('japanese', 'Japanese'),
+    ),
+
+    'FITNESS': (
+            ('martial_arts', 'Martial arts'),
+            ('gymnastics', 'Gymnastics'),
+            ('yoga', 'Yoga'),
+            ('weight_training', 'Weight training'),
+            ('crossfit', 'Crossfit'),
+    ),
+
+    'HEALTH': (
+        ('blood', 'Blood'),
+        ('cardiovascular', 'Cardiovascular'),
+        ('infection', 'Infection'),
+        ('mental', 'Mental'),
+    ),
+
+    'ADVENTURE': (
+        ('action', 'Action'),
+        ('thriller', 'Thriller'),
+        ('comedy', 'Comedy'),
+        ('travel', 'Travel'),
+    ),
+}
+
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -66,7 +91,6 @@ def save_user_profile(sender, instance, **kwargs):
 
 
 class Post(models.Model):
-    # category =  models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True, related_name='category')
     category = models.CharField(choices=CATEGORIES, max_length=256, null=True, blank=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
@@ -103,11 +127,6 @@ class Comment(models.Model):
 
     def approve(self):
         self.is_approved = True
-        self.save()
-
-
-    def reject(self):
-        self.is_rejected = True
         self.save()
 
 
