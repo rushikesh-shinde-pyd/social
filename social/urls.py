@@ -29,7 +29,13 @@ urlpatterns = [
 
 
     # showing pop-up post-details 
-    path('show-post-details/', views.show_post_details, name="show-post-details"),
     path('add-subcategory/', views.add_subcategory, name="add-subcategory"),
+    
+    
+    path('blog/', views.blog, name="blog"),
+
+
+    path('blog/category/<str:key>/', views.blog, name="category"),
+    path('blog/<int:pk>/', views.post_details, name="post-details"),
 
 ]

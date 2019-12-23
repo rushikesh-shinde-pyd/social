@@ -1,0 +1,1691 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load mathfilters %}
+{% load c_filters %}
+{% block title %}
+    <title>Dashboard - Social Module</title>
+{% endblock %}
+{% block content %}
+<style>
+    .profile-pic {
+        position: relative;
+        display: inline-block;
+    }
+
+    .profile-pic:hover .edit {
+        display: block;
+    }
+
+    .edit {
+        padding-top: 7px;
+        padding-right: 7px;
+        position: absolute;
+        right: 0;
+        top: 0;
+        display: none;
+    }
+
+    .edit a {
+        color: blue;
+    }
+    .dropdown-submenu {
+        position: relative;
+    }
+
+    .dropdown-submenu .dropdown-menu {
+        top: 0;
+        left: 100%;
+        margin-top: -1px;
+    }
+    .note-editor {
+        margin-bottom: 0 !important;
+        border-radius: 0;
+        border: 0 !important;
+    }
+    .ui-icon-gripsmall-diagonal-se {
+        display: none !important;
+    }
+
+
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 40%;
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<section id="container" >
+    <!-- **********************************************************************************************************************************************************
+    TOP BAR CONTENT & NOTIFICATIONS
+    *********************************************************************************************************************************************************** -->
+    <!--header start-->
+    <header class="header black-bg">
+            <div class="sidebar-toggle-box">
+                <div class="fa fa-bars tooltips" data-placement="right" data-original-title="Toggle Navigation"></div>
+            </div>
+        <!--logo start-->
+        <a href="{% url 'social:dashboard' %}" class="logo"><b>SOCIAL MODULE</b></a>
+        <!--logo end-->
+        <div class="nav notify-row" id="top_menu">
+            <!--  notification start -->
+            <ul class="nav top-menu">
+                <!-- settings start -->
+                <li class="dropdown">
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="index.html#">
+                        <i class="fa fa-tasks"></i>
+                        <span class="badge bg-theme">4</span>
+                    </a>
+                    <ul class="dropdown-menu extended tasks-bar">
+                        <div class="notify-arrow notify-arrow-green"></div>
+                        <li>
+                            <p class="green">You have 4 pending tasks</p>
+                        </li>
+                        <li>
+                            <a href="index.html#">
+                                <div class="task-info">
+                                    <div class="desc">DashGum Admin Panel</div>
+                                    <div class="percent">40%</div>
+                                </div>
+                                <div class="progress progress-striped">
+                                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+                                        <span class="sr-only">40% Complete (success)</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html#">
+                                <div class="task-info">
+                                    <div class="desc">Database Update</div>
+                                    <div class="percent">60%</div>
+                                </div>
+                                <div class="progress progress-striped">
+                                    <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%">
+                                        <span class="sr-only">60% Complete (warning)</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html#">
+                                <div class="task-info">
+                                    <div class="desc">Product Development</div>
+                                    <div class="percent">80%</div>
+                                </div>
+                                <div class="progress progress-striped">
+                                    <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 80%">
+                                        <span class="sr-only">80% Complete</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html#">
+                                <div class="task-info">
+                                    <div class="desc">Payments Sent</div>
+                                    <div class="percent">70%</div>
+                                </div>
+                                <div class="progress progress-striped">
+                                    <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width: 70%">
+                                        <span class="sr-only">70% Complete (Important)</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="external">
+                            <a href="#">See All Tasks</a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- settings end -->
+                <!-- inbox dropdown start-->
+                <li id="header_inbox_bar" class="dropdown">
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="index.html#">
+                        <i class="fa fa-envelope-o"></i>
+                        <span class="badge bg-theme">5</span>
+                    </a>
+                    <ul class="dropdown-menu extended inbox">
+                        <div class="notify-arrow notify-arrow-green"></div>
+                        <li>
+                            <p class="green">You have 5 new messages</p>
+                        </li>
+                        <li>
+                            <a href="index.html#">
+                                <span class="photo"><img alt="avatar" src="assets/img/ui-zac.jpg"></span>
+                                <span class="subject">
+                                <span class="from">Zac Snider</span>
+                                <span class="time">Just now</span>
+                                </span>
+                                <span class="message">
+                                    Hi mate, how is everything?
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html#">
+                                <span class="photo"><img alt="avatar" src="assets/img/ui-divya.jpg"></span>
+                                <span class="subject">
+                                <span class="from">Divya Manian</span>
+                                <span class="time">40 mins.</span>
+                                </span>
+                                <span class="message">
+                                    Hi, I need your help with this.
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html#">
+                                <span class="photo"><img alt="avatar" src="assets/img/ui-danro.jpg"></span>
+                                <span class="subject">
+                                <span class="from">Dan Rogers</span>
+                                <span class="time">2 hrs.</span>
+                                </span>
+                                <span class="message">
+                                    Love your new Dashboard.
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html#">
+                                <span class="photo"><img alt="avatar" src="assets/img/ui-sherman.jpg"></span>
+                                <span class="subject">
+                                <span class="from">Dj Sherman</span>
+                                <span class="time">4 hrs.</span>
+                                </span>
+                                <span class="message">
+                                    Please, answer asap.
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html#">See all messages</a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- inbox dropdown end -->
+            </ul>
+            <!--  notification end -->
+        </div>
+        <div class="top-menu">
+            <ul class="nav pull-right top-menu">
+                <li><a class="logout" href="{% url 'social:logout' %}">Logout</a></li>
+            </ul>
+        </div>
+
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissable" role="alert" >
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="close"><span aria-hidden="true">&times</span></button>
+        </div>
+        
+      {% endfor %}
+    </header>
+    <!--header end-->
+
+    <!-- **********************************************************************************************************************************************************
+    MAIN SIDEBAR MENU
+    *********************************************************************************************************************************************************** -->
+    <!--sidebar start-->
+    <!--<div id="myModal" class="modal">
+        <form method="post">
+            {% csrf_token %}
+        {% comment %} Modal content {% endcomment %}
+        <div class="modal-content">
+        <span class="close">&times;</span>
+        <p class="form-label">Upload Image</p><br/>
+        <input type="file" id="image1"  class="form-control"><br/>
+        <button id="create_file" type="submit" class="btn btn-primary btn-sm" >Upload</button>
+        </div>
+        </form>
+    </div>-->
+
+    <aside>
+        <div id="sidebar"  class="nav-collapse ">
+            <!-- sidebar menu start-->
+            <ul class="sidebar-menu" id="nav-accordion">
+
+                <p class="centered"><a href="{% url 'social:profile' %}"><img src="{% static 'img/ui-sam.jpg' %}" class="img-circle" width="60"></a></p>
+                <h5 class="centered">{{ user.first_name|title }} {{ user.last_name|title }}</h5>
+
+                <li class="mt">
+                    <a class="active" href="{% url 'social:profile' %}">
+                        <i class="fa fa-dashboard"></i>
+                        <span>Profile</span>
+                    </a>
+                </li>
+                <li class="sub-menu">
+                    <a href="javascript:;" >
+                        <i class="fa fa-list-alt"></i>
+                        <span>Categories</span>
+                    </a>
+                    <ul class="sub">
+                    {% for value, category in categories %}
+                        {% comment %} <option value="{{ value }}"></option> {% endcomment %}
+                        <li><a  href="general.html">{{ category|title }}</a></li>
+                    {% endfor %}
+                        
+                        <li><a  href="buttons.html">Buttons</a></li>
+                        <li><a  href="panels.html">Panels</a></li>
+                    </ul>
+                </li>
+
+                <li class="sub-menu">
+                    <a href="javascript:;" >
+                        <i class="fa fa-desktop"></i>
+                        <span>UI Elements</span>
+                    </a>
+                    <ul class="sub">
+                        <li><a  href="general.html">General</a></li>
+                        <li><a  href="buttons.html">Buttons</a></li>
+                        <li><a  href="panels.html">Panels</a></li>
+                    </ul>
+                </li>
+
+                <li class="sub-menu">
+                    <a href="javascript:;" >
+                        <i class="fa fa-cogs"></i>
+                        <span>Components</span>
+                    </a>
+                    <ul class="sub">
+                        <li><a  href="calendar.html">Calendar</a></li>
+                        <li><a  href="gallery.html">Gallery</a></li>
+                        <li><a  href="todo_list.html">Todo List</a></li>
+                    </ul>
+                </li>
+                <li class="sub-menu">
+                    <a href="javascript:;" >
+                        <i class="fa fa-book"></i>
+                        <span>Extra Pages</span>
+                    </a>
+                    <ul class="sub">
+                        <li><a  href="blank.html">Blank Page</a></li>
+                        <li><a  href="login.html">Login</a></li>
+                        <li><a  href="lock_screen.html">Lock Screen</a></li>
+                    </ul>
+                </li>
+                <li class="sub-menu">
+                    <a href="javascript:;" >
+                        <i class="fa fa-tasks"></i>
+                        <span>Forms</span>
+                    </a>
+                    <ul class="sub">
+                        <li><a  href="form_component.html">Form Components</a></li>
+                    </ul>
+                </li>
+                <li class="sub-menu">
+                    <a href="javascript:;" >
+                        <i class="fa fa-th"></i>
+                        <span>Data Tables</span>
+                    </a>
+                    <ul class="sub">
+                        <li><a  href="basic_table.html">Basic Table</a></li>
+                        <li><a  href="responsive_table.html">Responsive Table</a></li>
+                    </ul>
+                </li>
+                <li class="sub-menu">
+                    <a href="javascript:;" >
+                        <i class=" fa fa-bar-chart-o"></i>
+                        <span>Charts</span>
+                    </a>
+                    <ul class="sub">
+                        <li><a  href="morris.html">Morris</a></li>
+                        <li><a  href="chartjs.html">Chartjs</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <!-- sidebar menu end-->
+        </div>
+    </aside>
+    <!--sidebar end-->
+
+    <!-- **********************************************************************************************************************************************************
+    MAIN CONTENT
+    *********************************************************************************************************************************************************** -->
+    <!--main content start-->
+    <section id="main-content">
+        <section class="wrapper">
+
+            <!--<div class="row">-->
+                <div class="col-lg-9 main-chart">
+                <!--.>&lt;!&ndash; /row mt &ndash;&gt;-->
+                <div class="row mt">
+                    <!-- SERVER STATUS PANELS -->
+                    <!--.&lt;!&ndash; /col-md-4&ndash;&gt;-->
+                    <div class="col-md-12 col-sm-12 mb" >
+                        <i title="Create new post" class="fa fa-plus" style="padding:5px; color: #31708f; margin: 0px 0px 10px 0px; font-size:20px;" aria-hidden="true"></i>
+                        <form class="post-create-form" style="display: none;" method="post" action="{% url 'social:post-create' %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <p>
+                                    <select name="category" class="form-control" required>
+                                        <option selected value="None">Select Category</option>
+                                        {% for value, category in categories %}
+                                            <option value="{{ value }}">{{ category|title }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </p>
+                                <p>
+                                    <select name="subcategory" class="form-control" required placeholder="Subcategory">
+                                        <option selected value="None">Select Subcategory</option>
+                                    </select>
+                                </p>
+                                <p><input type="text" name="post-title" class="form-control" placeholder="Post Title"></p>
+                                <p><textarea style="resize:none;" name="post-content" class="form-control" rows="3" placeholder="What's on your mind!"></textarea></p>
+                                <p><button class="btn btn-sm btn-primary" type="submit" style="margin-top:10px;">POST</button></p>
+                            </div>
+                        </form>
+
+                        <!-- 
+                        <div class="row mtbox">
+                            <div class="col-md-2 col-sm-2 col-md-offset-1 box0">
+                                <div class="box1">
+                                    <span class="li_heart"></span>
+                                    <h3>933</h3>
+                                </div>
+                                    <p>933 People liked your page the last 24hs. Whoohoo!</p>
+                            </div>
+                            <div class="col-md-2 col-sm-2 box0">
+                                <div class="box1">
+                                    <span class="li_cloud"></span>
+                                    <h3>+48</h3>
+                                </div>
+                                    <p>48 New files were added in your cloud storage.</p>
+                            </div>
+                            <div class="col-md-2 col-sm-2 box0">
+                                <div class="box1">
+                                    <span class="li_stack"></span>
+                                    <h3>23</h3>
+                                </div>
+                                    <p>You have 23 unread messages in your inbox.</p>
+                            </div>
+                            <div class="col-md-2 col-sm-2 box0">
+                                <div class="box1">
+                                    <span class="li_news"></span>
+                                    <h3>+10</h3>
+                                </div>
+                                    <p>More than 10 news were added in your reader.</p>
+                            </div>
+                            <div class="col-md-2 col-sm-2 box0">
+                                <div class="box1">
+                                    <span class="li_data"></span>
+                                    <h3>OK!</h3>
+                                </div>
+                                    <p>Your server is working perfectly. Relax & enjoy.</p>
+                            </div>
+                        </div><!--row mt -->
+                        <!--<hr/> -->
+
+                        {% comment %} ****************************************
+                                            BLOG MODULE 
+                        **************************************** {% endcomment %}
+
+                        {% comment %} posts div starts {% endcomment %}
+                        {% for post in posts %}
+                            <div class="row">
+                                <div class="post-div col-md-12 col-sm-12 mb" id="post-id-{{ post.id }}">
+                                    <div class="panel panel-info ">
+                                        <input type="hidden" name="id" value="{{ post.id }}">
+                                        <div class="panel-heading"><a href="#" onclick="show_post({{ post.id }})" data-toggle="modal" data-target="#post_view_modal"><span id="post-title">{{ post.title | title }}</span></a>
+                                            {% if user.first_name == post.author.first_name and user.last_name == post.author.last_name %}
+                                            <div class="post-actions" style="border-top-right-radius: 3px; background-color: rgba(0,0,0,.5); position: absolute; top: 0px; right: 15px; padding: 7px;">
+                                                <i onclick="update_post({{ post.id }})" data-toggle="modal" data-target="#updateModal" style="color: #ffffff; margin-right: 7px; transform:scale(1.3,1.3);cursor:pointer" class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                                <i onclick="delete_post({{ post.id }})" style="color: #ffffff; transform:scale(1.3,1.3);cursor:pointer" class="glyphicon glyphicon-remove"></i>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div style="float:left;">
+                                                        <strong id="cat-subcat">
+                                                            {{ post.category | title }} >> {{ post.subcategory | title }}</strong>
+                                                    </div>
+                                                    <div style="float:right;">
+                                                        <strong id="post-author">
+                                                            {{ post.author.first_name | title }} {{ post.author.last_name | title }}</strong> :
+                                                        <span id="post-published">
+                                                            <small>{{ post.published_date|timesince }} ago</small>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                                <hr style="border-top: 1px solid #797979;margin-top:10px;margin-bottom:10px;">
+                                                <p id="post-text">
+                                                    {% if post.text|count_length > 500 %}
+                                                        {{ post.text |title|show_more }}
+                                                        <i data-toggle="modal" data-target="#post_view_modal" onclick="show_post({{ post.id }})" style="transform:scale(1,1);cursor:pointer" class="glyphicon glyphicon-new-window"></i>
+                                                    {% else %}
+                                                        {{ post.text|title }}
+                                                    {% endif %}
+                                                </p>
+                                        </div>
+                                        <div class="panel-heading">
+                                            <ul class="dlikes list-group" >
+                                                {% get_like_obj post.id request.user.id as like_obj %}
+                                                {% get_dislike_obj post.id request.user.id as dislike_obj %}
+                                                {% comment %} {% if dislike_obj == False%} {% endcomment %}
+                                                    {% if like_obj %}
+                                                    <li class="list-group-item">
+                                                        <i onclick="undolike({{ post.id }})" style="transform:scale(1.5,1.5); cursor:pointer;" class="undolike likedislikeclass glyphicon glyphicon-thumbs-up" aria-hidden="true"></i>
+                                                    </li>
+                                                    {% else %}
+                                                        <li class="list-group-item">
+                                                            <i onclick="like({{ post.id }})" style="transform:scale(1.5,1.5);cursor:pointer;" class="like glyphicon glyphicon-thumbs-up" aria-hidden="true"></i>
+                                                        </li>
+                                                    {%endif%}    
+
+                                                    {% if post.likes.count > 0 %}    
+                                                        <li class="list-group-item">
+                                                            <strong id="like-count">{{ post.likes.count }}</strong>
+                                                        </li>
+                                                    {% else %}
+                                                        <li class="list-group-item">
+                                                            <strong id="like-count"></strong>
+                                                        </li>
+                                                    {% endif %}   
+                                                {% comment %} {% endif %}  {% endcomment %}
+
+                                                {% if dislike_obj %}
+                                                <li class="list-group-item">
+                                                    <i onclick="undodislike({{ post.id }})" style="transform:scale(1.5,1.5); cursor:pointer;" class="undodislike likedislikeclass glyphicon glyphicon-thumbs-down" aria-hidden="true"></i>
+                                                </li>
+                                                {% else %}
+                                                    <li class="list-group-item">
+                                                        <i onclick="dislike({{ post.id }})" style="transform:scale(1.5,1.5);cursor:pointer;" class="dislike glyphicon glyphicon-thumbs-down" aria-hidden="true"></i>
+                                                    </li>
+                                                {%endif%}    
+
+                                                {% if post.dislikes.count > 0 %}    
+                                                    <li class="list-group-item">
+                                                        <strong id="dislike-count">{{ post.dislikes.count }}</strong>
+                                                    </li>
+                                                {% else %}
+                                                    <li class="list-group-item">
+                                                        <strong id="dislike-count"></strong>
+                                                    </li>
+                                                {% endif %}    
+
+                                                <li class="list-group-item">
+                                                    <i onclick="comment({{ post.id }})" style="transform:scale(1.5,1.5); cursor:pointer;" class="glyphicon glyphicon-comment" aria-hidden="true"></i>
+                                                </li>
+                                                
+                                                {% if post.comment_set.count > 0 %}    
+                                                    <li class="list-group-item">
+                                                        <strong id="comment-count">{{ post.comment_set.count }}</strong>
+                                                    </li>
+                                                {% else %}
+                                                    <li class="list-group-item">
+                                                        <strong id="comment-count"></strong>
+                                                    </li>
+                                                {% endif %}    
+                                            </ul>
+                                            <div class="write-comment" style="display: none;">
+                                                <form id="comment-form-{{ post.id }}" method="post">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="post-id" value="{{ post.id }}">
+                                                    <textarea autofocus maxlength="160" style="margin: 10px 0px; border: none;" class="comment-box form-control" placeholder="Comment here..."></textarea>
+                                                    <input type="button" name="close-comment" class="btn" value="Cancel">
+                                                    <input type="submit" disabled name="comment" style="display:none;" class="btn btn-primary" value="Comment">
+                                                </form>
+                                                <div class="comments-replies">
+                                                    {% get_comments post.comment_set.all as qs %}
+                                                    {% if qs%}
+                                                    <h5>Comments</h5>
+                                                    {% endif %}
+                                                    <div class="comment-wrapper">
+                                                        {% for each_comment in qs %}
+                                                        <div id="comment-div-id-{{ each_comment.id }}">
+                                                            <div style="margin:10px 10px;"><strong class="commenter">{{ each_comment.user.first_name|title }} {{ each_comment.user.last_name|title }}</strong> commented <span class="comment-timestamp">
+                                                            {% if each_comment.commented_at|timesince == '0 minutes' %}
+                                                            <small> just now </small>
+                                                            {% else %}
+                                                                <small> {{ each_comment.commented_at|timesince }} ago</small>
+                                                            {% endif %}
+                                                            </div>
+                                                            <ul class="list-group comment-div" id="comment-id-{{each_comment.id}}">
+                                                                <li class="list-group-item" style="display:inline-block;">
+                                                                    {{ each_comment.message }}
+                                                                </li>
+                                                                {% comment %} <input type="button" style="margin-bottom:0px; background-color:#fff; color: #2b6eff; border:none; padding:0px;"    value="Reply"> {% endcomment %}
+                                                                <i style="cursor:pointer;" onclick="reply_to_comment({{each_comment.id}}, {{post.id}})" class="fa fa-reply remove-comment" aria-hidden="true"></i>
+                                                                {% verify_user_for_deletion post.author.username each_comment.user.username request.user as its_user %}
+                                                                {% if its_user == True %}
+                                                                    <i style="cursor:pointer;" onclick="remove_comment({{each_comment.id}}, {{post.id}})" class="fa fa-trash" aria-hidden="true"></i>
+                                                                {% endif %}
+                                                                <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
+                                                                    {% csrf_token %}
+                                                                    <textarea autofocus style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
+                                                                    <input class="btn btn-primary" style="display:none" type="submit" disabled name="reply" value="Reply">
+                                                                </form>
+                                                                {% comment %} <br> {% endcomment %}
+                                                                {% get_replies each_comment.parent.all as reply_queryset %}
+                                                                {%if reply_queryset %}
+                                                                <button style="background-color:transparent; color: #2b6eff; border:none; margin-left: 10px; margin-top: 5px;" name="show-replies">show replies</button>
+                                                                <h5 id="reply-count" style="padding:0px 15px;">{{ reply_queryset.count|pluralize_reply }}</h5>
+                                                                <div class="replies">
+                                                                    {% for each_reply in reply_queryset %}
+                                                                        <div class="reply-wrapper">
+                                                                            <ul  style="margin-left:50px;display:none;" class="list-group reply-div">
+                                                                                <div style="margin:10px 0px;"><strong class="replier">{{ each_reply.user.first_name|title }} {{ each_reply.user.last_name|title }}</strong> replied <span class="reply-timestamp"><small>{{ each_reply.commented_at|timesince }}</span> ago</small><br></div>
+                                                                                <li class="list-group-item" style="display:inline-block;">{{ each_reply.reply }}</li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    {% endfor %}
+                                                                </div>
+                                                                {% endif %}
+                                                            </ul>
+                                                        </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {% comment %} posts ends here {% endcomment %}
+
+                        {% comment %} pagination starts {% endcomment %}
+                        <div class="row">
+                            <div class="col-lg-10">
+                                <nav aria-label="..." style="margin-left:50%">
+                                    <ul class="pagination">
+                                        {% if posts.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=1">First</a>
+                                        </li>
+                                        <li class="page-item"><a class="page-link" href="?page={{ posts.previous_page_number }}">{{ posts.previous_page_number }}</a></li>
+                                        {% endif %}
+                                        <li class="page-item active">
+                                        <a class="page-link" href="?page={{ posts.number }}">{{ posts.number }} <span class="sr-only">(current)</span></a>
+                                        </li>
+                                        
+                                        {% if posts.has_next %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ posts.next_page_number }}">{{ posts.next_page_number }}</a>
+                                            </li>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ total_pages }}">Last</a>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                        {% comment %} pagination ends {% endcomment %}
+                        
+                        <div class="darkblue-panel pn" style="background-image:url({% static 'img/profile-02.jpg' %});background-repeat: no-repeat;background-size: cover;">
+                            <div class="darkblue-header">
+                                <h5 class="">PROFILE DETAILS</h5>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 col-xs-6 ">
+                                    <p> </p>
+                                </div>
+                                <div class="col-sm-6 col-xs-6"></div>
+                            </div>
+                            <div class=" goleft" style="margin:20px;">
+                                <div class="profile-pic">
+                                    <img src="{% static 'img/ui-zac.jpg' %}" width="120" class="">
+                                    <div class="edit"><a href="#" id="pic"><i class="fa fa-edit"></i></a></div></div>
+                            </div>
+                            <div>
+                                <p class="goleft" style="color:white;margin:20px;">{{ user.first_name }} {{ user.last_name }}</p>
+                            </div>
+
+                        </div>
+                    </div><!-- /col-md-4 -->
+
+                    <!--<div class="col-md-4 mb">-->
+                        <!--&lt;!&ndash; WHITE PANEL - TOP USER &ndash;&gt;-->
+                        <!--<div class="white-panel pn">-->
+                            <!--<div class="white-header">-->
+                                <!--<h5>TOP USER</h5>-->
+                            <!--</div>-->
+                            <!--<p><img src="assets/img/ui-zac.jpg" class="img-circle" width="80"></p>-->
+                            <!--<p><b>Zac Snider</b></p>-->
+                            <!--<div class="row">-->
+                                <!--<div class="col-md-6">-->
+                                    <!--<p class="small mt">MEMBER SINCE</p>-->
+                                    <!--<p>2012</p>-->
+                                <!--</div>-->
+                                <!--<div class="col-md-6">-->
+                                    <!--<p class="small mt">TOTAL SPEND</p>-->
+                                    <!--<p>$ 47,60</p>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>&lt;!&ndash; /col-md-4 &ndash;&gt;-->
+
+
+                </div><!-- /row -->
+
+
+                <div class="row">
+                    <!-- TWITTER PANEL -->
+                    <div class="col-md-12 col-sm-12 mb">
+                    <div class="panel panel-info ">
+                        <div class="panel-body">
+                            <div class="row">
+                                    <div class="col-sm-6 form-group">
+                                    <label class="col-sm-4" style="color:black;">First Name </label>:
+                                    {{ user.first_name }}
+                                    </div>
+                                    <div class="col-sm-6 form-group">
+                                    <label class="col-sm-4" style="color:black;">Last Name </label>:
+                                    {{ user.last_name }}
+                                    </div>
+                            </div>
+                            <div class="row">
+                                    <div class="col-sm-6 form-group">
+                                    <label class="col-sm-4" style="color:black;">Email Id </label>:
+                                    {{ user.email }}
+                                    </div>
+                                    <div class="col-sm-6 form-group">
+                                    <label class="col-sm-4" style="color:black;">Username</label>:
+                                    {{ user.username }}
+                                    </div>
+                            </div>
+                            <div class="row">
+                                    <div class="col-sm-6 form-group">
+                                    <label class="col-sm-4" style="color:black;">Gender </label>:
+                                    {{ user.profile.gender }}
+                                    </div>
+                                    <div class="col-sm-6 form-group">
+                                    <label class="col-sm-4" style="color:black;">Birth Date</label>:
+                                    {{ user.profile.birth_date }}
+                                    </div>
+                            </div>
+                            <div class="row">
+                                    <div class="col-sm-6 form-group">
+                                    <label class="col-sm-4" style="color:black;">City </label>:
+                                    {{ user.profile.city }}
+                                    </div>
+                                    <div class="col-sm-6 form-group">
+                                    <label class="col-sm-4" style="color:black;">State</label>:
+                                    {{ user.profile.state }}
+                                    </div>
+                            </div>
+                            <div class="row">
+                                    <div class="col-sm-6 form-group">
+                                    <label class="col-sm-4" style="color:black;">Country </label>:
+                                    {{ user.profile.country }}
+                                    </div>
+                                    <div class="col-sm-6 form-group">
+                                    <label class="col-sm-4" style="color:black;">Address</label>:
+                                    {{ user.profile.fullAddress }}
+                                    </div>
+                            </div><hr/>
+
+
+                        <div class="form-buttons-w">
+
+                            <div class="col-sm-6 text"><a class="btn btn-primary btn-sm" href="{% url 'social:editProfile' %}">
+                            <i class="fa fa-edit"></i> <span>Edit Profile</span></a></div></div>
+
+                        </div><! -- /darkblue panel -->
+                    </div><!-- /col-md-4 -->
+                    </div>
+
+                    <!--<div class="col-md-4 mb">-->
+                        <!--&lt;!&ndash; INSTAGRAM PANEL &ndash;&gt;-->
+                        <!--<div class="instagram-panel pn">-->
+                            <!--<i class="fa fa-instagram fa-4x"></i>-->
+                            <!--<p>@THISISYOU<br/>-->
+                                <!--5 min. ago-->
+                            <!--</p>-->
+                            <!--<p><i class="fa fa-comment"></i> 18 | <i class="fa fa-heart"></i> 49</p>-->
+                        <!--</div>-->
+                    <!--</div>&lt;!&ndash; /col-md-4 &ndash;&gt;-->
+
+                    <!--<div class="col-md-4 col-sm-4 mb">-->
+                        <!--&lt;!&ndash; REVENUE PANEL &ndash;&gt;-->
+                        <!--<div class="darkblue-panel pn">-->
+                            <!--<div class="darkblue-header">-->
+                                <!--<h5>REVENUE</h5>-->
+                            <!--</div>-->
+                            <!--<div class="chart mt">-->
+                                <!--<div class="sparkline" data-type="line" data-resize="true" data-height="75" data-width="90%" data-line-width="1" data-line-color="#fff" data-spot-color="#fff" data-fill-color="" data-highlight-line-color="#fff" data-spot-radius="4" data-data="[200,135,667,333,526,996,564,123,890,464,655]"></div>-->
+                            <!--</div>-->
+                            <!--<p class="mt"><b>$ 17,980</b><br/>Month Income</p>-->
+                        <!--</div>-->
+                    <!--</div>&lt;!&ndash; /col-md-4 &ndash;&gt;-->
+
+                </div><!-- /row -->
+
+                <div class="row mt">
+                    <!--CUSTOM CHART START -->
+                    <div class="border-head">
+                        <h3>VISITS</h3>
+                    </div>
+                    <div class="custom-bar-chart">
+                        <ul class="y-axis">
+                            <li><span>10.000</span></li>
+                            <li><span>8.000</span></li>
+                            <li><span>6.000</span></li>
+                            <li><span>4.000</span></li>
+                            <li><span>2.000</span></li>
+                            <li><span>0</span></li>
+                        </ul>
+                        <div class="bar">
+                            <div class="title">JAN</div>
+                            <div class="value tooltips" data-original-title="8.500" data-toggle="tooltip" data-placement="top">85%</div>
+                        </div>
+                        <div class="bar ">
+                            <div class="title">FEB</div>
+                            <div class="value tooltips" data-original-title="5.000" data-toggle="tooltip" data-placement="top">50%</div>
+                        </div>
+                        <div class="bar ">
+                            <div class="title">MAR</div>
+                            <div class="value tooltips" data-original-title="6.000" data-toggle="tooltip" data-placement="top">60%</div>
+                        </div>
+                        <div class="bar ">
+                            <div class="title">APR</div>
+                            <div class="value tooltips" data-original-title="4.500" data-toggle="tooltip" data-placement="top">45%</div>
+                        </div>
+                        <div class="bar">
+                            <div class="title">MAY</div>
+                            <div class="value tooltips" data-original-title="3.200" data-toggle="tooltip" data-placement="top">32%</div>
+                        </div>
+                        <div class="bar ">
+                            <div class="title">JUN</div>
+                            <div class="value tooltips" data-original-title="6.200" data-toggle="tooltip" data-placement="top">62%</div>
+                        </div>
+                        <div class="bar">
+                            <div class="title">JUL</div>
+                            <div class="value tooltips" data-original-title="7.500" data-toggle="tooltip" data-placement="top">75%</div>
+                        </div>
+                    </div>
+                    <!--custom chart end-->
+                </div><!-- /row -->
+
+                </div><!-- /col-lg-9 END SECTION MIDDLE -->
+
+
+    <!-- **********************************************************************************************************************************************************
+    RIGHT SIDEBAR CONTENT
+    *********************************************************************************************************************************************************** -->
+
+                <div class="col-lg-3 ds">
+                <!--COMPLETED ACTIONS DONUTS CHART-->
+                    <h3>NOTIFICATIONS</h3>
+
+                    <!-- First Action -->
+                    <div class="desc">
+                    <div class="thumb">
+                        <span class="badge bg-theme"><i class="fa fa-clock-o"></i></span>
+                    </div>
+                    <div class="details">
+                        <p><muted>2 Minutes Ago</muted><br/>
+                            <a href="#">James Brown</a> subscribed to your newsletter.<br/>
+                        </p>
+                    </div>
+                    </div>
+                    <!-- Second Action -->
+                    <div class="desc">
+                    <div class="thumb">
+                        <span class="badge bg-theme"><i class="fa fa-clock-o"></i></span>
+                    </div>
+                    <div class="details">
+                        <p><muted>3 Hours Ago</muted><br/>
+                            <a href="#">Diana Kennedy</a> purchased a year subscription.<br/>
+                        </p>
+                    </div>
+                    </div>
+                    <!-- Third Action -->
+                    <div class="desc">
+                    <div class="thumb">
+                        <span class="badge bg-theme"><i class="fa fa-clock-o"></i></span>
+                    </div>
+                    <div class="details">
+                        <p><muted>7 Hours Ago</muted><br/>
+                            <a href="#">Brandon Page</a> purchased a year subscription.<br/>
+                        </p>
+                    </div>
+                    </div>
+                    <!-- Fourth Action -->
+                    <div class="desc">
+                    <div class="thumb">
+                        <span class="badge bg-theme"><i class="fa fa-clock-o"></i></span>
+                    </div>
+                    <div class="details">
+                        <p><muted>11 Hours Ago</muted><br/>
+                            <a href="#">Mark Twain</a> commented your post.<br/>
+                        </p>
+                    </div>
+                    </div>
+                    <!-- Fifth Action -->
+                    <div class="desc">
+                    <div class="thumb">
+                        <span class="badge bg-theme"><i class="fa fa-clock-o"></i></span>
+                    </div>
+                    <div class="details">
+                        <p><muted>18 Hours Ago</muted><br/>
+                            <a href="#">Daniel Pratt</a> purchased a wallet in your store.<br/>
+                        </p>
+                    </div>
+                    </div>
+
+                    <!-- USERS ONLINE SECTION -->
+                    <h3>TEAM MEMBERS</h3>
+                    <!-- First Member -->
+                    <div class="desc">
+                    <div class="thumb">
+                        <img class="img-circle" src="assets/img/ui-divya.jpg" width="35px" height="35px" align="">
+                    </div>
+                    <div class="details">
+                        <p><a href="#">DIVYA MANIAN</a><br/>
+                            <muted>Available</muted>
+                        </p>
+                    </div>
+                    </div>
+                    <!-- Second Member -->
+                    <div class="desc">
+                    <div class="thumb">
+                        <img class="img-circle" src="assets/img/ui-sherman.jpg" width="35px" height="35px" align="">
+                    </div>
+                    <div class="details">
+                        <p><a href="#">DJ SHERMAN</a><br/>
+                            <muted>I am Busy</muted>
+                        </p>
+                    </div>
+                    </div>
+                    <!-- Third Member -->
+                    <div class="desc">
+                    <div class="thumb">
+                        <img class="img-circle" src="assets/img/ui-danro.jpg" width="35px" height="35px" align="">
+                    </div>
+                    <div class="details">
+                        <p><a href="#">DAN ROGERS</a><br/>
+                            <muted>Available</muted>
+                        </p>
+                    </div>
+                    </div>
+                    <!-- Fourth Member -->
+                    <div class="desc">
+                    <div class="thumb">
+                        <img class="img-circle" src="assets/img/ui-zac.jpg" width="35px" height="35px" align="">
+                    </div>
+                    <div class="details">
+                        <p><a href="#">Zac Sniders</a><br/>
+                            <muted>Available</muted>
+                        </p>
+                    </div>
+                    </div>
+                    <!-- Fifth Member -->
+                    <div class="desc">
+                    <div class="thumb">
+                        <img class="img-circle" src="assets/img/ui-sam.jpg" width="35px" height="35px" align="">
+                    </div>
+                    <div class="details">
+                        <p><a href="#">Marcel Newman</a><br/>
+                            <muted>Available</muted>
+                        </p>
+                    </div>
+                    </div>
+
+                    <!-- CALENDAR-->
+                    <div id="calendar" class="mb">
+                        <div class="panel green-panel no-margin">
+                            <div class="panel-body">
+                                <div id="date-popover" class="popover top" style="cursor: pointer; disadding: block; margin-left: 33%; margin-top: -50px; width: 175px;">
+                                    <div class="arrow"></div>
+                                    <h3 class="popover-title" style="disadding: none;"></h3>
+                                    <div id="date-popover-content" class="popover-content"></div>
+                                </div>
+                                <div id="my-calendar"></div>
+                            </div>
+                        </div>
+                    </div><!-- / calendar -->
+
+                </div><!-- /col-lg-3 -->
+            </div><!--/row -->
+        </section>
+    </section>
+
+    <!--main content end-->
+    <!--footer start-->
+    <footer class="site-footer">
+        <div class="text-center">
+            2014 - Alvarez.is
+            <a href="index.html#" class="go-top">
+                <i class="fa fa-angle-up"></i>
+            </a>
+        </div>
+    </footer>
+    <!--footer end-->
+  <!--modals-->
+
+  <!--delete prompt modal-->
+      <div class="modal fade" id="deletepromptmodal" tabindex="-1" role="dialog" aria-labelledby="deletepromptmodalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content" style="border: solid 1px red; border-top-left-radius: 0px; border-top-right-radius: 0px;">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+              <h4 class="modal-title" id="deletepromptmodalLabel">Do you really want to DELETE?</h4>
+            </div>
+            <div class="modal-body">
+                <p id="delete_title"></p>
+            <div class="modal-footer">
+                <button type="button" id="delete_confirm" class="btn btn-danger" >DELETE</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  <!--deletion message modal-->
+    <div class="modal fade" id="delete_message" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+              <button type="button" style="position:absolute; right:10px; top:10px;" class="close" data-dismiss="modal" aria-label="Close">x
+               {% comment %} <i style="top:-5px" aria-hidden="true" style="padding-right:10px; float:right; cursor:pointer;" class="glyphicon glyphicon-remove"></i> {% endcomment %}
+              </button>
+          </div>
+          <div class="modal-body">
+            <p class="text-center">Post has been <span class="text-danger">DELETED</span> successfully!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!--updation message modal-->
+    <div class="modal fade" id="update_message" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+              <button type="button" style="position:absolute; right:10px; top:10px;" class="close" data-dismiss="modal" aria-label="Close">x
+               {% comment %} <i style="top:-5px" aria-hidden="true" style="padding-right:10px; float:right; cursor:pointer;" class="glyphicon glyphicon-remove"></i> {% endcomment %}
+              </button>
+          </div>
+          <div class="modal-body">
+            <p class="text-center">Post has been <span class="text-info">UPDATED</span> successfully!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  <!--view post modal-->
+    <div class="modal fade" id="post_view_modal" tabindex="-1" role="dialog" aria-labelledby="post_view_modalLongTitle" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+              <div class="row">
+                  <div class="col-md-12">
+                    <h5 style="" class="modal-title" id="post_view_modalLongTitle"></h5>
+                  </div>
+                  <!--<div class="col-md-1">-->
+                    <button type="button" style="position:absolute; right:10px; top:10px;" class="close" data-dismiss="modal" aria-label="Close">
+                     x {% comment %} <i aria-hidden="true" style="padding-right:10px; float:right; cursor:pointer;" class="glyphicon glyphicon-remove"></i> {% endcomment %}
+                    </button>
+                  <!--</div>-->
+              </div>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+               <div class="col-md-12">
+                   <div style="border-bottom:1px solid #666;padding-bottom:5px;">
+                       POSTED BY  <strong id="post-view-author" style="font-size:16px;"></strong>
+                        <small id="post-view-published"></small>
+                   </div>
+                <div  id="post-view-text" style="margin:10px 0px;"></div>
+               </div>
+           </div>
+
+          </div>
+         <!-- <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>-->
+        </div>
+      </div>
+    </div>
+
+
+  <!--update modal-->
+  <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+          <h4 class="modal-title" id="updateModalLabel">Post details</h4>
+        </div>
+        <div class="modal-body">
+          <form class="post-update-form" method="post">
+               {% csrf_token %}
+               <div class="form-group">
+                   <p><input type="text" id="update-post-title" class="form-control" placeholder="Post Title"></p>
+                   <p><textarea style="resize:none;" id="update-post-content" class="form-control" rows="3" placeholder="What's on your mind!"></textarea></p>
+               </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" >Save changes</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+{% endblock %}
+
+{% block custom_scripts %}
+    <script type="application/javascript">
+        $(document).ready(function () {
+            $("#date-popover").popover({html: true, trigger: "manual"});
+            $("#date-popover").hide();
+            $("#date-popover").click(function (e) {
+                $(this).hide();
+            });
+
+            $("#my-calendar").zabuto_calendar({
+                action: function () {
+                    return myDateFunction(this.id, false);
+                },
+                action_nav: function () {
+                    return myNavFunction(this.id);
+                },
+                ajax: {
+                    url: "show_data.php?action=1",
+                    modal: true
+                },
+                legend: [
+                    {type: "text", label: "Special event", badge: "00"},
+                    {type: "block", label: "Regular event", }
+                ]
+            });
+        });
+
+
+        function myNavFunction(id) {
+            $("#date-popover").hide();
+            var nav = $("#" + id).data("navigation");
+            var to = $("#" + id).data("to");
+            console.log('nav ' + nav + ' to: ' + to.month + '/' + to.year);
+        }
+    </script>
+
+    <script type="application/javascript">
+        // dynamically adding subcategories to category
+        $('select[name="category"]').change(function(){
+            $.ajax({
+                    url: "{% url 'social:add-subcategory' %}",
+                    type: "GET",
+                    data: {
+                        'category': $(this).val().trim()
+                    },
+                    success: function(data){
+                        console.log(data);
+                        var html = "";
+                        $.each(data.subcategories, function (key, value) {
+                            html += "<option value="+value[0]+">"+value[1]+"</option>";
+                        });
+                        $('select[name="subcategory"]').html('<option value="None">Select Subcategory</option>' + html);
+                
+                    },
+                    error: function(data){
+                        console.log(data);
+                    }
+                });
+        });
+
+        // toggling post add button
+        $(document).on('click', '.fa-plus', function(){
+            $(this).toggleClass('rotate-plus');
+            $(".post-create-form").slideToggle();
+        })
+
+        $(".post-div").mouseenter(function(){
+            $(this).find(".posts-actions").fadeOut();
+        })
+
+
+
+
+    </script>
+
+    <script type="application/javascript">
+
+        /* ****************************************
+                        POST MODULE 
+        **************************************** */
+
+
+        // removing comments
+        function remove_comment_from_page(comment_id, post_id, data){
+            if (data.total_comments==0){
+                $("#post-id-" + post_id).find("#comment-count").text('');
+                $("#post-id-" + post_id).find(".comments-replies").find("h5").slideUp();
+                $("#post-id-" + post_id).find("#comment-div-id-" + comment_id).remove();
+            }else{
+                $("#post-id-" + post_id).find("#comment-div-id-" + comment_id).remove();
+                $("#post-id-" + post_id).find("#comment-count").text(data.total_comments);
+            }
+            
+        }
+
+        function remove_comment(comment_id, post_id){
+            $.ajax({
+                url: "{% url 'social:remove-comment' %}",
+                type: "POST",
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'comment_id': comment_id,
+                    'post_id': post_id,
+                },
+                success: function(data){
+                    remove_comment_from_page(comment_id, post_id, data);
+                },
+                error: function(data){
+                    console.log(data);
+                },
+                complete: function(data){
+                    console.log(data);
+                }
+            });
+        }
+
+
+        // show/hide post comment's reply panel
+        $(document).on('click', 'button[name="show-replies"]', function(){
+            if ($(this).text().trim() == 'Hide replies'){
+            $('.reply-div').slideUp();
+            $(this).text('show-replies');
+            }else{
+                $('.reply-div').slideUp();
+                $(this).parent().find('.reply-div').slideDown();
+                $('button[name="show-replies"]').text("show-replies");
+                $(this).text('Hide replies');
+            }
+        });
+
+
+        // replying comments
+        function add_reply_to_page(comment_id, post_id, data){
+            if (data.total_replies == "1 reply"){
+                console.log('reply added');
+                $("#post-id-" + post_id).find("#comment-id-" + comment_id).append(`
+                <button style="background-color:transparent; color: #2b6eff; border:none; margin-left: 10px;" name="show-replies">show replies</button>
+                <h5 id="reply-count" style="padding:0px 15px;">${data.total_replies}</h5>
+                <div class="replies">
+                    <div class="reply-wrapper">
+                        <ul  style="margin-left:50px" class="list-group reply-div">
+                            <div style="margin:10px 0px;"><strong class="replier">${data.reply_user_fname} ${data.reply_user_lname}</strong> replied <span class="reply-timestamp"><small>just now</small></span><br></div>
+                            <li class="list-group-item" style="display:inline-block;">${data.reply_message}</li>
+                        </ul>
+                    </div>
+                </div>
+            `);
+            }else{
+                $("#post-id-" + post_id).find("#comment-id-" + comment_id).find('.replies').prepend(`
+                <div class="reply-wrapper">
+                    <ul  style="margin-left:50px" class="list-group reply-div">
+                        <div style="margin:10px 0px;"><strong class="replier">${data.reply_user_fname} ${data.reply_user_lname}</strong> replied <span class="reply-timestamp"><small>just now</small></span><br></div>
+                        <li class="list-group-item" style="display:inline-block;">${data.reply_message}</li>
+                    </ul>
+                </div>
+                `)
+                
+            }
+            $("#comment-id-" + comment_id).find('.reply-div').slideDown();
+            //$("#comment-id-" + comment_id).find('.replies').slideDown();
+            $("#comment-id-" + comment_id).find("#reply-count").text(data.total_replies);
+            $("#comment-id-" + comment_id).find('button[name="show-replies"]').text('Hide replies');
+            //$("#comment-id-" + comment_id).find(".comments-replies").slideDown();
+            $("#comment-id-" + comment_id).find("#hidden-reply-count").slideDown().text(data.total_replies);
+            return false;
+        }
+
+
+
+
+        function reply_to_comment(comment_id, post_id){
+            $(".remove-comment").slideDown();
+            $('#comment-id-' + comment_id).find(".remove-comment").slideUp();
+            $("#post-id-" + post_id).find(".reply-div").slideUp();
+            $('button[name="show-replies"]').text("show-replies");
+            $("#post-id-" + post_id).find('#comment-id-' + comment_id).find(".replies").slideDown();
+            $('form[name="reply-to-comment"]').slideUp();
+            $("#comment-id-" + comment_id).find('textarea[name="reply-area"]').parent().slideDown();
+                $('textarea[name="reply-area"]').keyup(function(){
+                    var char_len = $(this).val().trim().length;
+                    if (char_len > 0){
+                        $(this).parent().find('input[type="submit"]').attr('disabled', false).slideDown();
+                    }else if(char_len == 0){
+                        $(this).parent().find('input[type="submit"]').attr('disabled', true).slideUp();
+                    }
+                });
+                $('#comment-id-' + comment_id).find('form[name="reply-to-comment"]').submit(function(event){
+                    event.preventdefault;
+                    var reply = $(this).find('textarea[name="reply-area"]').val().trim();
+                    $.ajax({
+                        url: "{% url 'social:reply-to-comment' %}",
+                        type: "POST",
+                        data: {
+                            'csrfmiddlewaretoken': '{{ csrf_token }}',
+                            'comment_id': comment_id,
+                            'reply': reply,
+                        },
+                        success: function(data){
+                            add_reply_to_page(comment_id, post_id, data);
+                        },
+                        error: function(data){
+                            console.log(data);
+                        },
+                        complete: function(data){
+                            console.log(data);
+                        }
+                    });
+                    $(this).find('input[type="submit"]').attr('disabled', true).slideUp();
+                    $('form[name="reply-to-comment"]').trigger("reset");
+                    return false;
+                });
+                return false;
+        }
+
+
+        // commenting post
+        function add_comment_to_page(id, data){
+            $("#post-id-" + id).find("#comment-count").text(data.total_comments);
+            if (data.total_comments == 1){
+                $("#post-id-" + id).find(".comments-replies").prepend(`
+                    <h5>Comments</h5>
+                `);
+                $("#post-id-" + id).find(".comment-wrapper").prepend(`
+                <div id="comment-div-id-${data.comment_id}">
+                    <div style="margin:10px 10px;"><strong class="commenter">${data.comment_user_fname} ${data.comment_user_lname}</strong> commented <span class="comment-timestamp"><small>just now</small></span></div>
+                    <ul class="list-group comment-div" id="comment-id-${data.comment_id}">
+                        <li class="list-group-item" style="display:inline-block;">
+                            ${data.comment_message}
+                        </li>
+                        <i style="cursor:pointer;" onclick="reply_to_comment(${data.comment_id}, ${id})" class="fa fa-reply remove-comment" aria-hidden="true"></i>
+                        <i style="cursor:pointer;" onclick="remove_comment(${data.comment_id}, ${id})" class="fa fa-trash" aria-hidden="true"></i>
+                        <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
+                            {% csrf_token %}
+                            <textarea style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
+                            <input class="btn btn-primary" type="submit" style="display:none" disabled name="reply" value="Reply">
+                        </form>
+                    </ul>
+                </div>
+            `);
+            }else{
+                $("#post-id-" + id).find(".comment-wrapper").prepend(`
+                <div id="comment-div-id-${data.comment_id}">
+                    <div style="margin:10px 10px;"><strong class="commenter">${data.comment_user_fname} ${data.comment_user_lname}</strong> commented <span class="comment-timestamp"><small>just now</small></span></div>
+                    <ul class="list-group comment-div" id="comment-id-${data.comment_id}">
+                        <li class="list-group-item" style="display:inline-block;">
+                            ${data.comment_message}
+                        </li>
+                        <i style="cursor:pointer;" onclick="reply_to_comment(${data.comment_id}, ${id})" class="fa fa-reply remove-comment" aria-hidden="true"></i>
+                        <i style="cursor:pointer;" onclick="remove_comment(${data.comment_id}, ${id})" class="fa fa-trash" aria-hidden="true"></i>
+                        <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
+                            {% csrf_token %}
+                            <textarea style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
+                            <input class="btn btn-primary" type="submit" style="display:none" disabled name="reply" value="Reply">
+                        </form>
+                    </ul>
+                </div>
+            `);    
+            }
+        }
+
+        function comment(id){
+            {% comment %} $("#post-id-" + id).find(".glyphicon-comment").click(function(){
+            }); {% endcomment %}
+            $("#post-id-" + id).find(".write-comment").slideUp();    
+            $(".write-comment").slideUp();
+            $("#post-id-" + id).find(".write-comment").slideDown();
+            $(".write-comment").find('.comment-box').keyup(function(){
+                var char_len = $(this).val().trim().length;
+                if (char_len > 0){
+                    $('input[name="comment"]').attr('disabled', false).slideDown();
+                }else if(char_len == 0){
+                    $('input[name="comment"]').attr('disabled', true).slideUp();
+                }
+            });
+            $("#comment-form-" + id).submit(function(event){
+                event.preventdefault;
+                var post_id = $("#comment-form-" + id).find('input[name="post-id"]').val().trim();
+                var post_comment = $("#comment-form-" + id).find('.comment-box').val().trim();
+                $.ajax({
+                        url: "{% url 'social:comment' %}",
+                        type: "POST",
+                        data: {
+                            'csrfmiddlewaretoken': '{{ csrf_token }}',
+                            'post_id': post_id,
+                            'comment': post_comment,
+                        },
+                        success: function(data){
+                            add_comment_to_page(id, data);
+                        },
+                        error: function(data){
+                            console.log(data);
+                        },
+                        complete: function(data){
+                        }
+            });
+            $(this).find('input[type="submit"]').attr('disabled', false).slideUp();
+            $("#comment-form-" + id).trigger("reset");
+            return false;
+        });
+        return false;
+        }
+
+
+        // post deletion
+        function delete_post(id){
+            alert();
+            var title = $("#post-id-" + id).find("#post-title").text();
+            $("#deletepromptmodal").modal("show");
+            $("#deletepromptmodal").find("#delete_title").text(title);
+            $("#delete_confirm").click(function(){
+                $.ajax({
+                    url: "{% url 'social:ajax_requests' %}",
+                    type: "POST",
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                        'id': id,
+                        'request_type': 'delete',
+                    },
+                    success: function(data){
+                        console.log(data)
+                        if (data.deleted){
+                            $("#post-id-" + id).remove();
+                        }
+                    },
+                    error: function(data){
+                        console.log(data)
+                    }
+                });
+                $("#deletepromptmodal").modal("hide");
+                $("#delete_message").modal("show");
+            });
+        }
+
+
+        // post updation
+        function update_to_page(id, data){
+        $("#post-id-" + id).find("#post-title").text(data.title);
+        $("#post-id-" + id).find("#post-text").text(data.text);
+        $("#post-id-" + id).find("#post-published").text({{data.published_date|timesince}});
+        }
+
+
+        function update_post(id){
+            var title = $("#post-id-" + id).find("#post-title").text().trim();
+            var content = $("#post-id-" + id).find("#post-text").text().trim();
+            $(".post-update-form").find("#update-post-title").val(title);
+            $(".post-update-form").find("#update-post-content").val(content);
+
+            $(".post-update-form").submit(function(event){
+                event.preventDefault();
+                var title = $(".post-update-form").find("#update-post-title").val().trim();
+                var content = $(".post-update-form").find("#update-post-content").val().trim();
+                $.ajax({
+                    url: "{% url 'social:ajax_requests' %}",
+                    type: "POST",
+                    data: {
+                        'id': id,
+                        'title': title,
+                        'content': content,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                        'request_type': 'update',
+                    },
+                    success: function(data){
+                        if (data.updated){
+                            update_to_page(id, data);
+                        }
+                    },
+                    error: function(data){
+                        console.log(data)
+                    }
+                });
+                $('.post-update-form').trigger("reset");
+                {% comment %} $('#updateModal').modal('hide'); {% endcomment %}
+                {% comment %} $('.modal-backdrop').remove(); {% endcomment %}
+                $("#update_message").modal("show");
+                return false;
+            });
+        }
+        {% comment %} $(document).ready(function() {
+            $("#updateModal").modal();
+        }); {% endcomment %}
+
+
+
+        // post-view modal
+        function show_post(id){
+            var title = $("#post-id-" + id).find("#post-title").text().trim();
+            var author = $("#post-id-" + id).find("#post-author").text().trim();
+            var published = $("#post-id-" + id).find("#post-published").text().trim();
+            $.ajax({
+                url: "{% url 'social:show-post-details' %}",
+                data: {
+                    'post_id': id
+                },
+                type: "GET",
+                success: function(data){
+                    $("#post-view-text").text(data.content);
+                    $("#post_view_modalLongTitle").text(title);
+                    $("#post-view-author").text(author);
+                    $("#post-view-published").text(published);
+                }
+
+            });
+            
+            $('#post_view_modal').modal('hide');
+            $('.modal-backdrop').remove();
+            return false;
+        }
+
+
+        // like posts
+        function like(id){
+        $("#post-id-" + id).find(".like").addClass("likedislikeclass");
+            $.ajax({
+                    url: "{% url 'social:likedislike-requests' %}",
+                    type: "POST",
+                    data: {
+                        'post_id': id,
+                        'action': 'like',
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    },
+                    success: function(data){
+                        if (data.dislike){
+                            if (data.dislike_count == 0){
+                                $("#post-id-" + id).find("#dislike-count").text('');
+                            }else{
+                                $("#post-id-" + id).find("#dislike-count").text(data.dislike_count);
+                            }
+                            $("#post-id-" + id).find("#like-count").text(data.like_count);
+                            $("#post-id-" + id).find(".undodislike").attr("onclick", "dislike(" + id + ")");
+                            $("#post-id-" + id).find(".undodislike").removeClass("likedislikeclass").addClass("dislike");
+                        }else{
+                            $("#post-id-" + id).find("#like-count").text(data.like_count);
+                        }
+                    },
+                    error: function(data){
+                        console.log(data);
+                    }
+                });
+        $("#post-id-" + id).find(".like").attr("onclick", "undolike(" + id + ")");
+        $("#post-id-" + id).find(".like").removeClass("like").addClass("undolike");
+        }
+
+
+        // undolike posts
+        function undolike(id){
+        $("#post-id-" + id).find(".undolike").removeClass("likedislikeclass");
+            $.ajax({
+                    url: "{% url 'social:likedislike-requests' %}",
+                    type: "POST",
+                    data: {
+                        'post_id': id,
+                        'action': 'dislike',
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    },
+                    success: function(data){
+                        if (data.like_count == 0){
+                            $("#post-id-" + id).find("#like-count").text('');
+                        }else{
+                            $("#post-id-" + id).find("#like-count").text(data.like_count);
+                        }
+                    },
+                    error: function(data){
+                        console.log(data);
+                    }
+                });
+        $("#post-id-" + id).find(".undolike").attr("onclick", "like(" + id + ")");
+        $("#post-id-" + id).find(".undolike").removeClass("undolike").addClass("like");
+        }
+
+
+        // dislike posts
+        function dislike(id){
+        $("#post-id-" + id).find(".dislike").addClass("likedislikeclass");
+            $.ajax({
+                    url: "{% url 'social:dislike-requests' %}",
+                    type: "POST",
+                    data: {
+                        'post_id': id,
+                        'action': 'like',
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    },
+                    success: function(data){
+                        console.log(data);
+                        if (data.like){
+                            if (data.like_count == 0){
+                                $("#post-id-" + id).find("#like-count").text('');
+                            }else{
+                                $("#post-id-" + id).find("#like-count").text(data.like_count);
+                            }
+                            $("#post-id-" + id).find("#dislike-count").text(data.dislike_count);
+                            $("#post-id-" + id).find(".undolike").attr("onclick", "like(" + id + ")");
+                            $("#post-id-" + id).find(".undolike").removeClass("likedislikeclass").addClass("like");
+
+                        }else{
+                            $("#post-id-" + id).find("#dislike-count").text(data.dislike_count);
+                        }
+                    },
+                    error: function(data){
+                        console.log(data);
+                    }
+                });
+        $("#post-id-" + id).find(".dislike").attr("onclick", "undodislike(" + id + ")");
+        $("#post-id-" + id).find(".dislike").removeClass("dislike").addClass("undodislike");
+        }
+
+
+        // undodislike posts
+        function undodislike(id){
+        $("#post-id-" + id).find(".undodislike").removeClass("likedislikeclass");
+            $.ajax({
+                    url: "{% url 'social:dislike-requests' %}",
+                    type: "POST",
+                    data: {
+                        'post_id': id,
+                        'action': 'dislike',
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    },
+                    success: function(data){
+                        if (data.dislike_count == 0){
+                            $("#post-id-" + id).find("#dislike-count").text("");
+                        }else{
+                            $("#post-id-" + id).find("#dislike-count").text(data.dislike_count);
+                        }
+                    },
+                    error: function(data){
+                        console.log(data);
+                    }
+                });
+        $("#post-id-" + id).find(".undodislike").attr("onclick", "dislike(" + id + ")");
+        $("#post-id-" + id).find(".undodislike").removeClass("undodislike").addClass("dislike");
+        }
+
+
+        // closing comment panel
+        $('input[name="close-comment"]').click(function(){
+            $(this).parent().parent().slideUp();
+        });
+
+
+        // show less posts
+        {% comment %} $("#show_less").click(function(){
+            $(".mb").slice(5).hide();
+            window.scrollTo(0, 0); 
+            $("#show_more").show();
+            $("#show_more").attr('data-showmorecount', 10);
+            $(this).hide();
+        });
+
+        // show more posts
+        $("#show_more").click(function(){
+            var num_posts = $(".mb").length;
+            var count = parseInt($(this).attr('data-showmorecount'));
+            console.log(num_posts, count);
+            if (num_posts < count){
+                // $("#show_less").slideDown();
+                $(this).hide();
+                // $("#show_more").text("Show less");
+                $("#show_less").css('display', 'inline-block');
+                $(this).attr('data-showmorecount', 10);
+                // $(".mb").slice(5).hide();
+                
+            }else{
+                $(".mb").slice(0,count).slideDown();
+                $(".mb").slice(count).slideUp();
+                $(this).attr('data-showmorecount', count+5);
+            }
+            
+        }); {% endcomment %}
+
+        {% comment %} $(document).ready(function(){
+            $(".mb").slice(5).hide();
+        }); {% endcomment %}
+
+
+    </script>
+
+{% endblock %}

@@ -22,7 +22,9 @@ body {
 ul li {
     list-style: none;
 }
-
+.pointer{
+    cursor: pointer;
+}
 a, a:hover, a:focus {
     text-decoration: none;
     outline: none;
@@ -2277,10 +2279,13 @@ label {
 
 .alert, .alert-success {
     z-index: 999999;
-    position: absolute;
-    width: 50%;
-    margin: 0px 25% 0px 25%;
-    /*margin-left: -70px;*/
+    position: fixed;
+    display: block;
+    /* margin-top: 60px; */
+    width: 100%;
+    /* margin: 0px 25% 0px 25%; */
+    margin-left: -15px;
+    text-align: center;
 }
 #gritter-notice-wrapper{
     top: 70px;
@@ -2319,4 +2324,44 @@ label {
 }
 .fa{
     padding: 5px 5px;
+}
+.rotate-plus{
+    transform: rotate(45deg);
+}
+.modal-backdrop {
+    /* background-color: transparent; */
+    display: none;
+ }
+ .modal, .modal-dialog{
+    width: 100% !important;
+  }
+  .profile-pic {
+    position: relative;
+    display: inline-block;
+}
+
+.profile-pic:hover .edit {
+    display: block;
+}
+
+.edit {
+    padding-top: 7px;
+    padding-right: 7px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: none;
+}
+.edit a {
+    color: blue;
+}
+.category-thumbnail{
+    background-color: #ffffff;
+    padding: 10px 10px;
+    margin: 5px 10px;
+    border-radius: 3px;
+    border: 1px solid #889199;
+}
+.category-container{
+    margin-bottom: 15px;
 }

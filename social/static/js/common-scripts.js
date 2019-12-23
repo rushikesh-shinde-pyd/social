@@ -33,7 +33,7 @@ var Script = function () {
 
     $(function() {
         function responsiveView() {
-            var wSize = $(window).width();
+        var wSize = $(window).width();
             if (wSize <= 768) {
                 $('#container').addClass('sidebar-close');
                 $('#sidebar > ul').hide();
@@ -117,3 +117,6 @@ var Script = function () {
 
 
 }();
+
+
+

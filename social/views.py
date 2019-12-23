@@ -80,14 +80,15 @@ def dashboard(request):
                 'timezone':timezone, 
                 'total_pages':paginator_obj.num_pages,
                 # 'categories': Category.objects.all().order_by('category_name')
-                'categories': CATEGORIES
+                'categories': CATEGORIES,
+                'active_class': 'dashboard'
             }
     return render(request,'dashboard.html', context)
 
 # @login_required()
 def profile(request):
     user = request.user
-    return render(request,'profile.html',{'user':user})
+    return render(request,'profile.html',{'user':user, 'active_class': 'profile'})
 
 #@login_required()
 def editProfile(request):
@@ -164,7 +165,9 @@ def forgot_password(request):
 
 def create_post(request):
     if request.method == "POST":
+        print(request.POST)
         category = request.POST.get('category')
+        subcategory = request.POST.get('subcategory')
         post = request.POST.get('post-content')
         title = request.POST.get('post-title')
         print(category)
@@ -176,7 +179,8 @@ def create_post(request):
                 text = post.strip(),
                 created_date = timezone.now(),
                 # published_date = timezone.now(),
-                category = category
+                category = category,
+                subcategory = subcategory
             )
             obj.save()
             obj.publish()
@@ -373,20 +377,46 @@ def remove_comment(request):
 
 
 
-def show_post_details(request):
-    post_id = request.GET.get('post_id').strip()
-    post_obj = get_object_or_404(Post, id=post_id)
-    data = {
-        'content': post_obj.text
-    }
-    return JsonResponse(data)
+def post_details(request, *args, **kwargs):
+    print(kwargs)
+    post_obj = get_object_or_404(Post, id=kwargs.get('pk'))
+    context = {
+                'categories': CATEGORIES,
+                'post': post_obj
+            }
+    return render(request, 'post_details.html', context)
 
 
 
 
 def add_subcategory(request):
     category = request.GET.get('category').strip().upper()
+    print(category)
     data = {
         'subcategories': sorted(SUBCATEGORIES.get(category, None))
     }
     return JsonResponse(data)
+
+
+def blog(request, *args, **kwargs):
+    category_obj = Post.objects.filter(is_active=True, category=kwargs.get('key')).order_by("-published_date")
+    print(category_obj)
+    if category_obj:
+        paginator_obj = Paginator(category_obj, 5)
+        page = request.GET.get('page')
+        posts = paginator_obj.get_page(page)
+    else:
+        posts = Post.objects.filter(is_active=True).order_by("-published_date")
+        paginator_obj = Paginator(posts, 5)
+        page = request.GET.get('page')
+        posts = paginator_obj.get_page(page)
+    context = {
+                'user': request.user, 
+                'posts': posts, 
+                'dt': dt.now, 
+                'timezone':timezone, 
+                'total_pages':paginator_obj.num_pages,
+                # 'categories': Category.objects.all().order_by('category_name')
+                'categories': CATEGORIES,
+            }
+    return render(request,'blogs.html', context)

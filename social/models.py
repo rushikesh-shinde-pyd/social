@@ -92,6 +92,7 @@ def save_user_profile(sender, instance, **kwargs):
 
 class Post(models.Model):
     category = models.CharField(choices=CATEGORIES, max_length=256, null=True, blank=True)
+    subcategory = models.CharField(max_length=256, null=True, blank=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     text = models.TextField()

@@ -66,5 +66,13 @@ def verify_user_for_deletion(blogger, commentor, current_user):
     else:
         return False
 
+
+@register.simple_tag
+def get_category(posts, category_obj):
+    if category_obj is not None:
+        return category_obj
+    return posts
+
+
    
 
