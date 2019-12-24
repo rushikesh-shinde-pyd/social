@@ -2365,3 +2365,8 @@ label {
 .category-container{
     margin-bottom: 15px;
 }
+.higlight_category{
+    background-color: #ff865c;
+    color: #ffffff;
+    border-color: orangered ;
+}

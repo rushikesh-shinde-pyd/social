@@ -1,8 +1,8 @@
 from django.shortcuts import render,redirect,reverse, get_object_or_404
 from django.contrib.auth import authenticate,login as auth_login,logout
-from .forms import SignUpForm,PhotoForm
+from .forms import SignUpForm,PhotoForm, SubcategoryForm
 from django.contrib.auth.models import User
-from .models import Profile,Post, Like, Dislike, Comment, Replies, CATEGORIES, SUBCATEGORIES
+from .models import Profile,Post, Like, Dislike, Comment, Replies, CATEGORIES, SUBCATEGORIES, XCategory, XSubcategory
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
@@ -19,6 +19,7 @@ from django.core.paginator import Paginator
 # Create your views here.
 def index(request):
     return render(request,'index.html')
+
 
 def signup(request):
     if request.method == 'POST':
@@ -45,9 +46,12 @@ def signup(request):
         form = SignUpForm()
     return render(request, 'registration/signup.html', {'form': form})
 
+
+@login_required
 def logout_view(request):
     logout(request)
     return redirect('/')
+
 
 def login(request):
     if request.method == "POST":
@@ -67,7 +71,8 @@ def login(request):
             return redirect(reverse('social:login'))
     return render(request,'registration/login.html')
 
-# @login_required()
+
+@login_required()
 def dashboard(request):
     posts = Post.objects.filter(is_active=True).order_by("-published_date")
     # posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
@@ -85,12 +90,14 @@ def dashboard(request):
             }
     return render(request,'dashboard.html', context)
 
-# @login_required()
+
+@login_required()
 def profile(request):
     user = request.user
     return render(request,'profile.html',{'user':user, 'active_class': 'profile'})
 
-#@login_required()
+
+@login_required()
 def editProfile(request):
     u_id = request.user.id
     print('User id-',u_id)
@@ -142,6 +149,7 @@ def editProfile(request):
     return render(request,'editProfile.html',{'user':user})
 
 
+@login_required
 def forgot_password(request):
     if request.method == 'POST':
         u_email= request.POST.get('email')
@@ -162,7 +170,7 @@ def forgot_password(request):
     return render(request,'registration/forgot_password.html')
 
 
-
+@login_required
 def create_post(request):
     if request.method == "POST":
         print(request.POST)
@@ -184,7 +192,7 @@ def create_post(request):
             )
             obj.save()
             obj.publish()
-    return redirect(reverse("social:dashboard"))
+    return redirect(reverse("social:blog"))
 
 
 @method_decorator(login_required, name="dispatch")
@@ -222,6 +230,7 @@ class AjaxRequests(View):
                     'updated': True
                 }
                 return JsonResponse(data)
+
 
 @method_decorator(login_required, name="dispatch")
 class LikeDislike(View):
@@ -361,6 +370,8 @@ class ReplyToCommentView(View):
         }
         return JsonResponse(data)
 
+
+@login_required
 def remove_comment(request):
     print("*"*20)
     post_id = request.POST.get('post_id')
@@ -375,8 +386,7 @@ def remove_comment(request):
     return JsonResponse(data)
 
 
-
-
+@login_required
 def post_details(request, *args, **kwargs):
     print(kwargs)
     post_obj = get_object_or_404(Post, id=kwargs.get('pk'))
@@ -387,36 +397,89 @@ def post_details(request, *args, **kwargs):
     return render(request, 'post_details.html', context)
 
 
-
-
+@login_required
 def add_subcategory(request):
-    category = request.GET.get('category').strip().upper()
-    print(category)
+    subcategories = set()
+    category = request.GET.get('category').strip()
+    category_obj = XCategory.objects.get(category_name=category)
+    subcategories_queryset = XSubcategory.objects.filter(category_name=category_obj)
+    for subcategory in subcategories_queryset:
+        subcategories.add(subcategory.subcategory_name)
     data = {
-        'subcategories': sorted(SUBCATEGORIES.get(category, None))
+        'subcategories': sorted(subcategories)
     }
     return JsonResponse(data)
 
 
+@login_required
 def blog(request, *args, **kwargs):
-    category_obj = Post.objects.filter(is_active=True, category=kwargs.get('key')).order_by("-published_date")
-    print(category_obj)
-    if category_obj:
-        paginator_obj = Paginator(category_obj, 5)
-        page = request.GET.get('page')
-        posts = paginator_obj.get_page(page)
-    else:
-        posts = Post.objects.filter(is_active=True).order_by("-published_date")
+    categories_for_thumbnails = set()
+    category_queryset = XCategory.objects.all()
+    for category in category_queryset:
+        categories_for_thumbnails.add(category.category_name)
+    context = {}
+    context['subcategory_form'] = SubcategoryForm()
+    category = kwargs.get('key')
+    
+    if category is not None:
+        try:
+            category_obj = XCategory.objects.get(category_name=category.title())
+        except: 
+            if category == 'my_blogs':
+                print('yass')
+                my_blogs_obj = Post.objects.filter(author_id=request.user.id, is_active=True).order_by('-published_date')
+                num_posts = my_blogs_obj.count()
+                paginator_obj = Paginator(my_blogs_obj, 5)
+                page = request.GET.get('page')
+                posts = paginator_obj.get_page(page)
+                context['posts'] = posts
+                context['num_posts'] = num_posts
+                context['total_pages'] = paginator_obj.num_pages
+                context['higlight_category'] = category
+                context['categories_post'] = sorted(categories_for_thumbnails)
+            else:
+                posts = Post.objects.filter(is_active=True).order_by("-published_date")
+                paginator_obj = Paginator(posts, 5)
+                context['invalid_or_unavailable_category'] = True
+                context['categories_post'] = sorted(categories_for_thumbnails)
+                context['total_pages'] = paginator_obj.num_pages
+                context['higlight_category'] = category
+        else:
+
+            # num_posts = category_obj.count()
+            posts = Post.objects.filter(xcat=category_obj)
+            num_posts = posts.count()
+            paginator_obj = Paginator(posts, 5)
+            page = request.GET.get('page')
+            posts = paginator_obj.get_page(page)
+            context['num_posts'] = num_posts
+            context['posts'] = posts
+            context['higlight_category'] = category
+            context['total_pages'] = paginator_obj.num_pages
+            context['categories_post'] = sorted(categories_for_thumbnails)
+    elif not kwargs:
+        posts = Post.objects.filter(is_active=True).order_by('-published_date')
+        num_posts = posts.count()
         paginator_obj = Paginator(posts, 5)
         page = request.GET.get('page')
         posts = paginator_obj.get_page(page)
-    context = {
-                'user': request.user, 
-                'posts': posts, 
-                'dt': dt.now, 
-                'timezone':timezone, 
-                'total_pages':paginator_obj.num_pages,
-                # 'categories': Category.objects.all().order_by('category_name')
-                'categories': CATEGORIES,
-            }
+        context['num_posts'] = num_posts
+        context['posts'] = posts
+        context['total_pages'] = paginator_obj.num_pages
+        context['categories_post'] = sorted(categories_for_thumbnails)
     return render(request,'blogs.html', context)
+
+
+def create_category(request):
+    if request.method == 'POST':
+        category = request.POST.get('category-name') 
+        subcategory = request.POST.get('subcategory-name') 
+        try:
+            category_obj = XCategory.objects.get(category_name=category)
+        except:
+            category_obj = XCategory.objects.create(category_name=category)
+        subcategory_obj = XSubcategory.objects.create(category_name=category_obj, subcategory_name=subcategory)
+        return redirect(reverse('social:blog'))
+
+
+

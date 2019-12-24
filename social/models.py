@@ -90,6 +90,33 @@ def save_user_profile(sender, instance, **kwargs):
 #         return self.name
 
 
+class XCategory(models.Model):
+    # post =  models.ForeignKey(Post, on_delete=models.CASCADE)
+    category_name = models.CharField(max_length=256)
+    
+
+    class Meta:
+        verbose_name = "category"
+        verbose_name_plural = "categories"
+
+    def __str__(self):
+        return self.category_name
+
+
+class XSubcategory(models.Model):
+    # post =  models.ForeignKey(Post, on_delete=models.CASCADE)
+    category_name =  models.ForeignKey(XCategory, on_delete=models.CASCADE)
+    subcategory_name = models.CharField(max_length=256)
+    
+
+    class Meta:
+        verbose_name = "subcategory"
+        verbose_name_plural = "subcategories"
+
+    def __str__(self):
+        return self.subcategory_name
+
+
 class Post(models.Model):
     category = models.CharField(choices=CATEGORIES, max_length=256, null=True, blank=True)
     subcategory = models.CharField(max_length=256, null=True, blank=True)
@@ -99,6 +126,8 @@ class Post(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
+    xcat = models.ForeignKey(XCategory, on_delete=models.CASCADE, null=True, blank=True)
+    xsubcat = models.ForeignKey(XSubcategory, on_delete=models.CASCADE, null=True, blank=True)
 
     def publish(self):
         self.published_date = timezone.now()
@@ -140,21 +169,3 @@ class Replies(models.Model):
     is_rejected = models.BooleanField(default=False)
     commented_at = models.DateTimeField(default=timezone.now, verbose_name='Created at')
 
-
-
-# class Subcategory(models.Model):
-#     SUBCATEGORIES = (
-#         ('subone', 'Subone'),
-#         ('subtwo', 'Subtwo'),
-#     )
-#     post =  models.ForeignKey(Post, on_delete=models.CASCADE)
-#     category_name =  models.ForeignKey(Category, on_delete=models.CASCADE)
-#     subcategory_name = models.CharField(choices=SUBCATEGORIES, max_length=256)
-    
-
-#     class Meta:
-#         verbose_name = "subcategory"
-#         verbose_name_plural = "subcategories"
-
-#     def __str__(self):
-#         return self.subcategory_name

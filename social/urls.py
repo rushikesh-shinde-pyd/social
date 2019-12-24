@@ -37,5 +37,6 @@ urlpatterns = [
 
     path('blog/category/<str:key>/', views.blog, name="category"),
     path('blog/<int:pk>/', views.post_details, name="post-details"),
+    path('create-category/', views.create_category, name="create-category"),
 
 ]
