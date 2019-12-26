@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile,Post, Like, Dislike, Comment, Replies, XCategory, XSubcategory
+from .models import Profile,Post, Like, Dislike, Comment, Reply, Category, Subcategory
 
 # Register your models here.
 admin.autodiscover()
@@ -12,6 +12,6 @@ admin.site.register(Post)
 admin.site.register(Like)
 admin.site.register(Dislike)
 admin.site.register(Comment)
-admin.site.register(Replies)
-admin.site.register(XCategory)
-admin.site.register(XSubcategory)
+admin.site.register(Reply)
+admin.site.register(Category)
+admin.site.register(Subcategory)

@@ -16,20 +16,43 @@
                 <div class="col-lg-9 main-chart">
                     <!--.>&lt;!&ndash; /row mt &ndash;&gt;-->
 
-                    <i title="Create new post" class="fa fa-plus pointer" style="padding:5px; color: #31708f; margin: 0px 0px 10px 0px; font-size:20px;" aria-hidden="true"></i>
-
                     <div class="row">
-                        <h3>Categories</h3>
+                        <h3 style="display: inline;">Categories</h3>
+                        <i title="Create new category" class="pointer fa fa-plus add-category" style="padding:5px; color: #31708f; margin: 0px 0px 10px 0px; font-size:20px;" aria-hidden="true"></i>
+
+                        <form class="create-category" style="display: none;" method="post" action="{% url 'social:create-category' %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <p><input type="text" required name="category-name" class="form-control" placeholder="Category name"></p>
+                                <p><input type="text" required name="subcategory-name" class="form-control" placeholder="Subcategory name"></p>
+                                <p><button class="btn btn-sm btn-primary" type="submit" style="margin-top:10px;">Create category</button></p>
+                            </div>
+                        </form>
+
                         <div class="row category-container">
-                            {% for key, value in categories %}
-                                <a href="{% url 'social:category' key %}">
-                                <div class="category-thumbnail col-md-2 col-lg-2 col-sm-2 text-center">
-                                    {{ value }}
+                            <a href="{% url 'social:category' 'my_blogs' %}">
+                                <div class="category-thumbnail {% if higlight_category == 'my_blogs'%} higlight_category {% endif %} col-md-2 col-lg-2 col-sm-2 text-center">
+                                    {{ 'My blogs'|title }}
                                 </div>
+                            </a>
+                            {% for each_category in categories_post %}
+                                <a href="{% url 'social:category' each_category %}">
+                                    <div class="category-thumbnail {% if higlight_category == each_category%} higlight_category {% endif %} col-md-2 col-lg-2 col-sm-2 text-center">
+                                        {{ each_category|title }}
+                                    </div>
                                 </a>
+                                {% empty %}
+                                    <div class="row">
+                                        <div class="col-sm-12 col-md-12 col-lg-12">
+                                            <h3 class="text-center">:(</h3>
+                                            <h6 class="text-center">No categories so far !</h6>
+                                        </div>
+                                    </div>
                             {% endfor %}
                         </div>
-                        <h6 class="category-expansion pointer" style="display: inline;">Show all categories</h6>
+                        {% if categories_post|length  >= 4 %}
+                            <h6 class="category-expansion pointer" style="display: inline;">Show all categories</h6>
+                        {% endif %}
                     </div>
 
 
@@ -37,24 +60,26 @@
                         <!-- SERVER STATUS PANELS -->
                         <!--.&lt;!&ndash; /col-md-4&ndash;&gt;-->
                         <div class="col-md-12 col-sm-12 mb" >
+                            <i title="Create new post" class="pointer fa fa-plus add-blog" style="padding:5px; color: #31708f; margin: 0px 0px 10px 0px; font-size:20px;" aria-hidden="true"></i>
+
                             <form class="post-create-form" style="display: none;" method="post" action="{% url 'social:post-create' %}">
                                 {% csrf_token %}
                                 <div class="form-group">
                                     <p>
-                                        <select name="category" class="form-control" required>
+                                        <select required name="category" class="form-control" >
                                             <option selected value="None">Select Category</option>
-                                            {% for value, category in categories %}
-                                                <option value="{{ value }}">{{ category|title }}</option>
+                                            {% for category in categories_post %}
+                                                <option value="{{ category }}">{{ category|title }}</option>
                                             {% endfor %}
                                         </select>
                                     </p>
                                     <p>
-                                        <select name="subcategory" class="form-control" required placeholder="Subcategory">
+                                        <select required name="subcategory" class="form-control"  placeholder="Subcategory">
                                             <option selected value="None">Select Subcategory</option>
                                         </select>
                                     </p>
-                                    <p><input type="text" name="post-title" class="form-control" placeholder="Post Title"></p>
-                                    <p><textarea style="resize:none;" name="post-content" class="form-control" rows="3" placeholder="What's on your mind!"></textarea></p>
+                                    <p><input required type="text" name="post-title" class="form-control" placeholder="Post Title"></p>
+                                    <p><textarea required style="resize:none;" name="post-content" class="form-control" rows="3" placeholder="What's on your mind!"></textarea></p>
                                     <p><button class="btn btn-sm btn-primary" type="submit" style="margin-top:10px;">POST</button></p>
                                 </div>
                             </form>
@@ -102,6 +127,10 @@
                             {% comment %} ****************************************
                                                 BLOG MODULE 
                             **************************************** {% endcomment %}
+
+                            {% comment %} posts div starts {% endcomment %}
+                            
+                            {% comment %} {% get_category posts category_obj as queryset %}     {% endcomment %}
 
                             <div class="row">
                                 <div class="post-div col-md-12 col-sm-12 mb" id="post-id-{{ post.id }}">
@@ -244,7 +273,7 @@
                                                                         <div class="reply-wrapper">
                                                                             <ul  style="margin-left:50px;display:none;" class="list-group reply-div">
                                                                                 <div style="margin:10px 0px;"><strong class="replier">{{ each_reply.user.first_name|title }} {{ each_reply.user.last_name|title }}</strong> replied <span class="reply-timestamp"><small>{{ each_reply.commented_at|timesince }}</span> ago</small><br></div>
-                                                                                <li class="list-group-item" style="display:inline-block;">{{ each_reply.reply }}</li>
+                                                                                <li class="list-group-item" style="display:inline-block;">{{ each_reply.reply_message }}</li>
                                                                             </ul>
                                                                         </div>
                                                                     {% endfor %}
@@ -260,7 +289,8 @@
                                     </div>
                                 </div>
                             </div>
-                            
+                            <br>
+                            {% comment %} posts ends here {% endcomment %}
                         </div><!-- /col-md-4 -->
 
                         <!--<div class="col-md-4 mb">-->
@@ -613,10 +643,9 @@
                     console.log(data);
                     var html = "";
                     $.each(data.subcategories, function (key, value) {
-                        html += "<option value="+value[0]+">"+value[1]+"</option>";
+                        html += "<option value='" + value + "'>" + value + "</option>";
                     });
                     $('select[name="subcategory"]').html('<option value="None">Select Subcategory</option>' + html);
-            
                 },
                 error: function(data){
                     console.log(data);
@@ -625,10 +654,21 @@
     });
 
     // toggling post add button
-    $(document).on('click', '.fa-plus', function(){
+    $(document).on('click', '.add-blog', function(){
+        $('.add-category').removeClass('rotate-plus');
         $(this).toggleClass('rotate-plus');
         $(this).attr('title', '');
+        $('.create-category').slideUp();
         $(".post-create-form").slideToggle();
+    })
+
+    // toggling category add button
+    $(document).on('click', '.add-category', function(){
+        $('.add-blog').removeClass('rotate-plus');
+        $(this).toggleClass('rotate-plus');
+        $(this).attr('title', '');
+        $('.post-create-form').slideUp();
+        $(".create-category").slideToggle();
     })
 
     $(".post-div").mouseenter(function(){
@@ -1102,7 +1142,7 @@
     }); {% endcomment %}
 
     $(document).ready(function(){
-        $(".category-thumbnail").slice(4).hide();
+        $(".category-thumbnail").slice(5).hide();
     }); 
 
 
@@ -1115,7 +1155,7 @@
     $(".category-expansion").click(function(){
         if ($(this).text().trim() == 'Show less'){
             $(this).text("Show all categories");
-            $(".category-thumbnail").slice(4).fadeOut();
+            $(".category-thumbnail").slice(5).fadeOut();
         }else{
             $(this).text("Show less");
             $(".category-thumbnail").slice().fadeIn();

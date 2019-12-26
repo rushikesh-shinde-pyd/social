@@ -1,5 +1,5 @@
 from django import forms
-from .models import Profile, User, XSubcategory
+from .models import Profile, User
 from django.contrib.auth.forms import UserCreationForm
 from crispy_forms.helper import FormHelper
 from PIL import Image
@@ -52,8 +52,3 @@ class PhotoForm(forms.ModelForm):
         resized_image.save(profile.image.path)
         return profile
 
-
-class SubcategoryForm(forms.ModelForm):
-    class Meta:
-        model = XSubcategory
-        exclude = ['category_name']

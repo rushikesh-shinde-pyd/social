@@ -1,8 +1,8 @@
 from django.shortcuts import render,redirect,reverse, get_object_or_404
 from django.contrib.auth import authenticate,login as auth_login,logout
-from .forms import SignUpForm,PhotoForm, SubcategoryForm
+from .forms import SignUpForm,PhotoForm
 from django.contrib.auth.models import User
-from .models import Profile,Post, Like, Dislike, Comment, Replies, CATEGORIES, SUBCATEGORIES, XCategory, XSubcategory
+from .models import (Profile, Post, Like, Dislike, Comment, Reply, Category, Subcategory)
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
@@ -10,7 +10,6 @@ from django.conf import settings
 from django.utils import timezone
 from django.views.generic import View
 from django.http import JsonResponse
-from datetime import datetime as dt
 import datetime
 from django.utils.decorators import method_decorator
 from django.db.models import Q
@@ -61,12 +60,9 @@ def login(request):
         user = authenticate(username=username, password=password)
         if user is not None:
             auth_login(request, user)
-            print('success')
             messages.success(request, 'Login success.')
-            print('redirecting')
-            return redirect(reverse('social:dashboard'))
+            return redirect(reverse('social:profile'))
         else:
-            print('wrong')
             messages.error(request, 'Invalid username and password.')
             return redirect(reverse('social:login'))
     return render(request,'registration/login.html')
@@ -81,7 +77,7 @@ def dashboard(request):
     posts = paginator_obj.get_page(page)
     context = {
                 'user': request.user, 
-                'posts': posts, 'dt': dt.now, 
+                'posts': posts,
                 'timezone':timezone, 
                 'total_pages':paginator_obj.num_pages,
                 # 'categories': Category.objects.all().order_by('category_name')
@@ -177,19 +173,15 @@ def create_post(request):
         title = request.POST.get('post-title')
         category = request.POST.get('category').lower()
         subcategory = request.POST.get('subcategory').lower()
-        print(subcategory)
         try:
-            category_obj = get_object_or_404(XCategory, category_name=category)
-            subcategory_obj = get_object_or_404(XSubcategory, category_name=category_obj, subcategory_name=subcategory)
-            print('Miss')
+            category_obj = get_object_or_404(Category, category_name=category)
+            subcategory_obj = get_object_or_404(Subcategory, category_name=category_obj, subcategory_name=subcategory)
         except:
-            print(post, title, category, subcategory)
 
             messages.error(request, 'Post creation failed due to invalid input.')
             return redirect(reverse('social:blog'))
         else:
             if post.strip() and title.strip() and category.strip() and subcategory.strip():
-                print(post, title, category, subcategory)
                 user_obj = User.objects.get(username=request.user)
                 obj = Post(
                     author= user_obj,
@@ -197,8 +189,8 @@ def create_post(request):
                     text = post.strip(),
                     created_date = timezone.now(),
                     # published_date = timezone.now(),
-                    xcat = category_obj,
-                    xsubcat = subcategory_obj
+                    category = category_obj,
+                    subcategory = subcategory_obj
                 )
                 obj.save()
                 obj.publish()
@@ -365,7 +357,7 @@ class ReplyToCommentView(View):
         comment_obj = get_object_or_404(Comment, id=comment_id)
         user_obj = User.objects.get(id=request.user.id)
         reply = request.POST.get('reply').strip()
-        obj = Replies(user=user_obj, parent=comment_obj, reply=reply)
+        obj = Reply(user=user_obj, parent=comment_obj, reply_message=reply)
         obj.save()
         counts = comment_obj.parent.all().count()
         reply_count = ''
@@ -377,7 +369,7 @@ class ReplyToCommentView(View):
             'reply_id': obj.id,
             'reply_user_fname': obj.user.first_name.title(),
             'reply_user_lname': obj.user.last_name.title(),
-            'reply_message': obj.reply,
+            'reply_message': obj.reply_message,
             'reply_commented_at': obj.commented_at,
             'total_replies': reply_count
 
@@ -402,11 +394,14 @@ def remove_comment(request):
 
 @login_required
 def post_details(request, *args, **kwargs):
-    print(kwargs)
+    categories_for_thumbnails = set()
     post_obj = get_object_or_404(Post, id=kwargs.get('pk'))
+    category_queryset = Category.objects.all()
+    for category in category_queryset:
+        categories_for_thumbnails.add(category.category_name)
     context = {
-                'categories': CATEGORIES,
-                'post': post_obj
+                'post': post_obj,
+                'categories_post': sorted(categories_for_thumbnails)
             }
     return render(request, 'post_details.html', context)
 
@@ -415,8 +410,8 @@ def post_details(request, *args, **kwargs):
 def add_subcategory(request):
     subcategories = set()
     category = request.GET.get('category').strip()
-    category_obj = XCategory.objects.get(category_name=category)
-    subcategories_queryset = XSubcategory.objects.filter(category_name=category_obj)
+    category_obj = Category.objects.get(category_name=category)
+    subcategories_queryset = Subcategory.objects.filter(category_name=category_obj)
     for subcategory in subcategories_queryset:
         subcategories.add(subcategory.subcategory_name.title())
     data = {
@@ -428,15 +423,14 @@ def add_subcategory(request):
 @login_required
 def blog(request, *args, **kwargs):
     categories_for_thumbnails = set()
-    category_queryset = XCategory.objects.all()
+    category_queryset = Category.objects.all()
     for category in category_queryset:
         categories_for_thumbnails.add(category.category_name)
     context = {}
-    context['subcategory_form'] = SubcategoryForm()
     category = kwargs.get('key')
     if category is not None:
         try:
-            category_obj = XCategory.objects.get(category_name=category)
+            category_obj = Category.objects.get(category_name=category)
             print(category_obj)
         except: 
             if category == 'my_blogs':
@@ -463,7 +457,7 @@ def blog(request, *args, **kwargs):
                 return redirect(reverse('social:blog'))
         else:
 
-            posts = Post.objects.filter(xcat=category_obj)
+            posts = Post.objects.filter(category=category_obj)
             if posts.count() == 0:
                 # posts = Post.objects.filter(is_active=True).order_by("-published_date")
                 # paginator_obj = Paginator(posts, 5)
@@ -494,6 +488,7 @@ def blog(request, *args, **kwargs):
     return render(request,'blogs.html', context)
 
 
+@login_required
 def create_category(request):
     if request.method == 'POST':
         category = request.POST.get('category-name').lower()
@@ -501,10 +496,10 @@ def create_category(request):
         print(request.POST)
         if category.strip() and subcategory.strip():
             try:
-                category_obj = XCategory.objects.get(category_name=category)
+                category_obj = Category.objects.get(category_name=category)
             except:
-                category_obj = XCategory.objects.create(category_name=category)
-            subcategory_obj = XSubcategory.objects.create(category_name=category_obj, subcategory_name=subcategory)
+                category_obj = Category.objects.create(category_name=category)
+            subcategory_obj = Subcategory.objects.create(category_name=category_obj, subcategory_name=subcategory)
             messages.success(request, 'Category and subcategory created successfully!')
             return redirect(reverse('social:blog'))
         messages.error(request, 'Category creation failed due to invalid input.')

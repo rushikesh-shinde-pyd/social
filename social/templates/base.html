@@ -297,7 +297,7 @@
                     <ul class="sidebar-menu" id="nav-accordion">
 
                         <p class="centered"><a href="{% url 'social:profile' %}"><img src="{% static 'img/ui-sam.jpg' %}" class="img-circle" width="60"></a></p>
-                        <h5 class="centered">{{ user.first_name }} {{ user.last_name }}</h5>
+                        <h5 class="centered">{{ request.user.first_name|title }} {{ request.user.last_name|title }}</h5>
 
                         <li class="mt">
                             <a {% if active_class == 'profile' %} class="active" {% endif %} href="{% url 'social:profile' %}">

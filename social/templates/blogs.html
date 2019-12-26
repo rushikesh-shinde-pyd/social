@@ -19,7 +19,6 @@
                     <div class="row">
                         <h3 style="display: inline;">Categories</h3>
                         <i title="Create new category" class="pointer fa fa-plus add-category" style="padding:5px; color: #31708f; margin: 0px 0px 10px 0px; font-size:20px;" aria-hidden="true"></i>
-
                         <form class="create-category" style="display: none;" method="post" action="{% url 'social:create-category' %}">
                             {% csrf_token %}
                             <div class="form-group">
@@ -28,7 +27,6 @@
                                 <p><button class="btn btn-sm btn-primary" type="submit" style="margin-top:10px;">Create category</button></p>
                             </div>
                         </form>
-
                         <div class="row category-container">
                             <a href="{% url 'social:category' 'my_blogs' %}">
                                 <div class="category-thumbnail {% if higlight_category == 'my_blogs'%} higlight_category {% endif %} col-md-2 col-lg-2 col-sm-2 text-center">
@@ -148,10 +146,10 @@
                                             <div class="panel-body">
                                                 <div class="row">
                                                     <div class="col-md-4 col-lg-4 col-sm-4">
-                                                        Category: <h5 style="display: inline;">{{ post.xcat | title }}</h5>
+                                                        Category: <h5 style="display: inline;">{{ post.category | title }}</h5>
                                                     </div>
                                                     <div class="col-md-4 col-lg-4 col-sm-4">
-                                                        Subcategory: <h5 style="display: inline;">{{ post.xsubcat | title }}</h5>
+                                                        Subcategory: <h5 style="display: inline;">{{ post.subcategory | title }}</h5>
                                                     </div>
                                                     <div class="col-md-4 col-lg-4 col-sm-4" style="text-align: right;">
                                                         <strong id="post-author">
@@ -165,7 +163,7 @@
                                                 <p id="post-text">
                                                     {% if post.text|count_length > 500 %}
                                                         {{ post.text |title|show_more }}
-                                                        <i data-backdrop="false" data-toggle="modal" data-target="#post_view_modal" onclick="show_post({{ post.id }})" style="transform:scale(1,1);cursor:pointer" class="glyphicon glyphicon-new-window"></i>
+                                                        <a href="{% url 'social:post-details' post.id %}"><i class="glyphicon glyphicon-new-window"></i></a>
                                                     {% else %}
                                                         {{ post.text|title }}
                                                     {% endif %}
@@ -279,7 +277,7 @@
                                                                             <div class="reply-wrapper">
                                                                                 <ul  style="margin-left:50px;display:none;" class="list-group reply-div">
                                                                                     <div style="margin:10px 0px;"><strong class="replier">{{ each_reply.user.first_name|title }} {{ each_reply.user.last_name|title }}</strong> replied <span class="reply-timestamp"><small>{{ each_reply.commented_at|timesince }}</span> ago</small><br></div>
-                                                                                    <li class="list-group-item" style="display:inline-block;">{{ each_reply.reply }}</li>
+                                                                                    <li class="list-group-item" style="display:inline-block;">{{ each_reply.reply_message }}</li>
                                                                                 </ul>
                                                                             </div>
                                                                         {% endfor %}
@@ -296,19 +294,12 @@
                                     </div>
                                 </div>
                                 <br>
-                                {% empty %}
-                                    <div class="row">
-                                        <div class="col-sm-12 col-md-12 col-lg-12">
-                                            <h3 class="text-center">:(</h3>
-                                            <h6 class="text-center">No blogs so far !</h6>
-                                        </div>
-                                    </div>
                             {% endfor %}
                             {% if invalid_or_unavailable_category %}
                                     <div class="row">
                                         <div class="col-sm-12 col-md-12 col-lg-12">
                                             <h3 class="text-center">:(</h3>
-                                            <h6 class="text-center">No posts so far !</h6>
+                                            <h6 class="text-center">No blogs so far !</h6>
                                         </div>
                                     </div>
                             {% endif %}

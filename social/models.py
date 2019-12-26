@@ -6,51 +6,6 @@ from django.utils import timezone
 from django.conf import settings
 
 
-CATEGORIES = (
-        ('adventure', 'Adventure'),
-        ('fitness', 'Fitness'),
-        ('health', 'Health'),
-        ('food', 'Food'),
-        ('sports', 'Sports'),
-    )
-
-SUBCATEGORIES = {
-    'SPORTS': (
-        ('cricket', 'Cricket'),
-        ('football', 'Football'),
-        ('baseball', 'Baseball'),
-    ),
-
-    'FOOD': (
-            ('indian', 'Indian'),
-            ('chinese', 'Chinese'),
-            ('japanese', 'Japanese'),
-    ),
-
-    'FITNESS': (
-            ('martial_arts', 'Martial arts'),
-            ('gymnastics', 'Gymnastics'),
-            ('yoga', 'Yoga'),
-            ('weight_training', 'Weight training'),
-            ('crossfit', 'Crossfit'),
-    ),
-
-    'HEALTH': (
-        ('blood', 'Blood'),
-        ('cardiovascular', 'Cardiovascular'),
-        ('infection', 'Infection'),
-        ('mental', 'Mental'),
-    ),
-
-    'ADVENTURE': (
-        ('action', 'Action'),
-        ('thriller', 'Thriller'),
-        ('comedy', 'Comedy'),
-        ('travel', 'Travel'),
-    ),
-}
-
-
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='profile/',default='default_pic.png')
@@ -77,57 +32,40 @@ def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
 
-# class Category(models.Model):
-#     # post =  models.ForeignKey(Post, on_delete=models.CASCADE)
-#     name = models.CharField(choices=CATEGORIES, max_length=256, null=True, blank=True)
-    
-
-#     class Meta:
-#         verbose_name = "category"
-#         verbose_name_plural = "categories"
-
-#     def __str__(self):
-#         return self.name
-
-
-class XCategory(models.Model):
-    # post =  models.ForeignKey(Post, on_delete=models.CASCADE)
+class Category(models.Model):
     category_name = models.CharField(max_length=256)
-    
 
     class Meta:
         verbose_name = "category"
         verbose_name_plural = "categories"
 
+
     def __str__(self):
         return self.category_name
 
 
-class XSubcategory(models.Model):
-    # post =  models.ForeignKey(Post, on_delete=models.CASCADE)
-    category_name =  models.ForeignKey(XCategory, on_delete=models.CASCADE)
+class Subcategory(models.Model):
+    category_name =  models.ForeignKey(Category, on_delete=models.CASCADE)
     subcategory_name = models.CharField(max_length=256)
     
-
     class Meta:
         verbose_name = "subcategory"
         verbose_name_plural = "subcategories"
+
 
     def __str__(self):
         return self.subcategory_name
 
 
 class Post(models.Model):
-    category = models.CharField(choices=CATEGORIES, max_length=256, null=True, blank=True)
-    subcategory = models.CharField(max_length=256, null=True, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
+    subcategory = models.ForeignKey(Subcategory, on_delete=models.CASCADE, null=True, blank=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     text = models.TextField()
     created_date = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
-    xcat = models.ForeignKey(XCategory, on_delete=models.CASCADE, null=True, blank=True)
-    xsubcat = models.ForeignKey(XSubcategory, on_delete=models.CASCADE, null=True, blank=True)
 
     def publish(self):
         self.published_date = timezone.now()
@@ -160,12 +98,16 @@ class Comment(models.Model):
         self.save()
 
 
-class Replies(models.Model):
+class Reply(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     parent = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='parent')
     parent_reply = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
-    reply = models.CharField(max_length=500)
+    reply_message = models.CharField(max_length=500)
     is_approved = models.BooleanField(default=True)
     is_rejected = models.BooleanField(default=False)
     commented_at = models.DateTimeField(default=timezone.now, verbose_name='Created at')
+
+    class Meta:
+        verbose_name = 'reply'
+        verbose_name_plural = 'replies'
 
