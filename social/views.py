@@ -173,26 +173,40 @@ def forgot_password(request):
 @login_required
 def create_post(request):
     if request.method == "POST":
-        print(request.POST)
-        category = request.POST.get('category')
-        subcategory = request.POST.get('subcategory')
         post = request.POST.get('post-content')
         title = request.POST.get('post-title')
-        print(category)
-        if post and title:
-            user_obj = User.objects.get(username=request.user)
-            obj = Post(
-                author= user_obj,
-                title = title.strip(),
-                text = post.strip(),
-                created_date = timezone.now(),
-                # published_date = timezone.now(),
-                category = category,
-                subcategory = subcategory
-            )
-            obj.save()
-            obj.publish()
-    return redirect(reverse("social:blog"))
+        category = request.POST.get('category').lower()
+        subcategory = request.POST.get('subcategory').lower()
+        print(subcategory)
+        try:
+            category_obj = get_object_or_404(XCategory, category_name=category)
+            subcategory_obj = get_object_or_404(XSubcategory, category_name=category_obj, subcategory_name=subcategory)
+            print('Miss')
+        except:
+            print(post, title, category, subcategory)
+
+            messages.error(request, 'Post creation failed due to invalid input.')
+            return redirect(reverse('social:blog'))
+        else:
+            if post.strip() and title.strip() and category.strip() and subcategory.strip():
+                print(post, title, category, subcategory)
+                user_obj = User.objects.get(username=request.user)
+                obj = Post(
+                    author= user_obj,
+                    title = title.strip(),
+                    text = post.strip(),
+                    created_date = timezone.now(),
+                    # published_date = timezone.now(),
+                    xcat = category_obj,
+                    xsubcat = subcategory_obj
+                )
+                obj.save()
+                obj.publish()
+                return redirect(reverse("social:blog"))
+            messages.error(request, 'Post creatioon failed due to invalid input.')
+            return redirect(reverse('social:blog'))
+    return redirect(reverse('social:blog'))
+    
 
 
 @method_decorator(login_required, name="dispatch")
@@ -404,7 +418,7 @@ def add_subcategory(request):
     category_obj = XCategory.objects.get(category_name=category)
     subcategories_queryset = XSubcategory.objects.filter(category_name=category_obj)
     for subcategory in subcategories_queryset:
-        subcategories.add(subcategory.subcategory_name)
+        subcategories.add(subcategory.subcategory_name.title())
     data = {
         'subcategories': sorted(subcategories)
     }
@@ -420,43 +434,53 @@ def blog(request, *args, **kwargs):
     context = {}
     context['subcategory_form'] = SubcategoryForm()
     category = kwargs.get('key')
-    
     if category is not None:
         try:
-            category_obj = XCategory.objects.get(category_name=category.title())
+            category_obj = XCategory.objects.get(category_name=category)
+            print(category_obj)
         except: 
             if category == 'my_blogs':
-                print('yass')
                 my_blogs_obj = Post.objects.filter(author_id=request.user.id, is_active=True).order_by('-published_date')
-                num_posts = my_blogs_obj.count()
-                paginator_obj = Paginator(my_blogs_obj, 5)
-                page = request.GET.get('page')
-                posts = paginator_obj.get_page(page)
-                context['posts'] = posts
-                context['num_posts'] = num_posts
-                context['total_pages'] = paginator_obj.num_pages
-                context['higlight_category'] = category
-                context['categories_post'] = sorted(categories_for_thumbnails)
+                if my_blogs_obj.count() == 0:
+                    # posts = Post.objects.filter(is_active=True).order_by("-published_date")
+                    # paginator_obj = Paginator(posts, 5)
+                    context['invalid_or_unavailable_category'] = True
+                    context['categories_post'] = sorted(categories_for_thumbnails)
+                    # context['total_pages'] = paginator_obj.num_pages
+                    context['higlight_category'] = category
+                else:
+                    num_posts = my_blogs_obj.count()
+                    paginator_obj = Paginator(my_blogs_obj, 5)
+                    page = request.GET.get('page')
+                    posts = paginator_obj.get_page(page)
+                    context['posts'] = posts
+                    context['num_posts'] = num_posts
+                    context['total_pages'] = paginator_obj.num_pages
+                    context['higlight_category'] = category
+                    context['categories_post'] = sorted(categories_for_thumbnails)
             else:
-                posts = Post.objects.filter(is_active=True).order_by("-published_date")
-                paginator_obj = Paginator(posts, 5)
-                context['invalid_or_unavailable_category'] = True
-                context['categories_post'] = sorted(categories_for_thumbnails)
-                context['total_pages'] = paginator_obj.num_pages
-                context['higlight_category'] = category
+                messages.error(request, 'Invalid category.')
+                return redirect(reverse('social:blog'))
         else:
 
-            # num_posts = category_obj.count()
             posts = Post.objects.filter(xcat=category_obj)
-            num_posts = posts.count()
-            paginator_obj = Paginator(posts, 5)
-            page = request.GET.get('page')
-            posts = paginator_obj.get_page(page)
-            context['num_posts'] = num_posts
-            context['posts'] = posts
-            context['higlight_category'] = category
-            context['total_pages'] = paginator_obj.num_pages
-            context['categories_post'] = sorted(categories_for_thumbnails)
+            if posts.count() == 0:
+                # posts = Post.objects.filter(is_active=True).order_by("-published_date")
+                # paginator_obj = Paginator(posts, 5)
+                context['invalid_or_unavailable_category'] = True
+                context['categories_post'] = sorted(categories_for_thumbnails)
+                # context['total_pages'] = paginator_obj.num_pages
+                context['higlight_category'] = category
+            else:
+                num_posts = posts.count()
+                paginator_obj = Paginator(posts, 5)
+                page = request.GET.get('page')
+                posts = paginator_obj.get_page(page)
+                context['num_posts'] = num_posts
+                context['posts'] = posts
+                context['higlight_category'] = category
+                context['total_pages'] = paginator_obj.num_pages
+                context['categories_post'] = sorted(categories_for_thumbnails)
     elif not kwargs:
         posts = Post.objects.filter(is_active=True).order_by('-published_date')
         num_posts = posts.count()
@@ -472,14 +496,20 @@ def blog(request, *args, **kwargs):
 
 def create_category(request):
     if request.method == 'POST':
-        category = request.POST.get('category-name') 
-        subcategory = request.POST.get('subcategory-name') 
-        try:
-            category_obj = XCategory.objects.get(category_name=category)
-        except:
-            category_obj = XCategory.objects.create(category_name=category)
-        subcategory_obj = XSubcategory.objects.create(category_name=category_obj, subcategory_name=subcategory)
+        category = request.POST.get('category-name').lower()
+        subcategory = request.POST.get('subcategory-name').lower()
+        print(request.POST)
+        if category.strip() and subcategory.strip():
+            try:
+                category_obj = XCategory.objects.get(category_name=category)
+            except:
+                category_obj = XCategory.objects.create(category_name=category)
+            subcategory_obj = XSubcategory.objects.create(category_name=category_obj, subcategory_name=subcategory)
+            messages.success(request, 'Category and subcategory created successfully!')
+            return redirect(reverse('social:blog'))
+        messages.error(request, 'Category creation failed due to invalid input.')
         return redirect(reverse('social:blog'))
+        
 
 
 

@@ -41,6 +41,13 @@
                                         {{ each_category|title }}
                                     </div>
                                 </a>
+                                {% empty %}
+                                    <div class="row">
+                                        <div class="col-sm-12 col-md-12 col-lg-12">
+                                            <h3 class="text-center">:(</h3>
+                                            <h6 class="text-center">No categories so far !</h6>
+                                        </div>
+                                    </div>
                             {% endfor %}
                         </div>
                         {% if categories_post|length  >= 4 %}
@@ -59,7 +66,7 @@
                                 {% csrf_token %}
                                 <div class="form-group">
                                     <p>
-                                        <select name="category" class="form-control" required>
+                                        <select required name="category" class="form-control" >
                                             <option selected value="None">Select Category</option>
                                             {% for category in categories_post %}
                                                 <option value="{{ category }}">{{ category|title }}</option>
@@ -67,12 +74,12 @@
                                         </select>
                                     </p>
                                     <p>
-                                        <select name="subcategory" class="form-control" required placeholder="Subcategory">
+                                        <select required name="subcategory" class="form-control"  placeholder="Subcategory">
                                             <option selected value="None">Select Subcategory</option>
                                         </select>
                                     </p>
-                                    <p><input type="text" name="post-title" class="form-control" placeholder="Post Title"></p>
-                                    <p><textarea style="resize:none;" name="post-content" class="form-control" rows="3" placeholder="What's on your mind!"></textarea></p>
+                                    <p><input required type="text" name="post-title" class="form-control" placeholder="Post Title"></p>
+                                    <p><textarea required style="resize:none;" name="post-content" class="form-control" rows="3" placeholder="What's on your mind!"></textarea></p>
                                     <p><button class="btn btn-sm btn-primary" type="submit" style="margin-top:10px;">POST</button></p>
                                 </div>
                             </form>
@@ -141,10 +148,10 @@
                                             <div class="panel-body">
                                                 <div class="row">
                                                     <div class="col-md-4 col-lg-4 col-sm-4">
-                                                        Category: <h5 style="display: inline;">{{ post.category | title }}</h5>
+                                                        Category: <h5 style="display: inline;">{{ post.xcat | title }}</h5>
                                                     </div>
                                                     <div class="col-md-4 col-lg-4 col-sm-4">
-                                                        Subcategory: <h5 style="display: inline;">{{ post.subcategory | title }}</h5>
+                                                        Subcategory: <h5 style="display: inline;">{{ post.xsubcat | title }}</h5>
                                                     </div>
                                                     <div class="col-md-4 col-lg-4 col-sm-4" style="text-align: right;">
                                                         <strong id="post-author">
@@ -289,6 +296,13 @@
                                     </div>
                                 </div>
                                 <br>
+                                {% empty %}
+                                    <div class="row">
+                                        <div class="col-sm-12 col-md-12 col-lg-12">
+                                            <h3 class="text-center">:(</h3>
+                                            <h6 class="text-center">No blogs so far !</h6>
+                                        </div>
+                                    </div>
                             {% endfor %}
                             {% if invalid_or_unavailable_category %}
                                     <div class="row">
@@ -683,10 +697,9 @@
                     console.log(data);
                     var html = "";
                     $.each(data.subcategories, function (key, value) {
-                        html += "<option value="+value+">"+value+"</option>";
+                        html += "<option value='" + value + "'>" + value + "</option>";
                     });
                     $('select[name="subcategory"]').html('<option value="None">Select Subcategory</option>' + html);
-            
                 },
                 error: function(data){
                     console.log(data);
@@ -696,15 +709,19 @@
 
     // toggling post add button
     $(document).on('click', '.add-blog', function(){
+        $('.add-category').removeClass('rotate-plus');
         $(this).toggleClass('rotate-plus');
         $(this).attr('title', '');
+        $('.create-category').slideUp();
         $(".post-create-form").slideToggle();
     })
 
     // toggling category add button
     $(document).on('click', '.add-category', function(){
+        $('.add-blog').removeClass('rotate-plus');
         $(this).toggleClass('rotate-plus');
         $(this).attr('title', '');
+        $('.post-create-form').slideUp();
         $(".create-category").slideToggle();
     })
 
