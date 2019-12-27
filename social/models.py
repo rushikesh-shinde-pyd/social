@@ -15,7 +15,7 @@ class Profile(models.Model):
     fullAddress = models.CharField(default='',max_length=100)
     pin = models.CharField(default='',max_length=100)
     birth_date = models.DateField(null=True, blank=True)
-    gender = models.CharField(max_length=1)
+    gender = models.CharField(max_length=50)
 
     def __str__(self):
         return f'{self.user.username} Profile'

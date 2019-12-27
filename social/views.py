@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
-from django.views.generic import View
+from django.views.generic import View, ListView
 from django.http import JsonResponse
 import datetime
 from django.utils.decorators import method_decorator
@@ -506,5 +506,40 @@ def create_category(request):
         return redirect(reverse('social:blog'))
         
 
+class SearchResultsView(ListView):
+    model = Profile
+    template_name = 'search_results.html'
 
+    def get_context_object_name(self, queryset):
+        return 'users_list'
 
+    def get_queryset(self):
+        query = self.request.GET.get('query')
+        if query.strip():
+            if len(query.split()) >= 2:
+                for each in query.split():
+                    if len(each) >= 2:
+                        return Profile.objects.filter(
+                            Q(user__first_name__icontains=each) |
+                            Q(user__last_name__icontains=each) |
+                            Q(city__icontains=each) |
+                            Q(state__icontains=each) |
+                            Q(country__icontains=each)
+                        ).order_by('user__first_name')
+
+    def get_context_data(self, **kwargs):
+
+        query = self.request.GET.get('query')
+        context = super().get_context_data(**kwargs)
+        context['query'] = query
+        users = self.get_queryset()
+
+        num_users = users.count()
+        print(num_users)
+        paginator_obj = Paginator(users, 1)
+        page = self.request.GET.get('page')
+        users = paginator_obj.get_page(page)
+        context['num_users'] = num_users
+        context['users'] = users
+        context['total_pages'] = paginator_obj.num_pages
+        return context

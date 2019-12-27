@@ -6,7 +6,7 @@ from PIL import Image
 from django.core.files import File
 
 class SignUpForm(UserCreationForm):
-    Choice= ((None,'Select gender'),('M','Male'), ('F','Female'),('O','Other'), )
+    Choice= ((None,'Select gender'),('male','Male'), ('female','Female'),('other','Other'), )
     first_name = forms.CharField(max_length=30, required=False)
     last_name = forms.CharField(max_length=30, required=False)
     email = forms.EmailField(max_length=254)

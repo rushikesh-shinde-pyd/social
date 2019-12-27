@@ -2370,3 +2370,6 @@ label {
     color: #ffffff;
     border-color: orangered ;
 }
+.search-form-item{
+    float:left
+}

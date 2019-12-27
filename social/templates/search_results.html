@@ -34,145 +34,66 @@
                     <div class="row mt">
                     <!-- SERVER STATUS PANELS -->
                         <!--.&lt;!&ndash; /col-md-4&ndash;&gt;-->
-
-
-                        <div class="col-md-12 col-sm-12 mb" >
-                            <div class="darkblue-panel pn" style="background-image:url({% static 'img/profile-02.jpg' %});background-repeat: no-repeat;background-size: cover;">
-                                <div class="darkblue-header">
-                                    <h5 class="">PROFILE DETAILS</h5>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-6 col-xs-6 ">
-                                        <p> </p>
+                        <div class="col-md-12 col-sm-12 mb">
+                            <h3>Search results for </h3>
+                            <p>"{{ query }}"</p>
+                            {% for user_obj in users_list %}
+                                <div class="row mt">
+                                    <div class="col-md-1" style="padding:0px">
+                                        {% if user_obj.image %}
+                                            <img src="{{user_obj.image.url}}" style="border-radius: 100%; max-height:100%; max-width:100%;">
+                                            {% else %}
+                                            <img {% if user_obj.gender == 'male'%} src="{% static 'img/male_user.png' %}" {% else %}src="{% static 'img/female_user.png' %}"{% endif %} style="border-radius: 100%; max-height:100%; max-width:100%;">
+                                        {% endif %}
                                     </div>
-                                    <div class="col-sm-6 col-xs-6"></div>
+                                    <div class="col-md-11" style="background:linear-gradient(to right, white, #f2f2f2);">
+                                        <h4 style="margin-bottom:5px;">{{user_obj.user.first_name|title}} {{user_obj.user.last_name|title}}</h4>
+                                        {% if user_obj.gender %}<span>{{user_obj.gender|title}}</span></br>{% endif%}
+                                        {% if user_obj.city %}<span>from {{user_obj.city|title}}</span>{% endif %}
+                                    </div>
                                 </div>
-                                <div class=" goleft" style="margin:20px;">
-                                    <div class="profile-pic">
-                                        <img src="{% static 'img/ui-zac.jpg' %}" width="120" class="">
-                                        <div class="edit"><a href="#" id="pic"><i class="fa fa-edit"></i></a></div></div>
+                                {% empty %}
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-12 col-lg-12">
+                                        <h3 class="text-center">:(</h3>
+                                        <h6 class="text-center">No result found!</h6>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p class="goleft" style="color:white;margin:20px;">{{ user.first_name|title }} {{ user.last_name|title }}</p>
-                                </div>
-
-                            </div>
+                            {% endfor %}
+                            {% if users_list %}
+                                <h6 class="text-center">End of result.</h6>
+                            {% endif %}
                         </div><!-- /col-md-4 -->
-
-                        <!--<div class="col-md-4 mb">-->
-                            <!--&lt;!&ndash; WHITE PANEL - TOP USER &ndash;&gt;-->
-                            <!--<div class="white-panel pn">-->
-                                <!--<div class="white-header">-->
-                                    <!--<h5>TOP USER</h5>-->
-                                <!--</div>-->
-                                <!--<p><img src="assets/img/ui-zac.jpg" class="img-circle" width="80"></p>-->
-                                <!--<p><b>Zac Snider</b></p>-->
-                                <!--<div class="row">-->
-                                    <!--<div class="col-md-6">-->
-                                        <!--<p class="small mt">MEMBER SINCE</p>-->
-                                        <!--<p>2012</p>-->
-                                    <!--</div>-->
-                                    <!--<div class="col-md-6">-->
-                                        <!--<p class="small mt">TOTAL SPEND</p>-->
-                                        <!--<p>$ 47,60</p>-->
-                                    <!--</div>-->
-                                <!--</div>-->
-                            <!--</div>-->
-                        <!--</div>&lt;!&ndash; /col-md-4 &ndash;&gt;-->
-
-
-                    </div><!-- /row -->
-
-
-                    <div class="row">
-                        <!-- TWITTER PANEL -->
-                    <div class="col-md-12 col-sm-12 mb">
-                        <div class="panel panel-info ">
-                            <div class="panel-body">
+                        {% comment %} pagination starts {% endcomment %}
+                            {% if users_list and num_users >= 2 %}
                                 <div class="row">
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">First Name </label>:
-                                        {{ user.first_name }}
-                                    </div>
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">Last Name </label>:
-                                        {{ user.last_name }}
+                                    <div class="col-md-10 col-lg-10 text-center">
+                                        <nav aria-label="..." class="">
+                                            <ul class="pagination">
+                                                {% if users.has_previous %}
+                                                <li class="page-item">
+                                                    <a class="page-link" href="?page=1">First</a>
+                                                </li>
+                                                <li class="page-item"><a class="page-link" href="?page={{ users.previous_page_number }}">{{ users.previous_page_number }}</a></li>
+                                                {% endif %}
+                                                <li class="page-item active">
+                                                <a class="page-link" href="?page={{ users.number }}">{{ users.number }} <span class="sr-only">(current)</span></a>
+                                                </li>
+                                                
+                                                {% if users.has_next %}
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?page={{ users.next_page_number }}">{{ users.next_page_number }}</a>
+                                                    </li>
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?page={{ total_pages }}">Last</a>
+                                                    </li>
+                                                {% endif %}
+                                            </ul>
+                                        </nav>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">Email Id </label>:
-                                        {{ user.email }}
-                                    </div>
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">Username</label>:
-                                        {{ user.username }}
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">Gender </label>:
-                                        {{ user.profile.gender }}
-                                    </div>
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">Birth Date</label>:
-                                        {{ user.profile.birth_date }}
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">City </label>:
-                                        {{ user.profile.city }}
-                                    </div>
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">State</label>:
-                                        {{ user.profile.state }}
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">Country </label>:
-                                        {{ user.profile.country }}
-                                    </div>
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">Address</label>:
-                                        {{ user.profile.fullAddress }}
-                                    </div>
-                                </div><hr/>
-
-
-                            <div class="form-buttons-w">
-
-                                <div class="col-sm-6 text"><a class="btn btn-primary btn-sm" href="{% url 'social:editProfile' %}">
-                                <i class="fa fa-edit"></i> <span>Edit Profile</span></a></div></div>
-
-                            </div><! -- /darkblue panel -->
-                        </div><!-- /col-md-4 -->
-                    </div>
-
-                        <!--<div class="col-md-4 mb">-->
-                            <!--&lt;!&ndash; INSTAGRAM PANEL &ndash;&gt;-->
-                            <!--<div class="instagram-panel pn">-->
-                                <!--<i class="fa fa-instagram fa-4x"></i>-->
-                                <!--<p>@THISISYOU<br/>-->
-                                    <!--5 min. ago-->
-                                <!--</p>-->
-                                <!--<p><i class="fa fa-comment"></i> 18 | <i class="fa fa-heart"></i> 49</p>-->
-                            <!--</div>-->
-                        <!--</div>&lt;!&ndash; /col-md-4 &ndash;&gt;-->
-
-                        <!--<div class="col-md-4 col-sm-4 mb">-->
-                            <!--&lt;!&ndash; REVENUE PANEL &ndash;&gt;-->
-                            <!--<div class="darkblue-panel pn">-->
-                                <!--<div class="darkblue-header">-->
-                                    <!--<h5>REVENUE</h5>-->
-                                <!--</div>-->
-                                <!--<div class="chart mt">-->
-                                    <!--<div class="sparkline" data-type="line" data-resize="true" data-height="75" data-width="90%" data-line-width="1" data-line-color="#fff" data-spot-color="#fff" data-fill-color="" data-highlight-line-color="#fff" data-spot-radius="4" data-data="[200,135,667,333,526,996,564,123,890,464,655]"></div>-->
-                                <!--</div>-->
-                                <!--<p class="mt"><b>$ 17,980</b><br/>Month Income</p>-->
-                            <!--</div>-->
-                        <!--</div>&lt;!&ndash; /col-md-4 &ndash;&gt;-->
+                            {% endif %}
+                            {% comment %} pagination ends {% endcomment %}
 
                     </div><!-- /row -->
 
@@ -411,133 +332,6 @@
 {% endblock %}
 
 {% block custom_scripts %}
-    <script type="application/javascript">
-        $(document).ready(function () {
-            $("#date-popover").popover({html: true, trigger: "manual"});
-            $("#date-popover").hide();
-            $("#date-popover").click(function (e) {
-                $(this).hide();
-            });
 
-            $("#my-calendar").zabuto_calendar({
-                action: function () {
-                    return myDateFunction(this.id, false);
-                },
-                action_nav: function () {
-                    return myNavFunction(this.id);
-                },
-                ajax: {
-                    url: "show_data.php?action=1",
-                    modal: true
-                },
-                legend: [
-                    {type: "text", label: "Special event", badge: "00"},
-                    {type: "block", label: "Regular event", }
-                ]
-            });
-        });
-
-
-        function myNavFunction(id) {
-            $("#date-popover").hide();
-            var nav = $("#" + id).data("navigation");
-            var to = $("#" + id).data("to");
-            console.log('nav ' + nav + ' to: ' + to.month + '/' + to.year);
-        }
-    </script>
-
-    <script type="application/javascript">
-        // Get the modal to create new file
-        var modal = document.getElementById('myModal');
-
-        // Get the button that opens the modal
-        var btn = document.getElementById("pic");
-
-        // Get the <span> element that closes the modal
-        var span = document.getElementsByClassName("close")[0];
-        var create = document.getElementById("create_file");
-        create.onclick = function() {
-                    var fs = require('fs');
-
-                    fs.appendFile($('#filename').val(),'\n Write your code here.', function (err) {
-                        if (err) throw err;
-                        console.log('Created!');
-                    });
-                modal.style.display = "none";
-                $("#modalCrop").modal("show");
-        }
-
-        // When the user clicks the button, open the modal
-        btn.onclick = function() {
-            modal.style.display = "block";
-        }
-
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
-            modal.style.display = "none";
-        }
-
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function(event) {
-            if (event.target == modal) {
-            modal.style.display = "none";
-            }
-        }
-    </script>
-
-    <script type="application/javascript">
-        $(function () {
-            <!--/* SCRIPT TO OPEN THE MODAL WITH THE PREVIEW */-->
-            <!--$("#id_file").change(function () {-->
-            <!--if (this.files && this.files[0]) {-->
-                <!--var reader = new FileReader();-->
-                <!--reader.onload = function (e) {-->
-                <!--$("#image").attr("src", e.target.result);-->
-                <!--$("#modalCrop").modal("show");-->
-                <!--}-->
-                <!--reader.readAsDataURL(this.files[0]);-->
-            <!--}-->
-            <!--});-->
-
-            /* SCRIPTS TO HANDLE THE CROPPER BOX */
-            var $image = $("#image1");
-            var cropBoxData;
-            var canvasData;
-            $("#modalCrop").on("shown.bs.modal", function () {
-            $image.cropper({
-                viewMode: 1,
-                aspectRatio: 1/1,
-                minCropBoxWidth: 200,
-                minCropBoxHeight: 200,
-                ready: function () {
-                $image.cropper("setCanvasData", canvasData);
-                $image.cropper("setCropBoxData", cropBoxData);
-                }
-            });
-            }).on("hidden.bs.modal", function () {
-            cropBoxData = $image.cropper("getCropBoxData");
-            canvasData = $image.cropper("getCanvasData");
-            $image.cropper("destroy");
-            });
-
-            $(".js-zoom-in").click(function () {
-            $image.cropper("zoom", 0.1);
-            });
-
-            $(".js-zoom-out").click(function () {
-            $image.cropper("zoom", -0.1);
-            });
-
-            /* SCRIPT TO COLLECT THE DATA AND POST TO THE SERVER */
-            $(".js-crop-and-upload").click(function () {
-            var cropData = $image.cropper("getData");
-            $("#id_x").val(cropData["x"]);
-            $("#id_y").val(cropData["y"]);
-            $("#id_height").val(cropData["height"]);
-            $("#id_width").val(cropData["width"]);
-            $("#formUpload").submit();
-            });
-        });
-    </script>
 
 {% endblock %}

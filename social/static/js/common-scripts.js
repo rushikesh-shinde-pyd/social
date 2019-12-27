@@ -119,4 +119,9 @@ var Script = function () {
 }();
 
 
-
+$(".search-form").submit(function(event){
+    var query = $('input[name="query"]').val().trim()
+    if (!query){
+        event.preventDefault();
+    }
+});
