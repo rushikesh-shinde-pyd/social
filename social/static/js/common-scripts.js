@@ -120,8 +120,61 @@ var Script = function () {
 
 
 $(".search-form").submit(function(event){
-    var query = $('input[name="query"]').val().trim()
+    var query = $('[name="query"]').val().trim()
     if (!query){
         event.preventDefault();
     }
+});
+
+
+// create category form validation
+
+$('form[name="create-category"]').submit(function(event){
+    $(".category-error").remove();
+    var category = $('[name="category-name"]');
+    var subcategory = $('[name="subcategory-name"]');
+    var ele_indices = [];
+    if (!category.val().trim()){
+        category.after('<span class="category-error text-danger">Invalid category!</span>')
+    }
+    if (!subcategory.val().trim()){
+        subcategory.after('<span class="category-error text-danger">Invalid subcategory!</span>')
+    }
+    $(this).find(ele_indices[0]).focus();
+    if (ele_indices.length > 0 ){
+        event.preventDefault();
+    }
+});
+
+
+// post creation form validation
+
+$('form[name="post-create-form"]').submit(function(event){
+    $(".category-error").remove();
+    var category = $('[name="category"]');
+    var subcategory = $('[name="subcategory"]');
+    var title = $('[name="post-title"]');
+    var content = $('[name="post-content"]');
+    var ele_indices = [];
+    if (category.val() == "None"){
+        category.after('<span class="category-error text-danger">Select category!</span>');
+        ele_indices.push($(category));
+    }
+    if (subcategory.val() == "None"){
+        subcategory.after('<span class="category-error text-danger">Select subcategory!</span>');
+        ele_indices.push($(subcategory));
+    }
+    if (!title.val().trim()){
+        title.after('<span class="category-error text-danger">Enter valid input!</span>');
+        ele_indices.push($(title));
+    }
+    if (!content.val().trim()){
+        content.after('<span class="category-error text-danger">Enter valid input!</span>');
+        ele_indices.push($(content));
+    }
+    $(this).find(ele_indices[0]).focus();
+    if (ele_indices.length > 0 ){
+        event.preventDefault();
+    }
+
 });

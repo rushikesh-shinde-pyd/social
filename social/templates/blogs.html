@@ -19,7 +19,7 @@
                     <div class="row">
                         <h3 style="display: inline;">Categories</h3>
                         <i title="Create new category" class="pointer fa fa-plus add-category" style="padding:5px; color: #31708f; margin: 0px 0px 10px 0px; font-size:20px;" aria-hidden="true"></i>
-                        <form class="create-category" style="display: none;" method="post" action="{% url 'social:create-category' %}">
+                        <form class="create-category" name="create-category" style="display: none;" method="post" action="{% url 'social:create-category' %}">
                             {% csrf_token %}
                             <div class="form-group">
                                 <p><input type="text" required name="category-name" class="form-control" placeholder="Category name"></p>
@@ -60,7 +60,7 @@
                         <div class="col-md-12 col-sm-12 mb" >
                             <i title="Create new post" class="pointer fa fa-plus add-blog" style="padding:5px; color: #31708f; margin: 0px 0px 10px 0px; font-size:20px;" aria-hidden="true"></i>
 
-                            <form class="post-create-form" style="display: none;" method="post" action="{% url 'social:post-create' %}">
+                            <form name="post-create-form" class="post-create-form" style="display: none;" method="post" action="{% url 'social:post-create' %}">
                                 {% csrf_token %}
                                 <div class="form-group">
                                     <p>
@@ -1194,6 +1194,8 @@
             $(".category-thumbnail").slice().fadeIn();
         }
     });
+
+    
 
 </script>
 

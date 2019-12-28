@@ -532,14 +532,14 @@ class SearchResultsView(ListView):
         query = self.request.GET.get('query')
         context = super().get_context_data(**kwargs)
         context['query'] = query
-        users = self.get_queryset()
+        # users = self.get_queryset()
 
-        num_users = users.count()
-        print(num_users)
-        paginator_obj = Paginator(users, 1)
-        page = self.request.GET.get('page')
-        users = paginator_obj.get_page(page)
-        context['num_users'] = num_users
-        context['users'] = users
-        context['total_pages'] = paginator_obj.num_pages
+        # num_users = users.count()
+        # print(num_users)
+        # paginator_obj = Paginator(users, 1)
+        # page = self.request.GET.get('page')
+        # users = paginator_obj.get_page(page)
+        # context['num_users'] = num_users
+        # context['users'] = users
+        # context['total_pages'] = paginator_obj.num_pages
         return context
