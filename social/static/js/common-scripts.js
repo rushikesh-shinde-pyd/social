@@ -178,3 +178,13 @@ $('form[name="post-create-form"]').submit(function(event){
     }
 
 });
+
+
+$("#searchfilters").click(function(event){
+    $(".filters-dropdown").toggle();
+});
+
+
+$("#gender-toogle").click(function(){
+    $("#gender-ul").slideToggle();
+})

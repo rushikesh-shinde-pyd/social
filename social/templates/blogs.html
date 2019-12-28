@@ -162,10 +162,10 @@
                                                 <hr style="border-top: 1px solid #797979;margin-top:10px;margin-bottom:10px;">
                                                 <p id="post-text">
                                                     {% if post.text|count_length > 500 %}
-                                                        {{ post.text |title|show_more }}
+                                                        {{ post.text |show_more|title|linebreaks }}
                                                         <a href="{% url 'social:post-details' post.id %}"><i class="glyphicon glyphicon-new-window"></i></a>
                                                     {% else %}
-                                                        {{ post.text|title }}
+                                                        {{ post.text|title|linebreaks  }}
                                                     {% endif %}
                                                 </p>
                                             </div>

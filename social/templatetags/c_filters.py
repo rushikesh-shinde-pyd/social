@@ -74,5 +74,6 @@ def get_category(posts, category_obj):
     return posts
 
 
+
    
 

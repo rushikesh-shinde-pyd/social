@@ -36,7 +36,7 @@
                         <!--.&lt;!&ndash; /col-md-4&ndash;&gt;-->
                         <div class="col-md-12 col-sm-12 mb">
                             <h3>Search results for </h3>
-                            <p>"{{ query }}"</p>
+                            <p><em>"{{ query }}"</em></p>
                             {% for user_obj in users_list %}
                                 <div class="row mt">
                                     <div class="col-md-1" style="padding:0px">
@@ -61,7 +61,7 @@
                                 </div>
                             {% endfor %}
                             {% if users_list %}
-                                <h6 class="text-center">End of result.</h6>
+                                <h6 style="margin-top: 2em" class="text-center">End of result.</h6>
                             {% endif %}
                         </div><!-- /col-md-4 -->
                         {% comment %} pagination starts {% endcomment %}

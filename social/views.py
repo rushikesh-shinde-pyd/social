@@ -515,24 +515,29 @@ class SearchResultsView(ListView):
 
     def get_queryset(self):
         query = self.request.GET.get('query')
+        gender = self.request.GET.get('filter-gender')
+        city = self.request.GET.get('filter-location')
+        print(gender)
         if query.strip():
-            if len(query.split()) >= 2:
-                for each in query.split():
-                    if len(each) >= 2:
-                        return Profile.objects.filter(
-                            Q(user__first_name__icontains=each) |
-                            Q(user__last_name__icontains=each) |
-                            Q(city__icontains=each) |
-                            Q(state__icontains=each) |
-                            Q(country__icontains=each)
-                        ).order_by('user__first_name')
+            for each in query.split():
+                res = (Q(user__first_name__icontains=each)|
+                        Q(user__last_name__icontains=each)
+                    )
+        if gender:
+            return res & Q(gender=gender)
+        if city:
+            return res & Q(city=city.strip())
+        if gender and city:
+            return res & (Q(city=city.strip()) & Q(gender=gender))
+        return Profile.objects.filter(res)
+        
 
     def get_context_data(self, **kwargs):
 
         query = self.request.GET.get('query')
         context = super().get_context_data(**kwargs)
         context['query'] = query
-        # users = self.get_queryset()
+        users = self.get_queryset()
 
         # num_users = users.count()
         # print(num_users)

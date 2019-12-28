@@ -269,12 +269,43 @@
                             <li>
                                 <form class="form-inline my-2 my-lg-0 search-form" action="{% url 'social:search-key' %}">
                                     <input name="query" class="form-control  mr-sm-2" type="search" style="border: none;" placeholder="Search" aria-label="Search">
-                                    {% comment %} <label for="exampleFormControlSelect1">Search by</label>
-                                    <select name="search-filter" class="form-control" id="exampleFormControlSelect1">
-                                    <option value="name">Name</option>
-                                    <option value="gender">Gender</option>
-                                    </select>
-                                    <button class=" btn btn-outline-success my-2 my-sm-0" type="submit"><i style="padding: 0px 0px;" class="fa fa-search" aria-hidden="true"></i></button> {% endcomment %}
+                                    <i style="transform: scale(1.2,1.2); padding:0px; margin: 10px 5px 0px 5px;"  class="pointer glyphicon glyphicon-filter" id="searchfilters"></i>
+                                    
+                                    <div class="filters-dropdown" style="display: none;">
+                                        <div style="padding: 4px 0px; display: block;" id="gender-toogle" class="pointer"><span>Gender</span></div>
+                                        <ul class="list-group" id="gender-ul" style="display: none; padding: 10px;">
+                                            <li class="list-group-item">
+                                                <input type="radio" name="filter-gender" value="male" id="filter-gender-male">
+                                                <label for="filter-gender-male">Male</label>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <input type="radio" name="filter-gender" value="female" id="filter-gender-female">
+                                                <label for="filter-gender-female">Female</label>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <input type="radio" name="filter-gender" value="others" id="filter-gender-others">
+                                                <label for="filter-gender-others">Others</label>
+                                            </li>
+                                        </ul>
+                                        <input class="form-control" type="text" name="filter-location" placeholder="Location">
+                                        {% comment %} <label class="filter-container">Location
+                                            <input type="checkbox" name="filter-location">
+                                            <span class="checkmark"></span>
+                                        </label> {% endcomment %}
+                                        {% comment %} <label class="filter-container">One
+                                            <input type="checkbox" checked="checked">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                        <label class="filter-container">One
+                                            <input type="checkbox" checked="checked">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                        <label class="filter-container">One
+                                            <input type="checkbox" checked="checked">
+                                            <span class="checkmark"></span>
+                                        </label> {% endcomment %}
+                                    </div>
+                                    <button type="submit" name="search" value="search" style="padding:0px; border: none; background: transparent; outline: none;"><i style="transform: scale(1.5,1.5); padding:0px;" class="fa fa-search" aria-hidden="true"></i></button>
                                 </form>
                             </li>
                         </ul>
