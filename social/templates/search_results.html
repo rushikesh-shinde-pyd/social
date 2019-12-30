@@ -35,7 +35,7 @@
                     <!-- SERVER STATUS PANELS -->
                         <!--.&lt;!&ndash; /col-md-4&ndash;&gt;-->
                         <div class="col-md-12 col-sm-12 mb">
-                            <h3>Search results for </h3>
+                            <h3>Found {{ users_list.count }} result{{ users_list.count|pluralize:'s' }} for </h3>
                             <p><em>"{{ query }}"</em></p>
                             {% for user_obj in users_list %}
                                 <div class="row mt">

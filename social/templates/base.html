@@ -268,26 +268,36 @@
                             </li>
                             <li>
                                 <form class="form-inline my-2 my-lg-0 search-form" action="{% url 'social:search-key' %}">
-                                    <input name="query" class="form-control  mr-sm-2" type="search" style="border: none;" placeholder="Search" aria-label="Search">
+                                    <input name="query" value="{% if query %}{{ query }}{% endif %}" class="form-control  mr-sm-2" type="search" style="border: none;" placeholder="Search" aria-label="Search">
                                     <i style="transform: scale(1.2,1.2); padding:0px; margin: 10px 5px 0px 5px;"  class="pointer glyphicon glyphicon-filter" id="searchfilters"></i>
                                     
                                     <div class="filters-dropdown" style="display: none;">
-                                        <div style="padding: 4px 0px; display: block;" id="gender-toogle" class="pointer"><span>Gender</span></div>
-                                        <ul class="list-group" id="gender-ul" style="display: none; padding: 10px;">
-                                            <li class="list-group-item">
-                                                <input type="radio" name="filter-gender" value="male" id="filter-gender-male">
+                                        <div class="row">
+                                            <div class="col-md-12" style="background:redd;">
+                                                <span id="clear-filters" class="text-danger pointer">Clear filters</span>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6" style="background:lidme;">
+                                                <span id="gender-toogle" class="pointer">Gender</span>
+                                            </div>
+                                        </div>
+                                        <ul class="list-group" id="gender-ul" style="display: none; margin-bottom: 0px; padding: 10px;">
+                                            <li class="list-group-item" style="padding: 2px 15px;">
+                                                <input {% if gender == 'male' %} checked {% endif %} type="radio" name="filter-gender" value="male" id="filter-gender-male">
                                                 <label for="filter-gender-male">Male</label>
                                             </li>
-                                            <li class="list-group-item">
-                                                <input type="radio" name="filter-gender" value="female" id="filter-gender-female">
+                                            <li class="list-group-item" style="padding: 2px 15px;">
+                                                <input {% if gender == 'female' %} checked {% endif %} type="radio" name="filter-gender" value="female" id="filter-gender-female">
                                                 <label for="filter-gender-female">Female</label>
                                             </li>
-                                            <li class="list-group-item">
-                                                <input type="radio" name="filter-gender" value="others" id="filter-gender-others">
+                                            <li class="list-group-item" style="padding: 2px 15px;">
+                                                <input {% if gender == 'others' %} checked {% endif %} type="radio" name="filter-gender" value="others" id="filter-gender-others">
                                                 <label for="filter-gender-others">Others</label>
                                             </li>
                                         </ul>
-                                        <input class="form-control" type="text" name="filter-location" placeholder="Location">
+                                        <span id="location-toggle" class="pointer">Location</span>
+                                        <input class="form-control" style='display: none; margin-left: 10px;' type="text" value="{% if location %}{{ location }}{% endif %}" name="filter-location" id="filter-location" placeholder="Location">
                                         {% comment %} <label class="filter-container">Location
                                             <input type="checkbox" name="filter-location">
                                             <span class="checkmark"></span>

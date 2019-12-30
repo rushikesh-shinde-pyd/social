@@ -119,11 +119,16 @@ var Script = function () {
 }();
 
 
+
 $(".search-form").submit(function(event){
-    var query = $('[name="query"]').val().trim()
-    if (!query){
+    var query = $('[name="query"]').val().trim();
+    var location = $('[name="filter-location"]');
+    var obj = new RegExp('^[a-z]{2,20}\\s[a-z]{2,20}\\s*[a-z]*$');
+    
+    if (!obj.test(query)){
         event.preventDefault();
     }
+
 });
 
 
@@ -180,11 +185,35 @@ $('form[name="post-create-form"]').submit(function(event){
 });
 
 
-$("#searchfilters").click(function(event){
-    $(".filters-dropdown").toggle();
-});
 
 
 $("#gender-toogle").click(function(){
     $("#gender-ul").slideToggle();
 })
+
+$("#location-toggle").click(function(){
+    var location = $('[name="filter-location"]');
+    location.slideToggle();
+    location.focus();
+})
+
+$('[name="filter-location"]').keydown(function(event){
+    var location = $(this).val().trim();
+    if (!location){
+        if (event.keyCode == 32) {
+            event.preventDefault();
+        }
+    }
+})
+
+$("#clear-filters").click(function(event){
+    form = $(".search-form");
+    form.find('[name="filter-location"]').removeAttr('value');
+    form.find('[name="filter-gender"]').removeAttr('checked');
+})
+
+
+$("#searchfilters").click(function(event){
+    $(".filters-dropdown").toggle();
+});
+
