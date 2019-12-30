@@ -120,6 +120,14 @@ var Script = function () {
 
 
 
+
+$(document).ready(function(){
+    var x = new RegExp('^[a-z]{2,20}\\s[a-z]{2,20}\\s*[a-z]*$');
+    if (x.test('joe doe')){
+        console.log(x.test('joe doe hk '));
+    }
+})
+
 $(".search-form").submit(function(event){
     var query = $('[name="query"]').val().trim();
     var location = $('[name="filter-location"]');
@@ -127,6 +135,10 @@ $(".search-form").submit(function(event){
     
     if (!obj.test(query)){
         event.preventDefault();
+    }
+    
+    if (!location.val().trim()){
+        location.remove();
     }
 
 });
