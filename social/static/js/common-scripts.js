@@ -119,43 +119,17 @@ var Script = function () {
 }();
 
 
-
-
-$(document).ready(function(){
-    var x = new RegExp('^[a-z]{2,20}\\s[a-z]{2,20}\\s*[a-z]*$');
-    if (x.test('joe doe')){
-        console.log(x.test('joe doe hk '));
-    }
-})
-
-$(".search-form").submit(function(event){
-    var query = $('[name="query"]').val().trim();
-    var location = $('[name="filter-location"]');
-    var obj = new RegExp('^[a-z]{2,20}\\s[a-z]{2,20}\\s*[a-z]*$');
-    
-    if (!obj.test(query)){
-        event.preventDefault();
-    }
-    
-    if (!location.val().trim()){
-        location.remove();
-    }
-
-});
-
-
 // create category form validation
-
 $('form[name="create-category"]').submit(function(event){
     $(".category-error").remove();
     var category = $('[name="category-name"]');
     var subcategory = $('[name="subcategory-name"]');
     var ele_indices = [];
     if (!category.val().trim()){
-        category.after('<span class="category-error text-danger">Invalid category!</span>')
+        category.after('<span class="category-error text-danger">Invalid category!</span>');
     }
     if (!subcategory.val().trim()){
-        subcategory.after('<span class="category-error text-danger">Invalid subcategory!</span>')
+        subcategory.after('<span class="category-error text-danger">Invalid subcategory!</span>');
     }
     $(this).find(ele_indices[0]).focus();
     if (ele_indices.length > 0 ){
@@ -165,7 +139,6 @@ $('form[name="create-category"]').submit(function(event){
 
 
 // post creation form validation
-
 $('form[name="post-create-form"]').submit(function(event){
     $(".category-error").remove();
     var category = $('[name="category"]');
@@ -197,27 +170,53 @@ $('form[name="post-create-form"]').submit(function(event){
 });
 
 
+// ****************search form****************
+
+// search form validation
+$(".search-form").submit(function(event){
+    var query = $('[name="query"]').val().trim();
+    var location = $('[name="filter-location"]');
+    var obj = new RegExp('^[a-z]{2,20}\\s[a-z]{2,20}\\s*[a-z]*$');
+    if (!obj.test(query)){
+        
+        event.preventDefault();
+    } 
+    if (!location.val().trim()){
+        location.remove();
+    }
+});
 
 
+// toggle gender filter
 $("#gender-toogle").click(function(){
     $("#gender-ul").slideToggle();
 })
 
+
+// toggle location filter
 $("#location-toggle").click(function(){
     var location = $('[name="filter-location"]');
-    location.slideToggle();
-    location.focus();
-})
-
-$('[name="filter-location"]').keydown(function(event){
-    var location = $(this).val().trim();
-    if (!location){
-        if (event.keyCode == 32) {
-            event.preventDefault();
-        }
+    var flag = false;
+    location.fadeIn(function(){
+        flag = true;
+        $(this).focus();
+    });
+    if (flag){
+        location.fadeOut();
     }
 })
 
+
+// preventing user from typing space at the beginning at input
+$('[name="filter-location"]').keydown(function(event){
+    var location = $(this).val().trim();
+    if (event.keyCode == 32) {
+        event.preventDefault();
+    }
+})
+
+
+// clear all applied filters
 $("#clear-filters").click(function(event){
     form = $(".search-form");
     form.find('[name="filter-location"]').removeAttr('value');
@@ -225,7 +224,9 @@ $("#clear-filters").click(function(event){
 })
 
 
+// toggle all the filters
 $("#searchfilters").click(function(event){
     $(".filters-dropdown").toggle();
 });
 
+// ****************search form end****************

@@ -10,9 +10,9 @@ urlpatterns = [
     path('logout/',views.logout_view,name='logout'),
     path('dashboard/',views.dashboard,name='dashboard'),
     path('profile/',views.profile,name='profile'),
+    path('<slug:first_name>/<slug:last_name>/<int:pk>/',views.FriendProfile.as_view(),name='friend-profile'),
     path('editprofile/',views.editProfile,name='editProfile'),
     path('forgot_password/',views.forgot_password,name='forgot_password'),
-
     path('post_create/', views.create_post, name='post-create'),
 
 

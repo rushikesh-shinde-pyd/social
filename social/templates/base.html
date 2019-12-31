@@ -270,11 +270,10 @@
                                 <form class="form-inline my-2 my-lg-0 search-form" action="{% url 'social:search-key' %}">
                                     <input name="query" value="{% if query %}{{ query }}{% endif %}" class="form-control  mr-sm-2" type="search" style="border: none;" placeholder="Search" aria-label="Search">
                                     <i style="transform: scale(1.2,1.2); padding:0px; margin: 10px 5px 0px 5px;"  class="pointer glyphicon glyphicon-filter" id="searchfilters"></i>
-                                    
                                     <div class="filters-dropdown" style="display: none;">
                                         <div class="row">
                                             <div class="col-md-12" style="background:redd;">
-                                                <span id="clear-filters" class="text-danger pointer">Clear filters</span>
+                                                <span id="clear-filters" class="text-danger pull-right pointer">Clear filters</span>
                                             </div>
                                         </div>
                                         <div class="row">

@@ -92,11 +92,11 @@
                                 <div class="row">
                                     <div class="col-sm-6 form-group">
                                         <label class="col-sm-4" style="color:black;">First Name </label>:
-                                        {{ user.first_name }}
+                                        {{ user.first_name|title }}
                                     </div>
                                     <div class="col-sm-6 form-group">
                                         <label class="col-sm-4" style="color:black;">Last Name </label>:
-                                        {{ user.last_name }}
+                                        {{ user.last_name|title }}
                                     </div>
                                 </div>
                                 <div class="row">
@@ -112,7 +112,7 @@
                                 <div class="row">
                                     <div class="col-sm-6 form-group">
                                         <label class="col-sm-4" style="color:black;">Gender </label>:
-                                        {{ user.profile.gender }}
+                                        {{ user.profile.gender|title }}
                                     </div>
                                     <div class="col-sm-6 form-group">
                                         <label class="col-sm-4" style="color:black;">Birth Date</label>:
@@ -122,21 +122,21 @@
                                 <div class="row">
                                     <div class="col-sm-6 form-group">
                                         <label class="col-sm-4" style="color:black;">City </label>:
-                                        {{ user.profile.city }}
+                                        {{ user.profile.city|title }}
                                     </div>
                                     <div class="col-sm-6 form-group">
                                         <label class="col-sm-4" style="color:black;">State</label>:
-                                        {{ user.profile.state }}
+                                        {{ user.profile.state|title }}
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-6 form-group">
                                         <label class="col-sm-4" style="color:black;">Country </label>:
-                                        {{ user.profile.country }}
+                                        {{ user.profile.country|title }}
                                     </div>
                                     <div class="col-sm-6 form-group">
                                         <label class="col-sm-4" style="color:black;">Address</label>:
-                                        {{ user.profile.fullAddress }}
+                                        {{ user.profile.fullAddress|title }}
                                     </div>
                                 </div><hr/>
 

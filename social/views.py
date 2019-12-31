@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
-from django.views.generic import View, ListView
+from django.views.generic import View, ListView, DetailView
 from django.http import JsonResponse
 import datetime
 from django.utils.decorators import method_decorator
@@ -513,7 +513,7 @@ class SearchResultsView(ListView):
     def get_context_object_name(self, queryset):
         return 'users_list'
 
-    def get_queryset(self):
+    def get_queryset(self, *args, **kwargs):
         query = self.request.GET.get('query')
         gender = self.request.GET.get('filter-gender')
         city = self.request.GET.get('filter-location')
@@ -531,7 +531,6 @@ class SearchResultsView(ListView):
         
 
     def get_context_data(self, **kwargs):
-
         city = self.request.GET.get('filter-location')
         gender = self.request.GET.get('filter-gender')
         query = self.request.GET.get('query')
@@ -540,13 +539,15 @@ class SearchResultsView(ListView):
         context['gender'] = gender
         context['location'] = city
         users = self.get_queryset()
-
-        # num_users = users.count()
-        # print(num_users)
-        # paginator_obj = Paginator(users, 1)
-        # page = self.request.GET.get('page')
-        # users = paginator_obj.get_page(page)
-        # context['num_users'] = num_users
-        # context['users'] = users
-        # context['total_pages'] = paginator_obj.num_pages
         return context
+
+
+class FriendProfile(DetailView):
+    model = Profile
+    template_name = 'friend_profile.html'
+    context_object_name  = 'user_obj'
+
+    # def get_context_object_name(self, queryset):
+    #     return 'user'
+
+    
