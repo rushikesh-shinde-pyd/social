@@ -176,9 +176,8 @@ $('form[name="post-create-form"]').submit(function(event){
 $(".search-form").submit(function(event){
     var query = $('[name="query"]').val().trim();
     var location = $('[name="filter-location"]');
-    var obj = new RegExp('^[a-z]{2,20}\\s[a-z]{2,20}\\s*[a-z]*$');
+    var obj = new RegExp('^[a-z]{2,20}\\s*[a-z]*\\s*[a-z]*$');
     if (!obj.test(query)){
-        
         event.preventDefault();
     } 
     if (!location.val().trim()){

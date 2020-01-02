@@ -506,6 +506,7 @@ def create_category(request):
         return redirect(reverse('social:blog'))
         
 
+@method_decorator(login_required, name="dispatch")
 class SearchResultsView(ListView):
     model = Profile
     template_name = 'search_results.html'
@@ -538,10 +539,12 @@ class SearchResultsView(ListView):
         context['query'] = query
         context['gender'] = gender
         context['location'] = city
+        context['current_year'] = timezone.now().year
         users = self.get_queryset()
         return context
 
 
+@method_decorator(login_required, name="dispatch")
 class FriendProfile(DetailView):
     model = Profile
     template_name = 'friend_profile.html'

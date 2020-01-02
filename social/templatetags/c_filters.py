@@ -1,8 +1,11 @@
 from django.shortcuts import render,redirect,reverse, get_object_or_404
 from django import template
-from social.models import Like, Dislike, Post, Comment
-
+from social.models import Like, Dislike, Post, Comment, Profile
+from django.utils import timezone
 from django.template.defaultfilters import stringfilter
+import datetime
+
+
 register = template.Library()
 
 @stringfilter
@@ -72,6 +75,33 @@ def get_category(posts, category_obj):
     if category_obj is not None:
         return category_obj
     return posts
+
+
+@register.simple_tag
+def get_age(dob):
+    return timezone.now().year - dob.year
+
+
+@register.simple_tag
+def tag_x(user_id):
+    print(user_id)
+    obj = Profile.objects.get(pk=user_id)
+    print(obj.timestamp)
+    obj.timestamp = timezone.now()
+    obj.save()
+    obj.refresh_from_db()
+    print(obj.timestamp)
+    return obj.timestamp
+    
+
+@register.simple_tag
+def use_time_stamp(timestamp):
+    print(timestamp)
+    if timestamp == '0 minutes':
+        return 'online'
+    return 'active {} ago'.format(timestamp)
+    
+    
 
 
 

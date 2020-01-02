@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
+{% load c_filters %}
 {% block title %} <title>Profile - Social Module</title>{% endblock %}
 
 {% block content %}
@@ -38,6 +39,9 @@
                             <h3>Found {{ users_list.count }} result{{ users_list.count|pluralize:'s' }} for </h3>
                             <p><em>"{{ query }}"</em></p>
                             {% for user_obj in users_list %}
+                            {% use_time_stamp temp as user_status %}
+
+                            {% if user_obj.timestamp|timesince == '0 minutes' %}active {% else %} {{user_obj.timestamp|timesince}}{%endif%}
                                 <div class="row mt">
                                     <div class="col-md-1" style="padding:0px">
                                         {% if user_obj.image %}
@@ -47,9 +51,11 @@
                                         {% endif %}
                                     </div>
                                     <div class="col-md-11" style="background:linear-gradient(to right, white, #f2f2f2);">
+                                        {% get_age user_obj.birth_date as age %}
                                         <h4 style="margin-bottom:5px;"><a href="{% url 'social:friend-profile' user_obj.user.first_name user_obj.user.last_name user_obj.pk %}">{{user_obj.user.first_name|title}} {{user_obj.user.last_name|title}}</a></h4>
+                                        {% if user_obj.gender %}<span>{{age}} yrs</span>&nbsp;{% endif%}
                                         {% if user_obj.gender %}<span>{{user_obj.gender|title}}</span></br>{% endif%}
-                                        {% if user_obj.city %}<span>from {{user_obj.city|title}}</span>{% endif %}
+                                        {% if user_obj.city %}<span>from {{user_obj.country|title}}</span>{% endif %}
                                     </div>
                                 </div>
                                 {% empty %}

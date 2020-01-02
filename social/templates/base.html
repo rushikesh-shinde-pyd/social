@@ -107,6 +107,9 @@
     </style>
   </head>
   <body>
+    {% if request.user.is_authenticated %}
+            {% tag_x request.user.id as temp %}
+    {% endif %}
 
     <div class="container">
         <section id="container" >

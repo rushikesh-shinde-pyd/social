@@ -1144,36 +1144,6 @@
     });
 
 
-    // show less posts
-    {% comment %} $("#show_less").click(function(){
-        $(".mb").slice(5).hide();
-        window.scrollTo(0, 0); 
-        $("#show_more").show();
-        $("#show_more").attr('data-showmorecount', 10);
-        $(this).hide();
-    });
-
-    // show more posts
-    $("#show_more").click(function(){
-        var num_posts = $(".mb").length;
-        var count = parseInt($(this).attr('data-showmorecount'));
-        console.log(num_posts, count);
-        if (num_posts < count){
-            // $("#show_less").slideDown();
-            $(this).hide();
-            // $("#show_more").text("Show less");
-            $("#show_less").css('display', 'inline-block');
-            $(this).attr('data-showmorecount', 10);
-            // $(".mb").slice(5).hide();
-            
-        }else{
-            $(".mb").slice(0,count).slideDown();
-            $(".mb").slice(count).slideUp();
-            $(this).attr('data-showmorecount', count+5);
-        }
-        
-    }); {% endcomment %}
-
     $(document).ready(function(){
         $(".category-thumbnail").slice(5).hide();
     }); 
@@ -1183,7 +1153,6 @@
         $(this).find(".post-actions").fadeToggle();
     });
 
-    
 
     $(".category-expansion").click(function(){
         if ($(this).text().trim() == 'Show less'){
