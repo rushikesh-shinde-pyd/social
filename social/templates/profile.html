@@ -34,10 +34,8 @@
                     <div class="row mt">
                     <!-- SERVER STATUS PANELS -->
                         <!--.&lt;!&ndash; /col-md-4&ndash;&gt;-->
-
-
                         <div class="col-md-12 col-sm-12 mb" >
-                            <div class="darkblue-panel pn" style="background-image:url({% static 'img/profile-02.jpg' %});background-repeat: no-repeat;background-size: cover;">
+                            <div class="darkblue-panel" style="background-image:url({% static 'img/profile-02.jpg' %});background-repeat: no-repeat;background-size: cover;">
                                 <div class="darkblue-header">
                                     <h5 class="">PROFILE DETAILS</h5>
                                 </div>
@@ -47,15 +45,20 @@
                                     </div>
                                     <div class="col-sm-6 col-xs-6"></div>
                                 </div>
-                                <div class=" goleft" style="margin:20px;">
+                                <div class=" goleft" style="margin:10px;">
                                     <div class="profile-pic">
-                                        <img src="{% static 'img/ui-zac.jpg' %}" width="120" class="">
-                                        <div class="edit"><a href="#" id="pic"><i class="fa fa-edit"></i></a></div></div>
+                                        <img src="{{ request.user.profile.image.url }}" width="100" class="">
+                                    </div>
                                 </div>
-                                <div>
-                                    <p class="goleft" style="color:white;margin:20px;">{{ user.first_name|title }} {{ user.last_name|title }}</p>
+                                <div class="row" style="padding-bottom:10px;">
+                                    <div class="text-left col-md-4">
+                                        <h3 class="" style="display: inline; padding-left: 20px; color:#ffffff;">
+                                            {{ user.first_name|title }} 
+                                            {{ user.last_name|title }}
+                                        </h3>
+                                        <i class="fa fa-circle" style="color:#00e03c;" aria-hidden="true"></i>
+                                    </div>
                                 </div>
-
                             </div>
                         </div><!-- /col-md-4 -->
 

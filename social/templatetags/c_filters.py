@@ -83,23 +83,18 @@ def get_age(dob):
 
 
 @register.simple_tag
-def tag_x(user_id):
-    print(user_id)
+def refresh_timestamp(user_id):
     obj = Profile.objects.get(pk=user_id)
-    print(obj.timestamp)
     obj.timestamp = timezone.now()
     obj.save()
-    obj.refresh_from_db()
-    print(obj.timestamp)
-    return obj.timestamp
     
 
 @register.simple_tag
 def use_time_stamp(timestamp):
-    print(timestamp)
     if timestamp == '0 minutes':
         return 'online'
-    return 'active {} ago'.format(timestamp)
+    else:
+        return 'active {} ago'.format(timestamp)
     
     
 

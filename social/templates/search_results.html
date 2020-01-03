@@ -32,30 +32,58 @@
                     <!--.>&lt;!&ndash; /row mt &ndash;&gt;-->
 
 
-                    <div class="row mt">
+                    <div class="row">
                     <!-- SERVER STATUS PANELS -->
                         <!--.&lt;!&ndash; /col-md-4&ndash;&gt;-->
                         <div class="col-md-12 col-sm-12 mb">
                             <h3>Found {{ users_list.count }} result{{ users_list.count|pluralize:'s' }} for </h3>
                             <p><em>"{{ query }}"</em></p>
                             {% for user_obj in users_list %}
-                            {% use_time_stamp temp as user_status %}
-
-                            {% if user_obj.timestamp|timesince == '0 minutes' %}active {% else %} {{user_obj.timestamp|timesince}}{%endif%}
+                            {% use_time_stamp user_obj.timestamp|timesince as user_status %}
                                 <div class="row mt">
-                                    <div class="col-md-1" style="padding:0px">
-                                        {% if user_obj.image %}
-                                            <a href="{% url 'social:friend-profile' user_obj.user.first_name user_obj.user.last_name user_obj.pk %}"><img src="{{user_obj.image.url}}" style="border-radius: 100%; max-height:100%; max-width:100%;"></a>
-                                            {% else %}
-                                            <a href="{% url 'social:friend-profile' user_obj.user.first_name user_obj.user.last_name user_obj.pk%}"><img {% if user_obj.gender == 'male'%} src="{% static 'img/male_user.png' %}" {% else %}src="{% static 'img/female_user.png' %}"{% endif %} style="border-radius: 100%; max-height:100%; max-width:100%;"></a>
-                                        {% endif %}
-                                    </div>
-                                    <div class="col-md-11" style="background:linear-gradient(to right, white, #f2f2f2);">
-                                        {% get_age user_obj.birth_date as age %}
-                                        <h4 style="margin-bottom:5px;"><a href="{% url 'social:friend-profile' user_obj.user.first_name user_obj.user.last_name user_obj.pk %}">{{user_obj.user.first_name|title}} {{user_obj.user.last_name|title}}</a></h4>
-                                        {% if user_obj.gender %}<span>{{age}} yrs</span>&nbsp;{% endif%}
-                                        {% if user_obj.gender %}<span>{{user_obj.gender|title}}</span></br>{% endif%}
-                                        {% if user_obj.city %}<span>from {{user_obj.country|title}}</span>{% endif %}
+                                    <div class="col-md-12" style="background:linear-gradient(to right, white, #f2f2f2); padding: 10px 15px;">
+                                        <div class="profile-image-container">
+                                            {% if user_obj.image %}
+                                                    <a href="{% url 'social:friend-profile' user_obj.user.first_name user_obj.user.last_name user_obj.pk %}">
+                                                        <img src="{{user_obj.image.url}}" style="border-radius: 100%; max-height:100%; max-width:100%;">
+                                                    </a>
+                                                {% else %}
+                                                <a href="{% url 'social:friend-profile' user_obj.user.first_name user_obj.user.last_name user_obj.pk %}">
+                                                    <img 
+                                                        {% if user_obj.gender == 'male'%} 
+                                                            src="{% static 'img/male_user.png' %}" 
+                                                        {% else %}
+                                                            src="{% static 'img/female_user.png' %}"
+                                                        {% endif %} 
+                                                    style="border-radius: 100%; max-height:100%; max-width:100%;">
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                        <div class="profile-info-container">
+                                            {% get_age user_obj.birth_date as age %}
+                                            <h4 style="margin-bottom:5px; display: inline;"><a href="{% url 'social:friend-profile' user_obj.user.first_name user_obj.user.last_name user_obj.pk %}">{{user_obj.user.first_name|title}} {{user_obj.user.last_name|title}}</a></h4>
+                                            {% if user_status == 'online' %}
+                                                <i class="fa fa-circle" style="padding: 0px 5px; color:#00e03c;" aria-hidden="true"></i></br>
+                                                {% else %}
+                                                <br>
+                                            {% endif %}
+                                            {% if user_obj.gender %}<span>{{age}} yrs</span>&nbsp;{% endif%}
+                                            {% if user_obj.gender %}
+                                                {% if user_obj.gender == 'male' %}
+                                                    <i class="fa fa-mars" style="color: #2e7eff;"></i>
+                                                {% endif%}
+                                                {% if user_obj.gender == 'female' %}
+                                                    <i class="fa fa-venus" style="color: pink"></i>
+                                                {% endif%}
+                                                {% if user_obj.gender == 'other' %}
+                                                    <span>
+                                                        {{ user_obj.gender }}
+                                                    </span>
+                                                {% endif%}
+                                                </br>
+                                            {% endif%}
+                                            {% if user_obj.city %}<span>from {{user_obj.country|title}}</span>{% endif %}
+                                        </div>
                                     </div>
                                 </div>
                                 {% empty %}

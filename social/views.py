@@ -518,9 +518,10 @@ class SearchResultsView(ListView):
         query = self.request.GET.get('query')
         gender = self.request.GET.get('filter-gender')
         city = self.request.GET.get('filter-location')
+        default_filters = Q()
         if query.strip():
             for each in query.split():
-                default_filters = (Q(user__first_name__icontains=each)|
+                default_filters |= (Q(user__first_name__icontains=each)|
                                     Q(user__last_name__icontains=each)
                     )
         filters = {

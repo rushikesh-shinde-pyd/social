@@ -108,7 +108,7 @@
   </head>
   <body>
     {% if request.user.is_authenticated %}
-            {% tag_x request.user.id as temp %}
+            {% refresh_timestamp request.user.id as obj %}
     {% endif %}
 
     <div class="container">
