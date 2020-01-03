@@ -194,15 +194,16 @@ $("#gender-toogle").click(function(){
 
 // toggle location filter
 $("#location-toggle").click(function(){
-    var location = $('[name="filter-location"]');
-    var flag = false;
-    location.fadeIn(function(){
-        flag = true;
-        $(this).focus();
-    });
-    if (flag){
-        location.fadeOut();
-    }
+    var location = $('#location-input');
+    // var flag = false;
+    // location.fadeIn(function(){
+    //     flag = true;
+    //     $(this).focus();
+    // });
+    // if (flag){
+    //     location.fadeOut();
+    // }
+    location.slideToggle();
 })
 
 
@@ -224,8 +225,10 @@ $("#clear-filters").click(function(event){
 
 
 // toggle all the filters
-$("#searchfilters").click(function(event){
+$(".glyphicon-filter").click(function(event){
     $(".filters-dropdown").toggle();
 });
 
 // ****************search form end****************
+
+
