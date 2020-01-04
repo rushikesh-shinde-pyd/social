@@ -1,3 +1,4 @@
+
 /*---LEFT BAR ACCORDION----*/
 $(function() {
     $('#nav-accordion').dcAccordion({
@@ -114,8 +115,6 @@ var Script = function () {
             }, 2000)
         })
     }
-
-
 }();
 
 
@@ -186,25 +185,34 @@ $(".search-form").submit(function(event){
 });
 
 
+$(document).ready(function(){
+    $('.filter').click(function(event){
+        // $('.filter').siblings().slideUp();
+        // $(this).siblings().slideToggle();
+        $('.filter').not($(this)).siblings().slideUp();
+        $(this).siblings().slideToggle();
+    })
+});
+
 // toggle gender filter
-$("#gender-toogle").click(function(){
-    $("#gender-ul").slideToggle();
-})
+// $("#gender-toogle").click(function(){
+//     $("#gender-ul").slideToggle();
+// })
 
 
 // toggle location filter
-$("#location-toggle").click(function(){
-    var location = $('#location-input');
-    // var flag = false;
-    // location.fadeIn(function(){
-    //     flag = true;
-    //     $(this).focus();
-    // });
-    // if (flag){
-    //     location.fadeOut();
-    // }
-    location.slideToggle();
-})
+// $("#location-toggle").click(function(){
+//     var location = $('#location-input');
+//     // var flag = false;
+//     // location.fadeIn(function(){
+//     //     flag = true;
+//     //     $(this).focus();
+//     // });
+//     // if (flag){
+//     //     location.fadeOut();
+//     // }
+//     location.slideToggle();
+// })
 
 
 // preventing user from typing space at the beginning at input
@@ -226,7 +234,7 @@ $("#clear-filters").click(function(event){
 
 // toggle all the filters
 $(".glyphicon-filter").click(function(event){
-    $(".filters-dropdown").toggle();
+    $(".filters-dropdown").slideToggle();
 });
 
 // ****************search form end****************

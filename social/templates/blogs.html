@@ -265,14 +265,14 @@
                                                                     <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
                                                                         {% csrf_token %}
                                                                         <textarea autofocus style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
-                                                                        <input class="btn btn-primary" style="display:none" type="submit" disabled name="reply" value="Reply">
+                                                                        <input class="btn btn-primary" type="submit" disabled name="reply" value="Reply">
                                                                     </form>
                                                                     {% comment %} <br> {% endcomment %}
                                                                     {% get_replies each_comment.parent.all as reply_queryset %}
-                                                                    {%if reply_queryset %}
+                                                                    {% if reply_queryset %}
                                                                     <button style="background-color:transparent; color: #2b6eff; border:none; margin-left: 10px; margin-top: 5px;" name="show-replies">show replies</button>
                                                                     <h5 id="reply-count" style="padding:0px 15px;">{{ reply_queryset.count|pluralize_reply }}</h5>
-                                                                    <div class="replies">
+                                                                    <div class="replies" style="overflow: hidden;">
                                                                         {% for each_reply in reply_queryset %}
                                                                             <div class="reply-wrapper">
                                                                                 <ul  style="margin-left:50px;display:none;" class="list-group reply-div">
@@ -817,9 +817,9 @@
             $('textarea[name="reply-area"]').keyup(function(){
                 var char_len = $(this).val().trim().length;
                 if (char_len > 0){
-                    $(this).parent().find('input[type="submit"]').attr('disabled', false).slideDown();
+                    $(this).parent().find('input[type="submit"]').attr('disabled', false);
                 }else if(char_len == 0){
-                    $(this).parent().find('input[type="submit"]').attr('disabled', true).slideUp();
+                    $(this).parent().find('input[type="submit"]').attr('disabled', true);
                 }
             });
             $('#comment-id-' + comment_id).find('form[name="reply-to-comment"]').submit(function(event){
