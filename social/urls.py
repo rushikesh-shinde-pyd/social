@@ -39,5 +39,7 @@ urlpatterns = [
     path('blog/<int:pk>/', views.post_details, name="post-details"),
     path('create-category/', views.create_category, name="create-category"),
     path('search/', views.SearchResultsView.as_view(), name="search-key"),
+    path('edit-comment/', views.edit_comment, name="edit-comment"),
+    path('edit-reply/', views.edit_reply, name="edit-reply"),
 
 ]

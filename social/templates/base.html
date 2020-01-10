@@ -486,13 +486,13 @@
                 <form class="form-inline my-2 my-lg-0 search-form" action="{% url 'social:search-key' %}">
                     {% csrf_token %}
                     <div class="row">
-                        <div class="col-md-1 no-pad text-center" style="border: 1px solid #ccc; border-right: none;">
+                        <div class="col-lg-1 col-sm-1 col-md-1 no-pad text-center" style="border: 1px solid #ccc; border-right: none;">
                             <i style="padding: 6px 5px 6px 5px; font-size: 20px;" class="pointer glyphicon glyphicon-filter" aria-hidden="true" id="searchfilters"></i>
                         </div>                        
-                        <div class="col-md-10 no-pad ">
+                        <div class="col-lg-10 col-sm-10 col-md-10 no-pad ">
                             <input name="query" value="{% if query %}{{ query }}{% endif %}" class="form-control" type="search" placeholder="Search" aria-label="Search" style="border-radius: 0px; width: 100%; box-sizing: border-box;">
                         </div>
-                        <div class="col-md-1 no-pad text-center" style="border: 1px solid #ccc; border-left: none;">
+                        <div class="col-lg-1 col-sm-1 col-md-1 no-pad text-center" style="border: 1px solid #ccc; border-left: none;">
                             <button style="border: none; background: none; outline: none; padding: 0px;" type="submit" name="search">
                                 <i class="fa fa-search pointer" style="padding: 5px 5px 7px 5px; font-size: 20px;" aria-hidden="true"></i>
                             </button>

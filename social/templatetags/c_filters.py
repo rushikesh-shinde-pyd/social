@@ -42,14 +42,13 @@ def get_dislike_obj(post_id, user_id):
 
 @register.simple_tag
 def get_comments(queryset):
-    return queryset.order_by('-commented_at')
+    return queryset.order_by('-id')
 
 
 
 @register.simple_tag
 def get_replies(queryset):
-    return queryset.order_by('-commented_at')
-    # return queryset
+    return queryset.order_by('-replied_at')
 
 
 @register.filter(name='pluralize_reply')
@@ -97,8 +96,38 @@ def use_time_stamp(timestamp):
         return 'active {} ago'.format(timestamp)
     
     
+@register.simple_tag
+def newer(timestamp):
+    if timestamp == '0 minutes':
+        return True 
+    return False
 
+
+@register.simple_tag
+def check_reply_count(count):
+    if count > 1:
+        return True 
+    return False
+
+  
+@register.simple_tag
+def check_comment_count(count):
+    print(count)
+    if count > 1:
+        return True 
+    return False
 
 
    
+
+@register.simple_tag
+def check_timestamp(timestamp):
+    print(timestamp)
+    if timestamp == '0 minutes':
+        return 'just now' 
+    else:
+        return timestamp
+
+
+
 

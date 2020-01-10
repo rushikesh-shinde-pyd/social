@@ -98,17 +98,20 @@ class Comment(models.Model):
         self.is_approved = True
         self.save()
 
+    class Meta:
+        ordering = ['commented_at']
+
 
 class Reply(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    parent = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='parent')
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True)
     parent_reply = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
-    reply_message = models.CharField(max_length=500)
+    message = models.CharField(max_length=500)
     is_approved = models.BooleanField(default=True)
-    is_rejected = models.BooleanField(default=False)
-    commented_at = models.DateTimeField(default=timezone.now, verbose_name='Created at')
+    replied_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         verbose_name = 'reply'
         verbose_name_plural = 'replies'
+        ordering = ['replied_at']
 

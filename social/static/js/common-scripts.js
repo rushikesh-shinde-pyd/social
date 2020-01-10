@@ -175,7 +175,7 @@ $('form[name="post-create-form"]').submit(function(event){
 $(".search-form").submit(function(event){
     var query = $('[name="query"]').val().trim();
     var location = $('[name="filter-location"]');
-    var obj = new RegExp('^[a-z]{2,20}\\s*[a-z]*\\s*[a-z]*$');
+    var obj = new RegExp('^[a-z]{2,20}\\s*[a-z]*\\s*[a-z]*[a-z\\s]*$');
     if (!obj.test(query)){
         event.preventDefault();
     } 
@@ -218,7 +218,7 @@ $(document).ready(function(){
 // preventing user from typing space at the beginning at input
 $('[name="filter-location"]').keydown(function(event){
     var location = $(this).val().trim();
-    if (event.keyCode == 32) {
+    if (event.keyCode === 32 && !$(this).val().length) {
         event.preventDefault();
     }
 })
@@ -226,9 +226,7 @@ $('[name="filter-location"]').keydown(function(event){
 
 // clear all applied filters
 $("#clear-filters").click(function(event){
-    form = $(".search-form");
-    form.find('[name="filter-location"]').removeAttr('value');
-    form.find('[name="filter-gender"]').removeAttr('checked');
+    $(".search-form").trigger('reset');
 })
 
 
@@ -240,3 +238,161 @@ $(".glyphicon-filter").click(function(event){
 // ****************search form end****************
 
 
+
+
+
+$('.close-comment-form').click(function(){
+    $(this).parents(".comment-form-wrapper").slideUp();
+});
+
+$('.add-comment').click(function(){
+    $(this).parent().siblings(".comment-form-wrapper").slideToggle();
+    $(this).parent().siblings(".comment-form-wrapper").find('[name="comment-textarea"]').focus();
+});
+
+$('[name="comment-textarea"]').keydown(function(event){
+    var comment_btn = $('[name="comment-btn"]');
+    if (event.which === 32 && !$(this).val().length){
+        comment_btn.attr('disabled', true);
+        event.preventDefault();
+    }else{
+        comment_btn.attr('disabled', false);
+    }
+}).keyup(function(){
+    var comment_btn = $('[name="comment-btn"]');
+    if ($(this).val().trim().length === 0){
+        comment_btn.attr('disabled', true);
+    }
+});
+
+
+// reply
+$('.close-reply-form').click(function(){
+    $(this).parents(".reply-form-wrapper").slideUp();
+});
+
+$(document).on('click', '.add-reply', function(event){
+    $(this).parents('.reply-container').siblings(".reply-form-wrapper").fadeToggle('fast');
+    $(this).parents(".reply-container").siblings('.reply-form-wrapper').find('[name="reply-textarea"]').focus();
+});
+
+
+$(document).on('keydown', '[name="reply-textarea"]', function(event){
+    var reply_btn = $('[name="reply-btn"]');
+    if (event.which === 32 && !$(this).val().length){
+        reply_btn.attr('disabled', true);
+        event.preventDefault();
+    }else{
+        reply_btn.attr('disabled', false);
+    }
+});
+
+$(document).on('keyup', '[name="reply-textarea"]', function(event){
+    var reply_btn = $('[name="reply-btn"]');
+    if ($(this).val().trim().length === 0){
+        reply_btn.attr('disabled', true);
+    }
+});
+
+// $('.reply-or-replies').click(function(event){
+//         var replies = $(this).parents('.comment-reply-wrapper').children('.reply-wrapper');
+//         replies.slice(3).hide();
+//         $(this).parents('.comment-reply-wrapper').find('.reply-container').slideUp();
+//         // $(this).parents('.comment-reply-wrapper').find('.reply-container').children(".reply-wrapper").slice(0,1).show('slow');
+//     })
+    
+
+$(document).on('click', '.reply-or-replies', function(event){
+    var replies = $(this).parents('.comment-reply-wrapper').find('.reply-container').children('.reply-wrapper');
+    replies.slice(1).hide();
+    $(this).parents('.comment-reply-wrapper').find('.reply-container').slideToggle();
+})
+
+
+$(document).on('click', '.expand-replies', function(){
+    var replies = $(this).parents('.comment-reply-wrapper').find('.reply-container').children('.reply-wrapper');
+    if ($(this).text() === 'Show less'){
+        replies.slice(1).hide();
+        $(this).text('Show all replies');
+        $(this).parents('.comment-reply-wrapper').find('.reply-container').css({
+            'height': 'unset',
+            'overflow': 'hidden',
+        });
+    }else{
+        console.log(replies.length);
+        if (replies.length <= 5){
+            $(this).parents('.comment-reply-wrapper').find('.reply-container').css({
+                'height': 'unset',
+                'overflow': 'hidden',
+            });    
+        }else{
+            $(this).parents('.comment-reply-wrapper').find('.reply-container').css({
+                'height': '400px',
+                'overflow': 'auto',
+            });
+        }
+        
+        $(this).text('Show less');
+        replies.slice().show();
+    }
+});
+
+
+
+$(document).on('click', '.comment-icon', function(event){
+    var comments = $(this).parents('.panel-heading').find('.comment-banner').children('.comment-reply-wrapper');
+    comments.slice(0,1).show();
+    $(this).parents('.panel-heading').find('.comment-reply-banner').slideToggle();  
+})
+
+
+$(document).on('click', '.expand-comments', function(){
+    var comments = $(this).parents('.comment-reply-banner').find('.comment-reply-wrapper');
+    if ($(this).text() === 'Show less'){
+        comments.slice(1).hide();
+        $(this).text('Show all comments');
+        $(this).parents('.comment-reply-banner').css({
+            'height': 'unset',
+            'overflow': 'hidden',
+        });
+    }else{
+        if (comments.length <= 5){
+            $(this).parents('.comment-reply-banner').css({
+                'height': 'unset',
+                'overflow': 'hidden',
+            });    
+        }else{
+            $(this).parents('.comment-reply-banner').css({
+                'height': '400px',
+                'overflow': 'auto',
+            });
+        }
+        
+        $(this).text('Show less');
+        comments.slice().show();
+    }
+});
+
+
+
+(function($) {
+    var comments = $('.comment-banner');
+    comments.each(function(index){
+        var x = $(this).children('.comment-reply-wrapper');
+        if (x.length == 1){
+            $(this).find('.expand-comments').remove();
+        }
+    })
+  })(jQuery);
+
+
+//   (function($) {
+//     var replies = $('.reply-container');
+//     replies.each(function(index){
+//         var x = $(this).children('.reply-wrapper');
+//         if (x.length == 1){
+//             console.log('Hello');
+//             $(this).children('.expand-replies').remove();
+//         }
+//     })
+//   })(jQuery);

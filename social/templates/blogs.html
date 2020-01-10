@@ -131,9 +131,9 @@
                             {% comment %} {% get_category posts category_obj as queryset %}     {% endcomment %}
 
                             {% for post in posts %}
-                                <div class="row">
+                                <div class="row" style="overflow: hidden;">
                                     <div class="post-div col-md-12 col-sm-12 mb" id="post-id-{{ post.id }}">
-                                        <div class="panel panel-info ">
+                                        <div class="panel panel-info " style="overflow: hidden;">
                                             <input type="hidden" name="id" value="{{ post.id }}">
                                             <div class="panel-heading"><a href="{% url 'social:post-details' post.pk %}"><span id="post-title">{{ post.title | title }}</span></a>
                                                 {% if request.user.first_name == post.author.first_name and request.user.last_name == post.author.last_name %}
@@ -169,7 +169,7 @@
                                                     {% endif %}
                                                 </p>
                                             </div>
-                                            <div class="panel-heading">
+                                            <div class="panel-heading" style="overflow: hidden;">
                                                 <ul class="dlikes list-group" >
                                                     {% get_like_obj post.id request.user.id as like_obj %}
                                                     {% get_dislike_obj post.id request.user.id as dislike_obj %}
@@ -182,7 +182,7 @@
                                                             <li class="list-group-item">
                                                                 <i onclick="like({{ post.id }})" style="transform:scale(1.5,1.5);cursor:pointer;" class="like glyphicon glyphicon-thumbs-up" aria-hidden="true"></i>
                                                             </li>
-                                                        {%endif%}    
+                                                        {% endif %}    
 
                                                         {% if post.likes.count > 0 %}    
                                                             <li class="list-group-item">
@@ -203,7 +203,7 @@
                                                         <li class="list-group-item">
                                                             <i onclick="dislike({{ post.id }})" style="transform:scale(1.5,1.5);cursor:pointer;" class="dislike glyphicon glyphicon-thumbs-down" aria-hidden="true"></i>
                                                         </li>
-                                                    {%endif%}    
+                                                    {% endif %}    
 
                                                     {% if post.dislikes.count > 0 %}    
                                                         <li class="list-group-item">
@@ -215,8 +215,8 @@
                                                         </li>
                                                     {% endif %}    
 
-                                                    <li class="list-group-item">
-                                                        <i onclick="comment({{ post.id }})" style="transform:scale(1.5,1.5); cursor:pointer;" class="glyphicon glyphicon-comment" aria-hidden="true"></i>
+                                                    <li class="list-group-item comment-icon">
+                                                        <i style="transform:scale(1.5,1.5); cursor:pointer;" class="fa fa-comment" aria-hidden="true"></i>
                                                     </li>
                                                     
                                                     {% if post.comment_set.count > 0 %}    
@@ -229,66 +229,175 @@
                                                         </li>
                                                     {% endif %}    
                                                 </ul>
-                                                <div class="write-comment" style="display: none;">
-                                                    <form id="comment-form-{{ post.id }}" method="post">
-                                                        {% csrf_token %}
-                                                        <input type="hidden" name="post-id" value="{{ post.id }}">
-                                                        <textarea autofocus maxlength="160" style="margin: 10px 0px; border: none;" class="comment-box form-control" placeholder="Comment here..."></textarea>
-                                                        <input type="button" name="close-comment" class="btn" value="Cancel">
-                                                        <input type="submit" disabled name="comment" style="display:none;" class="btn btn-primary" value="Comment">
-                                                    </form>
-                                                    <div class="comments-replies">
-                                                        {% get_comments post.comment_set.all as qs %}
-                                                        {% if qs%}
-                                                        <h5>Comments</h5>
-                                                        {% endif %}
-                                                        <div class="comment-wrapper">
-                                                            {% for each_comment in qs %}
-                                                            <div id="comment-div-id-{{ each_comment.id }}">
-                                                                <div style="margin:10px 10px;"><strong class="commenter">{{ each_comment.user.first_name|title }} {{ each_comment.user.last_name|title }}</strong> commented <span class="comment-timestamp">
-                                                                {% if each_comment.commented_at|timesince == '0 minutes' %}
-                                                                <small> just now </small>
-                                                                {% else %}
-                                                                    <small> {{ each_comment.commented_at|timesince }} ago</small>
+                                                <!--comment and replies start-->
+                                                    <div class="comment-reply-banner" style="overflow: hidden; margin-top: 10px; display: none; background: #fff; box-shadow: 1px 1px 5px #31708f; padding: 10px 20px;">
+                                                        <div class="comment-header mb-10" style="overflow: hidden;">
+                                                            <h5 class="comment-plus inline">
+                                                                {% if post.comment_set.all %}
+                                                                    <span class="comment-sum"><span class="comment-count">{{ post.comment_set.count }}</span> &nbsp;Comment{{ post.comment_set.count|pluralize:"s" }}</span>
+                                                                    {% else %}
+                                                                        <span class="be-the-first-commenter">Be the first to comment</span>
                                                                 {% endif %}
+                                                            </h5>
+                                                            <i class="fa fa-plus add-comment pointer" aria-hidden="true"></i>
+                                                        </div>
+                                                        <div class="comment-form-wrapper row mb-10" style="display: none; overflow: hidden; box-sizing: border-box;">
+                                                            <form id="comment-form-{{ post.id }}" name="comment-form" method="post">
+                                                                {% csrf_token %}
+                                                                <input type="hidden" name="post-id" value="{{ post.id }}">
+                                                                <div class="col-xs-10 col-sm-10 col-md-10 " style=" padding-right: 0px;">
+                                                                    <textarea maxlength="1024" name="comment-textarea" style="border-top-right-radius: 0px; resize: none;" class="form-control" placeholder="Comment here..."></textarea>
                                                                 </div>
-                                                                <ul class="list-group comment-div" id="comment-id-{{each_comment.id}}">
-                                                                    <li class="list-group-item" style="display:inline-block;">
-                                                                        {{ each_comment.message }}
-                                                                    </li>
-                                                                    {% comment %} <input type="button" style="margin-bottom:0px; background-color:#fff; color: #2b6eff; border:none; padding:0px;"    value="Reply"> {% endcomment %}
-                                                                    <i style="cursor:pointer;" onclick="reply_to_comment({{each_comment.id}}, {{post.id}})" class="fa fa-reply remove-comment" aria-hidden="true"></i>
-                                                                    {% verify_user_for_deletion post.author.username each_comment.user.username request.user as its_user %}
-                                                                    {% if its_user == True %}
-                                                                        <i style="cursor:pointer;" onclick="remove_comment({{each_comment.id}}, {{post.id}})" class="fa fa-trash" aria-hidden="true"></i>
-                                                                    {% endif %}
-                                                                    <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
-                                                                        {% csrf_token %}
-                                                                        <textarea autofocus style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
-                                                                        <input class="btn btn-primary" type="submit" disabled name="reply" value="Reply">
-                                                                    </form>
-                                                                    {% comment %} <br> {% endcomment %}
-                                                                    {% get_replies each_comment.parent.all as reply_queryset %}
-                                                                    {% if reply_queryset %}
-                                                                    <button style="background-color:transparent; color: #2b6eff; border:none; margin-left: 10px; margin-top: 5px;" name="show-replies">show replies</button>
-                                                                    <h5 id="reply-count" style="padding:0px 15px;">{{ reply_queryset.count|pluralize_reply }}</h5>
-                                                                    <div class="replies" style="overflow: hidden;">
-                                                                        {% for each_reply in reply_queryset %}
-                                                                            <div class="reply-wrapper">
-                                                                                <ul  style="margin-left:50px;display:none;" class="list-group reply-div">
-                                                                                    <div style="margin:10px 0px;"><strong class="replier">{{ each_reply.user.first_name|title }} {{ each_reply.user.last_name|title }}</strong> replied <span class="reply-timestamp"><small>{{ each_reply.commented_at|timesince }}</span> ago</small><br></div>
-                                                                                    <li class="list-group-item" style="display:inline-block;">{{ each_reply.reply_message }}</li>
-                                                                                </ul>
+                                                                <div class="col-xs-1 col-sm-1 col-md-1" style=" padding-right: 0px;  padding-left: 0px;">
+                                                                    <button disabled name="comment-btn" type="submit" class="btn btn-primary no-pad" style="border-radius: 0px; border-bottom-right-radius: 3px; border-top-right-radius: 3px; width: 100%; outline: none; border: none;">
+                                                                        <i class="fa fa-paper-plane" style="font-size: 30px; padding-left: 0px;" aria-hidden="true"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="col-xs-1 col-sm-1 col-md-1" style="margin: 0px; padding-left: 0px;">
+                                                                    <i class="pointer close fa fa-times-circle close-comment-form" style="padding-top: 0px; font-size: 20px;" aria-label="Close"></i>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                        <div class="comment-banner" style='overflow: hidden'>
+                                                            {% get_comments post.comment_set.all as ordered_comments %}
+                                                            
+                                                            {% for comment in ordered_comments %}
+                                                                {% newer comment.commented_at|timesince as newer_comment %}
+                                                                <div class="comment-reply-wrapper" id="comment-id-{{ comment.id }}" style="border: 1px solid #ccc; {% if newer_comment %} box-shadow: 1px 1px 10px #c2c2c2; {% endif %} padding: 5px 15px 0px 15px; margin-bottom: 15px;">
+                                                                    <div class="comment-actions">
+                                                                        <ul style="margin-bottom: 0px;">
+                                                                            <li> 
+                                                                                <h5 class="commenter" style="display: inline">
+                                                                                    <a href="{% url 'social:friend-profile' comment.user.first_name comment.user.last_name comment.user.pk %}">
+                                                                                        {{ comment.user.first_name|title }} {{ comment.user.last_name|title }}
+                                                                                    </a>
+                                                                                </h5>
+                                                                            </li>
+                                                                            <li>
+                                                                                <em><small class="comment-quote">commented</small></em> 
+                                                                            </li>
+                                                                            <li class="comment-timestamp restrict-select">
+                                                                                <em style="font-size: 12px;">
+                                                                                {% check_timestamp comment.commented_at|timesince as timestamp %}
+                                                                                    {% if timestamp == 'just now' %}
+                                                                                        just now
+                                                                                        {% else %}
+                                                                                        {{ timestamp }}
+                                                                                        <small> ago</small>
+                                                                                    {% endif %}
+                                                                                </em>
+                                                                            </li>
+                                                                            <li class="reply-or-replies pointer">
+                                                                                {% if comment.reply_set.count %}
+                                                                                    Replies
+                                                                                    {% else %}
+                                                                                    <i class="fa fa-reply" aria-hidden="true"></i>
+                                                                                {% endif %}
+                                                                            </li>
+                                                                                {% if post.author == request.user or request.user == comment.user %}
+                                                                                <li class="delete-comment pointer">
+                                                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                                </li>
+                                                                            {% endif %}
+                                                                        </ul>
+                                                                    </div>
+                                                                    <div class="comment-message-container" style="overflow: hidden; width: 100%; display: inline-block; margin-left: 15px; padding: 10px;">
+                                                                        <span class="comment-message" style="padding: 5px 10px; background: #31708f; color: #fff; border-radius: 25px;">{{ comment.message}}</span>
+                                                                        {% if post.author == request.user or request.user == comment.user %}
+                                                                            <i class="glyphicon glyphicon-pencil edit-comment pointer" style="font-size: 16px; vertical-align: middle; padding: 5px;" aria-hidden="true"></i>
+                                                                        {% endif %}
+                                                                        
+
+                                                                    </div>
+                                                                    <div class="reply-form-wrapper row mb-10" style="display: none; overflow: hidden; box-sizing: border-box; margin-left: 20px; margin-bottom: 10px;">
+                                                                        <form name="reply-form" method="post">
+                                                                            {% csrf_token %}
+                                                                            <input type="hidden" name="comment-id" value="{{ comment.id }}">
+                                                                            <div class="col-xs-10 col-sm-10 col-md-10 " style=" padding-right: 0px; padding-left: 0px;">
+                                                                                <textarea maxlength="1024" name="reply-textarea" style="border-top-right-radius: 0px; resize: none;" class="form-control" placeholder="Reply here..."></textarea>
+                                                                            </div>
+                                                                            <div class="col-xs-1 col-sm-1 col-md-1" style=" padding-right: 0px;  padding-left: 0px;">
+                                                                                <button disabled name="reply-btn" type="submit" class="btn btn-primary no-pad" style="border-radius: 0px; border-bottom-right-radius: 3px; border-top-right-radius: 3px; width: 100%; outline: none; border: none;">
+                                                                                    <i class="fa fa-reply" style="font-size: 30px; padding-left: 0px;" aria-hidden="true"></i>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class="col-xs-1 col-sm-1 col-md-1" style="margin: 0px; padding-left: 0px;">
+                                                                                <i class="pointer close fa fa-times-circle close-reply-form" style="padding-top: 0px; font-size: 20px;" aria-label="Close"></i>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                    <div class="reply-container" style="overflow: hidden; display: none; margin-left: 20px;">
+                                                                        <div class="reply-header mb-10" style="overflow: hidden;">
+                                                                            <h5 class="reply-plus inline">
+                                                                                {% if comment.reply_set.all %}
+                                                                                    <span class="reply-sum"><span class="reply-count">{{ comment.reply_set.count }}</span> &nbsp;Repl{{ comment.reply_set.count|pluralize:"y,ies" }}</span>
+                                                                                    {% else %}
+                                                                                        <span class="be-the-first-replier">Be the first to reply</span>
+                                                                                {% endif %}
+                                                                            </h5>
+                                                                            <i class="fa fa-plus add-reply pointer" aria-hidden="true"></i>
+                                                                        </div>
+                                                                        {% get_replies comment.reply_set.all as ordered_replies %}
+                                                                        {% for reply in ordered_replies %}
+                                                                        {% newer reply.replied_at|timesince as newer_reply %}
+                                                                            <div class="reply-wrapper mb" id="reply-id-{{ reply.id }}" style="border: 1px solid #ccc;overflow: hidden; width: 90%; margin-left: 10px; padding: 10px 15px 0px 15px;  {% if newer_reply %} box-shadow: 1px 1px 10px #c2c2c2; {% endif %}">
+                                                                                <input type="hidden" name="reply-id" value="{{ reply.id }}">
+                                                                                <div class="reply-actions">
+                                                                                    <ul style="margin-bottom: 0px; overflow: hidden">
+                                                                                        <li> 
+                                                                                            <h5 class="replier" style="display: inline">
+                                                                                                <a href="{% url 'social:friend-profile' reply.user.first_name reply.user.last_name reply.user.pk %}">
+                                                                                                    {{ reply.user.first_name|title }} {{ reply.user.last_name|title }}
+                                                                                                </a>
+                                                                                            </h5>
+                                                                                        </li>
+                                                                                        <li>
+                                                                                            <em><small class="reply-quote">replied</small></em> 
+                                                                                        </li>
+                                                                                        <li class="reply-timestamp restrict-select">
+                                                                                            <em style="font-size: 12px;">
+                                                                                                {% check_timestamp reply.replied_at|timesince as timestamp %}
+                                                                                                {% if timestamp == 'just now' %}
+                                                                                                    just now
+                                                                                                    {% else %}
+                                                                                                    {{ timestamp }}
+                                                                                                    <small> ago</small>
+                                                                                                {% endif %}
+                                                                                            </em>
+                                                                                        </li>
+                                                                                        {% if request.user == reply.user or request.user == comment.user or request.user == post.author %}
+                                                                                            <li class="delete-reply pointer">
+                                                                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                                                                            </li>
+                                                                                        {% endif %}
+                                                                                    </ul>
+                                                                                </div>
+                                                                                <div class="reply-message-container" style="width: 90%; display: inline-block; margin-left: 15px; box-sizing: border-box; overflow: hidden; padding: 10px;">
+                                                                                    <span class="reply-message" style="padding: 5px 10px; background: #bce8f1; color: #000; border-radius: 25px;">{{ reply.message}}</span>
+                                                                                    {% if post.author == request.user or request.user == comment.user or request.user == reply.user %}
+                                                                                        <i class="glyphicon glyphicon-pencil edit-reply pointer" style="font-size: 16px; vertical-align: middle; padding: 5px;" aria-hidden="true"></i>
+                                                                                    {% endif %}
+                                                                                </div>
                                                                             </div>
                                                                         {% endfor %}
+                                                                        {% if comment.reply_set.count > 1 %}
+                                                                            <div style="overflow: hidden; padding-bottom: 10px;">
+                                                                                <span class="pointer expand-replies" style="">Show all replies</span>
+                                                                            </div>
+                                                                        {% endif %}
                                                                     </div>
-                                                                    {% endif %}
-                                                                </ul>
-                                                            </div>
+                                                                </div>    
                                                             {% endfor %}
+                                                            {% if post.comment_set.count > 1 %}
+                                                                <div style="overflow: hidden;">
+                                                                    <span class="pointer expand-comments" style="">Show all comments</span>
+                                                                </div>
+                                                            {% endif %}
                                                         </div>
                                                     </div>
-                                                </div>
+                                                    
+                                                <!--comment and replies end-->
+                                                
                                             </div>
                                         </div>
                                     </div>
@@ -296,7 +405,7 @@
                                 <br>
                             {% endfor %}
                             {% if invalid_or_unavailable_category %}
-                                    <div class="row">
+                                    <div class="row" style="overflow: hidden;">
                                         <div class="col-sm-12 col-md-12 col-lg-12">
                                             <h3 class="text-center">:(</h3>
                                             <h6 class="text-center">No blogs so far !</h6>
@@ -721,19 +830,10 @@
 
 
     // removing comments
-    function remove_comment_from_page(comment_id, post_id, data){
-        if (data.total_comments==0){
-            $("#post-id-" + post_id).find("#comment-count").text('');
-            $("#post-id-" + post_id).find(".comments-replies").find("h5").slideUp();
-            $("#post-id-" + post_id).find("#comment-div-id-" + comment_id).remove();
-        }else{
-            $("#post-id-" + post_id).find("#comment-div-id-" + comment_id).remove();
-            $("#post-id-" + post_id).find("#comment-count").text(data.total_comments);
-        }
-        
-    }
+    $(document).on('click', '.delete-comment', function(){
+        var comment_id = $(this).parents('.comment-reply-wrapper').find('[name="comment-id"]').val();
+        var post_id = $(this).parents('.comment-reply-banner').find('[name="post-id"]').val();
 
-    function remove_comment(comment_id, post_id){
         $.ajax({
             url: "{% url 'social:remove-comment' %}",
             type: "POST",
@@ -743,16 +843,32 @@
                 'post_id': post_id,
             },
             success: function(data){
-                remove_comment_from_page(comment_id, post_id, data);
+                if (data.total_comments == 0){
+                    $('#post-id-' + post_id).find('.comment-plus').html('<span class="be-the-first-commenter">Be the first to comment</span>');
+                    $('#post-id-' + post_id).find('.expand-comments').parent().remove();
+                }
+                else if(data.total_comments == 1){
+                    $('#post-id-' + post_id).find('.expand-comments').parent().remove();
+                    $('#post-id-' + post_id).find('.comment-count').text(data.total_comments);
+                    $('#post-id-' + post_id).find('#comment-count').text(data.total_comments);
+                }
+                else{
+                    $('#post-id-' + post_id).find('.comment-count').text(data.total_comments);
+                    $('#post-id-' + post_id).find('#comment-count').text(data.total_comments);
+                }
+                if (data.total_comments < 5){
+                    $('#post-id-' + post_id).find('.comment-reply-banner').css({
+                        'height': 'unset',
+                        'overflow': 'hidden'
+                    }); 
+                }
+                
+                $('#comment-id-' + comment_id).remove();
             },
-            error: function(data){
-                console.log(data);
-            },
-            complete: function(data){
-                console.log(data);
-            }
         });
-    }
+          
+    })
+    
 
 
     // show/hide post comment's reply panel
@@ -770,173 +886,190 @@
 
 
     // replying comments
-    function add_reply_to_page(comment_id, post_id, data){
-        if (data.total_replies == "1 reply"){
-            console.log('reply added');
-            $("#post-id-" + post_id).find("#comment-id-" + comment_id).append(`
-            <button style="background-color:transparent; color: #2b6eff; border:none; margin-left: 10px;" name="show-replies">show replies</button>
-            <h5 id="reply-count" style="padding:0px 15px;">${data.total_replies}</h5>
-            <div class="replies">
-                <div class="reply-wrapper">
-                    <ul  style="margin-left:50px" class="list-group reply-div">
-                        <div style="margin:10px 0px;"><strong class="replier">${data.reply_user_fname} ${data.reply_user_lname}</strong> replied <span class="reply-timestamp"><small>just now</small></span><br></div>
-                        <li class="list-group-item" style="display:inline-block;">${data.reply_message}</li>
-                    </ul>
+        function add_reply_to_page(comment_id, data){
+            $('#comment-id-' + comment_id).find('.reply-container').find('.reply-count').text(data.total_replies);
+            $('#comment-id-' + comment_id).find('.reply-container').find('.reply-header').after(`
+                <div class="reply-wrapper mb" id="reply-id-${data.reply_id}" style="border: 1px solid #ccc;overflow: hidden; width: 90%; margin-left: 10px; padding: 10px 15px 0px 15px;  {% if newer_reply %} box-shadow: 1px 1px 10px #c2c2c2; {% endif %}">
+                    <input type="hidden" name="reply-id" value="${data.reply_id}">
+                    <div class="reply-actions">
+                        <ul style="margin-bottom: 0px; overflow: hidden">
+                            <li> 
+                                <h5 class="replier" style="display: inline">
+                                    <a href="/${data.reply_user_fname}/${data.reply_user_lname}/${data.replier_id}">
+                                        ${data.reply_user_fname} ${data.reply_user_lname}
+                                    </a>
+                                </h5>
+                            </li>
+                            <li>
+                                <em><small class="reply-quote">replied</small></em> 
+                            </li>
+                            <li class="reply-timestamp restrict-select">
+                                <em style="font-size: 12px;">
+                                    just now
+                                </em>
+                            </li>
+                            <li class="delete-reply pointer">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="reply-message-container" style="width: 90%; display: inline-block; margin-left: 15px; box-sizing: border-box; overflow: hidden; padding: 10px;">
+                        <span class="reply-message" style="padding: 5px 10px; background: #bce8f1; color: #000; border-radius: 25px;">${data.reply_message}</span>
+                        <i class="glyphicon glyphicon-pencil edit-reply pointer" style="font-size: 16px; vertical-align: middle; padding: 5px;" aria-hidden="true"></i>
+                    </div>
                 </div>
-            </div>
-        `);
-        }else{
-            $("#post-id-" + post_id).find("#comment-id-" + comment_id).find('.replies').prepend(`
-            <div class="reply-wrapper">
-                <ul  style="margin-left:50px" class="list-group reply-div">
-                    <div style="margin:10px 0px;"><strong class="replier">${data.reply_user_fname} ${data.reply_user_lname}</strong> replied <span class="reply-timestamp"><small>just now</small></span><br></div>
-                    <li class="list-group-item" style="display:inline-block;">${data.reply_message}</li>
-                </ul>
-            </div>
-            `)
-            
+            `);
+            if (data.total_replies == 2){
+                $('#comment-id-' + comment_id).find('.reply-container').append(`
+                    <div style="overflow: hidden; padding-bottom: 10px;">
+                        <span class="pointer expand-replies" style="">show all replies</span>
+                    </div>
+                `);
+            }        
+            var replies = $("#comment-id-" + comment_id).find('.reply-container').children('.reply-wrapper');
+            replies.slice(0,1).show();
         }
-        $("#comment-id-" + comment_id).find('.reply-div').slideDown();
-        //$("#comment-id-" + comment_id).find('.replies').slideDown();
-        $("#comment-id-" + comment_id).find("#reply-count").text(data.total_replies);
-        $("#comment-id-" + comment_id).find('button[name="show-replies"]').text('Hide replies');
-        //$("#comment-id-" + comment_id).find(".comments-replies").slideDown();
-        $("#comment-id-" + comment_id).find("#hidden-reply-count").slideDown().text(data.total_replies);
-        return false;
-    }
+            
 
-
-    function reply_to_comment(comment_id, post_id){
-        $(".remove-comment").slideDown();
-        $('#comment-id-' + comment_id).find(".remove-comment").slideUp();
-        $("#post-id-" + post_id).find(".reply-div").slideUp();
-        $('button[name="show-replies"]').text("show-replies");
-        $("#post-id-" + post_id).find('#comment-id-' + comment_id).find(".replies").slideDown();
-        $('form[name="reply-to-comment"]').slideUp();
-        $("#comment-id-" + comment_id).find('textarea[name="reply-area"]').parent().slideDown();
-            $('textarea[name="reply-area"]').keyup(function(){
-                var char_len = $(this).val().trim().length;
-                if (char_len > 0){
-                    $(this).parent().find('input[type="submit"]').attr('disabled', false);
-                }else if(char_len == 0){
-                    $(this).parent().find('input[type="submit"]').attr('disabled', true);
-                }
-            });
-            $('#comment-id-' + comment_id).find('form[name="reply-to-comment"]').submit(function(event){
-                event.preventdefault;
-                var reply = $(this).find('textarea[name="reply-area"]').val().trim();
+        $(document).on('submit', '[name="reply-form"]', function(event){
+            event.preventDefault();
+            var comment_id = $(this).find('[name="comment-id"]').val();
+            var reply_message = $(this).find('[name="reply-textarea"]').val().trim();
+            if (!reply_message){
+                return false;
+            }else{
                 $.ajax({
                     url: "{% url 'social:reply-to-comment' %}",
                     type: "POST",
                     data: {
                         'csrfmiddlewaretoken': '{{ csrf_token }}',
                         'comment_id': comment_id,
-                        'reply': reply,
+                        'reply': reply_message,
                     },
                     success: function(data){
-                        add_reply_to_page(comment_id, post_id, data);
+                        add_reply_to_page(comment_id, data);
+                        if (data.total_replies == 1 ){
+                            $('#comment-id-' + comment_id).find('.reply-plus').html('<span class="reply-sum"><span class="reply-count">1</span> Reply</span>');
+                        }  
                     },
                     error: function(data){
                         console.log(data);
                     },
                     complete: function(data){
-                        console.log(data);
                     }
                 });
-                $(this).find('input[type="submit"]').attr('disabled', true).slideUp();
-                $('form[name="reply-to-comment"]').trigger("reset");
-                return false;
-            });
-            return false;
-    }
+            }
+            $(this).trigger('reset');
+            $(this).parent('.reply-form-wrapper').slideUp();
+        });
 
 
     // commenting post
-    function add_comment_to_page(id, data){
-        $("#post-id-" + id).find("#comment-count").text(data.total_comments);
-        if (data.total_comments == 1){
-            $("#post-id-" + id).find(".comments-replies").prepend(`
-                <h5>Comments</h5>
+        function add_comment_to_page(id, data){
+            $("#post-id-" + id).find(".comment-count").text(data.total_comments);
+            $('#post-id-' + id).find('#comment-count').text(data.total_comments);
+            $("#post-id-" + id).find(".comment-banner").prepend(`
+                <div class="comment-reply-wrapper" id="comment-id-${data.comment_id}" style="border: 1px solid #ccc; box-shadow: 1px 1px 10px #c2c2c2; padding: 5px 15px 0px 15px; margin-bottom: 15px;">
+                    <div class="comment-actions">
+                        <ul style="margin-bottom: 0px;">
+                            <li> 
+                                <h5 class="commenter" style="display: inline">
+                                    <a href="/${data.comment_user_fname}/${data.comment_user_lname}/${data.commentor_id}">
+                                        ${data.comment_user_fname} ${data.comment_user_lname}
+                                    </a>
+                                </h5>
+                            </li>
+                            <li>
+                                <em><small class="comment-quote">commented</small></em> 
+                            </li>
+                            <li class="comment-timestamp restrict-select">
+                                <em style="font-size: 12px;">jus now
+                                </em>
+                            </li>
+                            <li class="reply-or-replies pointer">
+                                {% if comment.reply_set.count %}
+                                    Replies
+                                    {% else %}
+                                    <i class="fa fa-reply" aria-hidden="true"></i>
+                                {% endif %}
+                            </li>
+                                <li class="delete-comment pointer">
+                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                </li>
+                        </ul>
+                    </div>
+                    <div class="comment-message-container" style="width: 90%; overflow: hidden; display: inline-block; margin-left: 15px; padding: 10px;">
+                        <span class="comment-message" style="padding: 5px 10px; background: #31708f; color: #fff; border-radius: 25px;">${data.comment_message}</span>
+                        <i class="glyphicon glyphicon-pencil edit-comment pointer" style="font-size: 16px; vertical-align: middle; padding: 5px;" aria-hidden="true"></i>
+                    </div>
+                    <div class="reply-form-wrapper row mb-10" style="display: none; overflow: hidden; box-sizing: border-box; margin-left: 20px; margin-bottom: 10px;">
+                        <form name="reply-form" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="comment-id" value="${data.comment_id}">
+                            <div class="col-xs-10 col-sm-10 col-md-10 " style=" padding-right: 0px; padding-left: 0px;">
+                                <textarea maxlength="1024" name="reply-textarea" style="border-top-right-radius: 0px; resize: none;" class="form-control" placeholder="Reply here..."></textarea>
+                            </div>
+                            <div class="col-xs-1 col-sm-1 col-md-1" style=" padding-right: 0px;  padding-left: 0px;">
+                                <button disabled name="reply-btn" type="submit" class="btn btn-primary no-pad" style="border-radius: 0px; border-bottom-right-radius: 3px; border-top-right-radius: 3px; width: 100%; outline: none; border: none;">
+                                    <i class="fa fa-reply" style="font-size: 30px; padding-left: 0px;" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            <div class="col-xs-1 col-sm-1 col-md-1" style="margin: 0px; padding-left: 0px;">
+                                <i class="pointer close fa fa-times-circle close-reply-form" style="padding-top: 0px; font-size: 20px;" aria-label="Close"></i>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="reply-container" style="overflow: hidden; display: none; margin-left: 20px;">
+                        <div class="reply-header mb-10" style="overflow: hidden;">
+                            <h5 class="comment-plus inline">
+                                Be the first to reply
+                            </h5>
+                            <i class="fa fa-plus add-reply pointer" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>    
             `);
-            $("#post-id-" + id).find(".comment-wrapper").prepend(`
-            <div id="comment-div-id-${data.comment_id}">
-                <div style="margin:10px 10px;"><strong class="commenter">${data.comment_user_fname} ${data.comment_user_lname}</strong> commented <span class="comment-timestamp"><small>just now</small></span></div>
-                <ul class="list-group comment-div" id="comment-id-${data.comment_id}">
-                    <li class="list-group-item" style="display:inline-block;">
-                        ${data.comment_message}
-                    </li>
-                    <i style="cursor:pointer;" onclick="reply_to_comment(${data.comment_id}, ${id})" class="fa fa-reply remove-comment" aria-hidden="true"></i>
-                    <i style="cursor:pointer;" onclick="remove_comment(${data.comment_id}, ${id})" class="fa fa-trash" aria-hidden="true"></i>
-                    <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
-                        {% csrf_token %}
-                        <textarea style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
-                        <input class="btn btn-primary" type="submit" style="display:none" disabled name="reply" value="Reply">
-                    </form>
-                </ul>
-            </div>
-        `);
-        }else{
-            $("#post-id-" + id).find(".comment-wrapper").prepend(`
-            <div id="comment-div-id-${data.comment_id}">
-                <div style="margin:10px 10px;"><strong class="commenter">${data.comment_user_fname} ${data.comment_user_lname}</strong> commented <span class="comment-timestamp"><small>just now</small></span></div>
-                <ul class="list-group comment-div" id="comment-id-${data.comment_id}">
-                    <li class="list-group-item" style="display:inline-block;">
-                        ${data.comment_message}
-                    </li>
-                    <i style="cursor:pointer;" onclick="reply_to_comment(${data.comment_id}, ${id})" class="fa fa-reply remove-comment" aria-hidden="true"></i>
-                    <i style="cursor:pointer;" onclick="remove_comment(${data.comment_id}, ${id})" class="fa fa-trash" aria-hidden="true"></i>
-                    <form style="display:none; padding-left:15px; padding-right:15px;" name="reply-to-comment" method="post">
-                        {% csrf_token %}
-                        <textarea style="margin:10px 0px;" class="form-control" placeholder="Reply here..." name="reply-area"></textarea>
-                        <input class="btn btn-primary" type="submit" style="display:none" disabled name="reply" value="Reply">
-                    </form>
-                </ul>
-            </div>
-        `);    
+             
+            var comments = $("#post-id-" + id).find('.comment-banner').children('.comment-reply-wrapper');
+            comments.slice(0,1).show();
         }
-    }
 
-    function comment(id){
-        {% comment %} $("#post-id-" + id).find(".glyphicon-comment").click(function(){
-        }); {% endcomment %}
-        $("#post-id-" + id).find(".write-comment").slideUp();    
-        $(".write-comment").slideUp();
-        $("#post-id-" + id).find(".write-comment").slideDown();
-        $(".write-comment").find('.comment-box').keyup(function(){
-            var char_len = $(this).val().trim().length;
-            if (char_len > 0){
-                $('input[name="comment"]').attr('disabled', false).slideDown();
-            }else if(char_len == 0){
-                $('input[name="comment"]').attr('disabled', true).slideUp();
-            }
-        });
-        $("#comment-form-" + id).submit(function(event){
-            event.preventdefault;
-            var post_id = $("#comment-form-" + id).find('input[name="post-id"]').val().trim();
-            var post_comment = $("#comment-form-" + id).find('.comment-box').val().trim();
-            $.ajax({
-                    url: "{% url 'social:comment' %}",
-                    type: "POST",
-                    data: {
-                        'csrfmiddlewaretoken': '{{ csrf_token }}',
-                        'post_id': post_id,
-                        'comment': post_comment,
-                    },
-                    success: function(data){
-                        add_comment_to_page(id, data);
-                    },
-                    error: function(data){
-                        console.log(data);
-                    },
-                    complete: function(data){
-                    }
-        });
-        $(this).find('input[type="submit"]').attr('disabled', false).slideUp();
-        $("#comment-form-" + id).trigger("reset");
-        return false;
-    });
-    return false;
-    }
+        $('[name="comment-form"]').submit(function(event){
+                event.preventDefault();
+                var post_id = $(this).find('[name="post-id"]').val();
+                var comment_message = $(this).find('[name="comment-textarea"]').val().trim();
+                var csrfmiddlewaretoken = $(this).find('[name="csrfmiddlewaretoken"]').val().trim();
+                if (!comment_message){
+                    return false;
+                }else{
+                    $.ajax({
+                        url: "{% url 'social:comment' %}",
+                        type: "POST",
+                        data: {
+                            'csrfmiddlewaretoken': csrfmiddlewaretoken,
+                            'post_id': post_id,
+                            'comment': comment_message,
+                        },
+                        success: function(data){
+                            console.log('commented OK');
+                            add_comment_to_page(post_id, data);
+                            if (data.total_comments == 1 ){
+                                $('#post-id-' + post_id).find('.comment-plus').html('<span class="comment-sum"><span class="comment-count">1</span> Comment</span>');
+                            }  
+                            
+                        },
+                        error: function(data){
+                            console.log(data);
+                        },
+                        complete: function(data){
+                        }
+                    });
+                }
+                $(this).trigger('reset');
+                $(this).parent('.comment-form-wrapper').slideUp();
+            });
+
+
 
 
     // post deletion
@@ -1165,6 +1298,93 @@
     });
 
     
+    $(document).on('click', '.edit-comment', function(){
+        var comment = $(this).prev().text().trim();
+        $(this).prev().remove();
+        $(this).parent().prepend(`
+            <textarea style="overflow: hidden; resize: none; padding-left: 0px; width: 90%; border-radius: 25px; padding: 5px 15px; outline: none; border: 1px solid #c2c2c2;" name="edit-comment">${comment}</textarea>
+        `);
+        $(document).find('[name="edit-comment"]').focus();
+    })
+
+    $(document).on('keydown', '[name="edit-comment"]', function(event){
+        var textarea_height = $(this).prop('scrollHeight');
+        var x = $(this).val().trim();
+        if (textarea_height > 45){
+            $(this).css('height', textarea_height);
+        }
+        if(event.keyCode === 13){
+            var comment = $('[name="edit-comment"]').val().trim();
+            var comment_id = $(this).parents('.comment-reply-wrapper').find('[name="comment-id"]').val()
+            $.ajax({
+                    url: "{% url 'social:edit-comment' %}",
+                    type: "POST",
+                    data: {
+                        'comment_id': comment_id,
+                        'edited_comment': comment,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    },
+                    success: function(data){
+                        $('[name="edit-comment"]').remove();
+                        $(document).find('#comment-id-'+ comment_id).find('.comment-message-container').prepend(`
+                            <span class="comment-message" style="padding: 5px 10px; background: #31708f; color: #fff; border-radius: 25px;">${data.edited_comment}</span>
+                        `);
+                    },
+                });
+                return false;
+           
+        }
+    })
+
+
+    $(document).on('click', '.edit-reply', function(){
+        var reply = $(this).prev().text().trim();
+        $(this).prev().remove();
+        $(this).parent().prepend(`
+            <textarea autofocus style="overflow: hidden; resize: none; padding-left: 0px; width: 90%; border-radius: 25px; padding: 5px 15px; outline: none; border: 1px solid #c2c2c2;" name="edit-reply">${reply}</textarea>
+        `);
+        $(document).find('[name="edit-comment"]').focus();
+    })
+
+    $(document).on('keydown', '[name="edit-reply"]', function(event){
+        var textarea_height = $(this).prop('scrollHeight');
+        var reply = $(this).val().trim();
+        var reply_id = $(this).parents('.reply-wrapper').find('[name="reply-id"]').val();
+        if (textarea_height > 45){
+            $(this).css('height', textarea_height);
+        }
+        if (event.which === 32 && !reply){
+            return false;
+        }
+        if(event.keyCode === 13){
+            if (!reply){
+                event.preventDefault();
+            }else{
+                $.ajax({
+                    url: "{% url 'social:edit-reply' %}",
+                    type: "POST",
+                    data: {
+                        'reply_id': reply_id,
+                        'edited_reply': reply,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    },
+                    success: function(data){
+                        $('[name="edit-reply"]').remove();
+                        $(document).find('#reply-id-'+ reply_id).find('.reply-message-container').prepend(`
+                            <span class="reply-message" style="padding: 5px 10px; background: #bce8f1; color: #000; border-radius: 25px;">${data.edited_reply}</span>
+                        `);
+                        
+                    },
+                    
+                });
+            }
+        }
+    })
+
+
+   (function(){
+       alert('problem section: autofocusing on comment need to be specific 2.restrict user to type space and submit empty comment/reply. 3. delete reply remaining git push:OKOK');
+   }())
 
 </script>
 

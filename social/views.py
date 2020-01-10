@@ -331,7 +331,6 @@ class DislikeView(View):
 @method_decorator(login_required, name="dispatch")
 class CommentView(View):
     def post(self, request, *args, **kwargs):
-        print("request came")
         post_id = request.POST.get('post_id')
         comment_message = request.POST.get('comment')
         user_id = request.user.id
@@ -341,11 +340,13 @@ class CommentView(View):
         obj.save()
         data = {
             'comment_id': obj.id,
+            'commentor_username': obj.user.username,
             'comment_user_fname': obj.user.first_name.title(),
             'comment_user_lname': obj.user.last_name.title(),
             'comment_message': obj.message,
             'comment_commented_at': obj.commented_at,
-            'total_comments': post_obj.comment_set.all().count()
+            'total_comments': post_obj.comment_set.all().count(),
+            'commentor_id': obj.user.pk
         }
         return JsonResponse(data)
 
@@ -357,21 +358,18 @@ class ReplyToCommentView(View):
         comment_obj = get_object_or_404(Comment, id=comment_id)
         user_obj = User.objects.get(id=request.user.id)
         reply = request.POST.get('reply').strip()
-        obj = Reply(user=user_obj, parent=comment_obj, reply_message=reply)
+        obj = Reply(user=user_obj, comment=comment_obj, message=reply)
         obj.save()
-        counts = comment_obj.parent.all().count()
-        reply_count = ''
-        if counts > 1:
-            reply_count += str(counts) + ' replies'
-        elif counts == 1:
-            reply_count += str(counts) + ' reply'
+       
         data = {
             'reply_id': obj.id,
             'reply_user_fname': obj.user.first_name.title(),
             'reply_user_lname': obj.user.last_name.title(),
-            'reply_message': obj.reply_message,
-            'reply_commented_at': obj.commented_at,
-            'total_replies': reply_count
+            'reply_message': obj.message,
+            'reply_commented_at': obj.replied_at,
+            'total_replies': comment_obj.reply_set.all().count(),
+            'replier_id': obj.user.pk
+
 
         }
         return JsonResponse(data)
@@ -379,7 +377,6 @@ class ReplyToCommentView(View):
 
 @login_required
 def remove_comment(request):
-    print("*"*20)
     post_id = request.POST.get('post_id')
     comment_id = request.POST.get('comment_id')
     post_obj = get_object_or_404(Post, id=post_id)
@@ -389,6 +386,7 @@ def remove_comment(request):
         'deleted': True,
         'total_comments': post_obj.comment_set.all().count()
     }
+    print(data)
     return JsonResponse(data)
 
 
@@ -431,7 +429,6 @@ def blog(request, *args, **kwargs):
     if category is not None:
         try:
             category_obj = Category.objects.get(category_name=category)
-            print(category_obj)
         except: 
             if category == 'my_blogs':
                 my_blogs_obj = Post.objects.filter(author_id=request.user.id, is_active=True).order_by('-published_date')
@@ -485,6 +482,7 @@ def blog(request, *args, **kwargs):
         context['posts'] = posts
         context['total_pages'] = paginator_obj.num_pages
         context['categories_post'] = sorted(categories_for_thumbnails)
+    # context['comment-count'] = 
     return render(request,'blogs.html', context)
 
 
@@ -555,3 +553,24 @@ class FriendProfile(DetailView):
     #     return 'user'
 
     
+def edit_comment(request):
+    comment_id = request.POST.get('comment_id')
+    edited_comment = request.POST.get('edited_comment')
+    Comment.objects.filter(id=comment_id).update(message=edited_comment)
+    obj = Comment.objects.get(id=comment_id)
+    data = {
+        'edited_comment': obj.message
+    }
+    return JsonResponse(data)
+
+
+def edit_reply(request):
+    reply_id = request.POST.get('reply_id')
+    edited_reply = request.POST.get('edited_reply')
+    print(reply_id, edited_reply)
+    Reply.objects.filter(id=reply_id).update(message=edited_reply)
+    obj = Reply.objects.get(id=reply_id)
+    data = {
+        'edited_reply': obj.message
+    }
+    return JsonResponse(data)
