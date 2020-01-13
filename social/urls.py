@@ -26,6 +26,7 @@ urlpatterns = [
     path('comment/', views.CommentView.as_view(), name="comment"),
     path('reply-to-comment/', views.ReplyToCommentView.as_view(), name="reply-to-comment"),
     path('remove-comment/', views.remove_comment, name='remove-comment'),
+    path('remove-reply/', views.remove_reply, name='remove-reply'),
 
 
     # showing pop-up post-details 

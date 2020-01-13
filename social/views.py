@@ -391,6 +391,23 @@ def remove_comment(request):
 
 
 @login_required
+def remove_reply(request):
+    post_id = request.POST.get('post_id')
+    comment_id = request.POST.get('comment_id')
+    reply_id = request.POST.get('reply_id')
+    post_obj = get_object_or_404(Post, id=post_id)
+    comment_obj = get_object_or_404(Comment, id=comment_id)
+    obj = get_object_or_404(Reply, id=reply_id)
+    obj.delete()
+    data = {
+        'deleted': True,
+        'total_replies': comment_obj.reply_set.all().count()
+    }
+    print(data)
+    return JsonResponse(data)
+
+
+@login_required
 def post_details(request, *args, **kwargs):
     categories_for_thumbnails = set()
     post_obj = get_object_or_404(Post, id=kwargs.get('pk'))

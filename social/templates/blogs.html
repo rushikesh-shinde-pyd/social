@@ -230,7 +230,7 @@
                                                     {% endif %}    
                                                 </ul>
                                                 <!--comment and replies start-->
-                                                    <div class="comment-reply-banner" style="overflow: hidden; margin-top: 10px; display: none; background: #fff; box-shadow: 1px 1px 5px #31708f; padding: 10px 20px;">
+                                                    <div class="comment-reply-banner" style="overflow: hidden; margin-top: 10px; display: none; background: #fff; color: #666; box-shadow: 1px 1px 5px #31708f; padding: 10px 20px;">
                                                         <div class="comment-header mb-10" style="overflow: hidden;">
                                                             <h5 class="comment-plus inline">
                                                                 {% if post.comment_set.all %}
@@ -245,16 +245,8 @@
                                                             <form id="comment-form-{{ post.id }}" name="comment-form" method="post">
                                                                 {% csrf_token %}
                                                                 <input type="hidden" name="post-id" value="{{ post.id }}">
-                                                                <div class="col-xs-10 col-sm-10 col-md-10 " style=" padding-right: 0px;">
+                                                                <div class="col-xs-12 col-sm-12 col-md-12 " style="">
                                                                     <textarea maxlength="1024" name="comment-textarea" style="border-top-right-radius: 0px; resize: none;" class="form-control" placeholder="Comment here..."></textarea>
-                                                                </div>
-                                                                <div class="col-xs-1 col-sm-1 col-md-1" style=" padding-right: 0px;  padding-left: 0px;">
-                                                                    <button disabled name="comment-btn" type="submit" class="btn btn-primary no-pad" style="border-radius: 0px; border-bottom-right-radius: 3px; border-top-right-radius: 3px; width: 100%; outline: none; border: none;">
-                                                                        <i class="fa fa-paper-plane" style="font-size: 30px; padding-left: 0px;" aria-hidden="true"></i>
-                                                                    </button>
-                                                                </div>
-                                                                <div class="col-xs-1 col-sm-1 col-md-1" style="margin: 0px; padding-left: 0px;">
-                                                                    <i class="pointer close fa fa-times-circle close-comment-form" style="padding-top: 0px; font-size: 20px;" aria-label="Close"></i>
                                                                 </div>
                                                             </form>
                                                         </div>
@@ -301,28 +293,18 @@
                                                                             {% endif %}
                                                                         </ul>
                                                                     </div>
-                                                                    <div class="comment-message-container" style="overflow: hidden; width: 100%; display: inline-block; margin-left: 15px; padding: 10px;">
-                                                                        <span class="comment-message" style="padding: 5px 10px; background: #31708f; color: #fff; border-radius: 25px;">{{ comment.message}}</span>
+                                                                    <div class="comment-message-container" style="overflow: hidden; width: 95%;  border-radius: 25px; color: #000; word-wrap: break-word; display: inline-block; margin-left: 20px; padding: 10px;">
+                                                                        <span class="comment-message" style="white-space: normal; padding: 5px 10px; color: #31708f; ">{{ comment.message}}</span>
                                                                         {% if post.author == request.user or request.user == comment.user %}
-                                                                            <i class="glyphicon glyphicon-pencil edit-comment pointer" style="font-size: 16px; vertical-align: middle; padding: 5px;" aria-hidden="true"></i>
+                                                                            <i class="glyphicon glyphicon-pencil edit-comment pointer" style="font-size: 14px; color: #31708f; vertical-align: middle; padding: 5px;" aria-hidden="true"></i>
                                                                         {% endif %}
-                                                                        
-
                                                                     </div>
                                                                     <div class="reply-form-wrapper row mb-10" style="display: none; overflow: hidden; box-sizing: border-box; margin-left: 20px; margin-bottom: 10px;">
                                                                         <form name="reply-form" method="post">
                                                                             {% csrf_token %}
                                                                             <input type="hidden" name="comment-id" value="{{ comment.id }}">
-                                                                            <div class="col-xs-10 col-sm-10 col-md-10 " style=" padding-right: 0px; padding-left: 0px;">
+                                                                            <div class="col-xs-12 col-sm-12 col-md-12 " style="">
                                                                                 <textarea maxlength="1024" name="reply-textarea" style="border-top-right-radius: 0px; resize: none;" class="form-control" placeholder="Reply here..."></textarea>
-                                                                            </div>
-                                                                            <div class="col-xs-1 col-sm-1 col-md-1" style=" padding-right: 0px;  padding-left: 0px;">
-                                                                                <button disabled name="reply-btn" type="submit" class="btn btn-primary no-pad" style="border-radius: 0px; border-bottom-right-radius: 3px; border-top-right-radius: 3px; width: 100%; outline: none; border: none;">
-                                                                                    <i class="fa fa-reply" style="font-size: 30px; padding-left: 0px;" aria-hidden="true"></i>
-                                                                                </button>
-                                                                            </div>
-                                                                            <div class="col-xs-1 col-sm-1 col-md-1" style="margin: 0px; padding-left: 0px;">
-                                                                                <i class="pointer close fa fa-times-circle close-reply-form" style="padding-top: 0px; font-size: 20px;" aria-label="Close"></i>
                                                                             </div>
                                                                         </form>
                                                                     </div>
@@ -340,7 +322,7 @@
                                                                         {% get_replies comment.reply_set.all as ordered_replies %}
                                                                         {% for reply in ordered_replies %}
                                                                         {% newer reply.replied_at|timesince as newer_reply %}
-                                                                            <div class="reply-wrapper mb" id="reply-id-{{ reply.id }}" style="border: 1px solid #ccc;overflow: hidden; width: 90%; margin-left: 10px; padding: 10px 15px 0px 15px;  {% if newer_reply %} box-shadow: 1px 1px 10px #c2c2c2; {% endif %}">
+                                                                            <div class="reply-wrapper mb" id="reply-id-{{ reply.id }}" style="overflow: hidden; width: 90%;border-radius: 25px; word-wrap: break-word; margin-left: 10px; padding: 10px 15px 0px 15px;  {% if newer_reply %} box-shadow: 1px 1px 10px #c2c2c2; {% endif %}">
                                                                                 <input type="hidden" name="reply-id" value="{{ reply.id }}">
                                                                                 <div class="reply-actions">
                                                                                     <ul style="margin-bottom: 0px; overflow: hidden">
@@ -372,17 +354,17 @@
                                                                                         {% endif %}
                                                                                     </ul>
                                                                                 </div>
-                                                                                <div class="reply-message-container" style="width: 90%; display: inline-block; margin-left: 15px; box-sizing: border-box; overflow: hidden; padding: 10px;">
-                                                                                    <span class="reply-message" style="padding: 5px 10px; background: #bce8f1; color: #000; border-radius: 25px;">{{ reply.message}}</span>
+                                                                                <div class="reply-message-container" style="word-wrap: break-word; width: 95%; display: inline-block; margin-left: 15px; border-radius: 25px; overflow: hidden; padding: 10px;">
+                                                                                    <span class="reply-message" style="padding: 5px 10px; white-space: normal; color: #31708f;  ">{{ reply.message}}</span>
                                                                                     {% if post.author == request.user or request.user == comment.user or request.user == reply.user %}
-                                                                                        <i class="glyphicon glyphicon-pencil edit-reply pointer" style="font-size: 16px; vertical-align: middle; padding: 5px;" aria-hidden="true"></i>
+                                                                                        <i class="glyphicon glyphicon-pencil edit-reply pointer" style="color: #31708f; font-size: 14px; vertical-align: middle; padding: 5px;" aria-hidden="true"></i>
                                                                                     {% endif %}
                                                                                 </div>
                                                                             </div>
                                                                         {% endfor %}
                                                                         {% if comment.reply_set.count > 1 %}
                                                                             <div style="overflow: hidden; padding-bottom: 10px;">
-                                                                                <span class="pointer expand-replies" style="">Show all replies</span>
+                                                                                <span class="pointer expand-replies">Show all replies</span>
                                                                             </div>
                                                                         {% endif %}
                                                                     </div>
@@ -833,7 +815,7 @@
     $(document).on('click', '.delete-comment', function(){
         var comment_id = $(this).parents('.comment-reply-wrapper').find('[name="comment-id"]').val();
         var post_id = $(this).parents('.comment-reply-banner').find('[name="post-id"]').val();
-
+        var comments = $(this).parents('.comment-reply-banner').find('.comment-reply-wrapper');
         $.ajax({
             url: "{% url 'social:remove-comment' %}",
             type: "POST",
@@ -851,24 +833,82 @@
                     $('#post-id-' + post_id).find('.expand-comments').parent().remove();
                     $('#post-id-' + post_id).find('.comment-count').text(data.total_comments);
                     $('#post-id-' + post_id).find('#comment-count').text(data.total_comments);
+                    $('#post-id-' + post_id).find('.comment-plus').html('<span class="comment-sum"><span class="comment-count">' + data.total_comments +  '</span> &nbsp;Comment</span>');
+
                 }
                 else{
                     $('#post-id-' + post_id).find('.comment-count').text(data.total_comments);
                     $('#post-id-' + post_id).find('#comment-count').text(data.total_comments);
                 }
-                if (data.total_comments < 5){
-                    $('#post-id-' + post_id).find('.comment-reply-banner').css({
+                if (data.total_comments <= 5){
+                    $("#post-id-" + post_id).find('.comment-reply-banner').css({
                         'height': 'unset',
-                        'overflow': 'hidden'
-                    }); 
+                        'overflow': 'hidden',
+                    });    
+                }else{
+                    $("#post-id-" + post_id).find('.comment-reply-banner').css({
+                        'height': '400px',
+                        'overflow': 'auto',
+                    });
                 }
-                
+                comments.slice().show();
+                $("#post-id-" + post_id).find('.expand-comments').text('Show less');
                 $('#comment-id-' + comment_id).remove();
             },
         });
           
     })
     
+
+    // removing reply
+    $(document).on('click', '.delete-reply', function(){
+        var post_id = $(this).parents('.comment-reply-banner').find('[name="post-id"]').val();
+        var comment_id = $(this).parents('.comment-reply-banner').find('[name="comment-id"]').val();
+        var reply_id = $(this).parents('.comment-reply-wrapper').find('[name="reply-id"]').val();
+        var replies = $(this).parents('.comment-reply-wrapper').find('.reply-container').children('.reply-wrapper');
+        console.log(post_id,comment_id, reply_id);
+        $.ajax({
+            url: "{% url 'social:remove-reply' %}",
+            type: "POST",
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                'post_id': post_id,
+                'comment_id': comment_id,
+                'reply_id': reply_id,
+            },
+            success: function(data){
+                if (data.total_replies == 0){
+                    $('#comment-id-' + comment_id).find('.reply-plus').html('<span class="be-the-first-replier">Be the first to reply</span>');
+                    $('#comment-id-' + comment_id).find('.expand-replies').parent().remove();
+                }
+                else if(data.total_replies == 1){
+                    $('#comment-id-' + comment_id).find('.expand-replies').parent().remove();
+                    $('#comment-id-' + comment_id).find('.reply-count').text(data.total_replies);
+                    $('#comment-id-' + comment_id).find('.reply-plus').html('<span class="reply-sum"><span class="reply-count">' + data.total_replies +  '</span> &nbsp;Reply</span>');
+                    
+                }
+                else{
+                    $('#comment-id-' + comment_id).find('.reply-count').text(data.total_replies);
+                }
+                if (data.total_replies <= 5){
+                    $('#comment-id-' + comment_id).find('.reply-container').css({
+                        'height': 'unset',
+                        'overflow': 'hidden',
+                    });    
+                }else{
+                    $('#comment-id-' + comment_id).find('.reply-container').css({
+                        'height': '400px',
+                        'overflow': 'auto',
+                    });
+                }
+                replies.slice().show();
+                $('#comment-id-' + comment_id).find('.expand-replies').text('Show less');
+                $('#reply-id-' + reply_id).remove();
+            },
+        });
+        return false;
+          
+    })
 
 
     // show/hide post comment's reply panel
@@ -887,9 +927,8 @@
 
     // replying comments
         function add_reply_to_page(comment_id, data){
-            $('#comment-id-' + comment_id).find('.reply-container').find('.reply-count').text(data.total_replies);
             $('#comment-id-' + comment_id).find('.reply-container').find('.reply-header').after(`
-                <div class="reply-wrapper mb" id="reply-id-${data.reply_id}" style="border: 1px solid #ccc;overflow: hidden; width: 90%; margin-left: 10px; padding: 10px 15px 0px 15px;  {% if newer_reply %} box-shadow: 1px 1px 10px #c2c2c2; {% endif %}">
+                <div class="reply-wrapper mb" id="reply-id-${data.reply_id}" style="overflow: hidden; width: 90%; margin-left: 10px; padding: 10px 15px 0px 15px;  {% if newer_reply %} box-shadow: 1px 1px 10px #c2c2c2; {% endif %}">
                     <input type="hidden" name="reply-id" value="${data.reply_id}">
                     <div class="reply-actions">
                         <ul style="margin-bottom: 0px; overflow: hidden">
@@ -913,22 +952,31 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="reply-message-container" style="width: 90%; display: inline-block; margin-left: 15px; box-sizing: border-box; overflow: hidden; padding: 10px;">
-                        <span class="reply-message" style="padding: 5px 10px; background: #bce8f1; color: #000; border-radius: 25px;">${data.reply_message}</span>
-                        <i class="glyphicon glyphicon-pencil edit-reply pointer" style="font-size: 16px; vertical-align: middle; padding: 5px;" aria-hidden="true"></i>
+                    <div class="reply-message-container" style="word-wrap: break-word; width: 95%; display: inline-block; margin-left: 15px; border-radius: 25px; overflow: hidden; padding: 10px;">
+                        <span class="reply-message" style="padding: 5px 10px; white-space: normal; color: #31708f;  ">${data.reply_message}</span>
+                        <i class="glyphicon glyphicon-pencil edit-reply pointer" style="font-size: 14px; vertical-align: middle; padding: 5px; color: #31708f;" aria-hidden="true"></i>
                     </div>
                 </div>
             `);
-            if (data.total_replies == 2){
-                $('#comment-id-' + comment_id).find('.reply-container').append(`
-                    <div style="overflow: hidden; padding-bottom: 10px;">
-                        <span class="pointer expand-replies" style="">show all replies</span>
-                    </div>
-                `);
-            }        
             var replies = $("#comment-id-" + comment_id).find('.reply-container').children('.reply-wrapper');
             replies.slice(0,1).show();
         }
+
+        
+        $(document).on('keydown', '[name="reply-textarea"]', function(event){
+            if (event.which === 32 && !$(this).val().length){
+                event.preventDefault();
+            }
+            if (event.which === 13){
+                if ($(this).val().length){
+                    $('[name="reply-form"]').trigger('submit');
+                    return false;
+                }else{
+                    event.preventDefault();
+                }
+                
+            }
+        });
             
 
         $(document).on('submit', '[name="reply-form"]', function(event){
@@ -950,7 +998,9 @@
                         add_reply_to_page(comment_id, data);
                         if (data.total_replies == 1 ){
                             $('#comment-id-' + comment_id).find('.reply-plus').html('<span class="reply-sum"><span class="reply-count">1</span> Reply</span>');
-                        }  
+                        }else{
+                            $('#comment-id-' + comment_id).find('.reply-plus').html('<span class="reply-sum"><span class="reply-count">' + data.total_replies + '</span> Replies</span>');
+                        }
                     },
                     error: function(data){
                         console.log(data);
@@ -961,15 +1011,16 @@
             }
             $(this).trigger('reset');
             $(this).parent('.reply-form-wrapper').slideUp();
+            return false;
         });
 
 
     // commenting post
         function add_comment_to_page(id, data){
-            $("#post-id-" + id).find(".comment-count").text(data.total_comments);
+            //$("#post-id-" + id).find(".comment-count").text(data.total_comments);
             $('#post-id-' + id).find('#comment-count').text(data.total_comments);
             $("#post-id-" + id).find(".comment-banner").prepend(`
-                <div class="comment-reply-wrapper" id="comment-id-${data.comment_id}" style="border: 1px solid #ccc; box-shadow: 1px 1px 10px #c2c2c2; padding: 5px 15px 0px 15px; margin-bottom: 15px;">
+                <div class="comment-reply-wrapper" id="comment-id-${data.comment_id}" style="box-shadow: 1px 1px 10px #c2c2c2; padding: 5px 15px 0px 15px; margin-bottom: 15px;">
                     <div class="comment-actions">
                         <ul style="margin-bottom: 0px;">
                             <li> 
@@ -998,30 +1049,23 @@
                                 </li>
                         </ul>
                     </div>
-                    <div class="comment-message-container" style="width: 90%; overflow: hidden; display: inline-block; margin-left: 15px; padding: 10px;">
-                        <span class="comment-message" style="padding: 5px 10px; background: #31708f; color: #fff; border-radius: 25px;">${data.comment_message}</span>
-                        <i class="glyphicon glyphicon-pencil edit-comment pointer" style="font-size: 16px; vertical-align: middle; padding: 5px;" aria-hidden="true"></i>
+                    <div class="comment-message-container" style="overflow: hidden; width: 95%; border-radius: 25px; word-wrap: break-word; display: inline-block; margin-left: 20px; padding: 10px;">
+                        <span class="comment-message" style="white-space: normal; padding: 5px 10px; color: #31708f;">${data.comment_message}</span>
+                        <i class="glyphicon glyphicon-pencil edit-comment pointer" style="font-size: 14px; color: #31708f; vertical-align: middle; padding: 5px;" aria-hidden="true"></i>
                     </div>
                     <div class="reply-form-wrapper row mb-10" style="display: none; overflow: hidden; box-sizing: border-box; margin-left: 20px; margin-bottom: 10px;">
                         <form name="reply-form" method="post">
                             {% csrf_token %}
                             <input type="hidden" name="comment-id" value="${data.comment_id}">
-                            <div class="col-xs-10 col-sm-10 col-md-10 " style=" padding-right: 0px; padding-left: 0px;">
+                            <div class="col-xs-12 col-sm-12 col-md-12 " style="">
                                 <textarea maxlength="1024" name="reply-textarea" style="border-top-right-radius: 0px; resize: none;" class="form-control" placeholder="Reply here..."></textarea>
                             </div>
-                            <div class="col-xs-1 col-sm-1 col-md-1" style=" padding-right: 0px;  padding-left: 0px;">
-                                <button disabled name="reply-btn" type="submit" class="btn btn-primary no-pad" style="border-radius: 0px; border-bottom-right-radius: 3px; border-top-right-radius: 3px; width: 100%; outline: none; border: none;">
-                                    <i class="fa fa-reply" style="font-size: 30px; padding-left: 0px;" aria-hidden="true"></i>
-                                </button>
-                            </div>
-                            <div class="col-xs-1 col-sm-1 col-md-1" style="margin: 0px; padding-left: 0px;">
-                                <i class="pointer close fa fa-times-circle close-reply-form" style="padding-top: 0px; font-size: 20px;" aria-label="Close"></i>
-                            </div>
+                            
                         </form>
                     </div>
                     <div class="reply-container" style="overflow: hidden; display: none; margin-left: 20px;">
                         <div class="reply-header mb-10" style="overflow: hidden;">
-                            <h5 class="comment-plus inline">
+                            <h5 class="reply-plus inline">
                                 Be the first to reply
                             </h5>
                             <i class="fa fa-plus add-reply pointer" aria-hidden="true"></i>
@@ -1033,6 +1077,22 @@
             var comments = $("#post-id-" + id).find('.comment-banner').children('.comment-reply-wrapper');
             comments.slice(0,1).show();
         }
+
+
+        $('[name="comment-textarea"]').keydown(function(event){
+            if (event.which === 32 && !$(this).val().length){
+                event.preventDefault();
+            }
+            if (event.which === 13){
+                if ($(this).val().length){
+                    $('[name="comment-form"]').trigger('submit');
+                    return false;
+                }else{
+                    event.preventDefault();
+                }
+                
+            }
+        })
 
         $('[name="comment-form"]').submit(function(event){
                 event.preventDefault();
@@ -1055,6 +1115,8 @@
                             add_comment_to_page(post_id, data);
                             if (data.total_comments == 1 ){
                                 $('#post-id-' + post_id).find('.comment-plus').html('<span class="comment-sum"><span class="comment-count">1</span> Comment</span>');
+                            }else{
+                                $('#post-id-' + post_id).find('.comment-plus').html('<span class="comment-sum"><span class="comment-count">' + data.total_comments + '</span> Comments</span>');
                             }  
                             
                         },
@@ -1067,6 +1129,7 @@
                 }
                 $(this).trigger('reset');
                 $(this).parent('.comment-form-wrapper').slideUp();
+                return false;
             });
 
 
@@ -1302,21 +1365,28 @@
         var comment = $(this).prev().text().trim();
         $(this).prev().remove();
         $(this).parent().prepend(`
-            <textarea style="overflow: hidden; resize: none; padding-left: 0px; width: 90%; border-radius: 25px; padding: 5px 15px; outline: none; border: 1px solid #c2c2c2;" name="edit-comment">${comment}</textarea>
+            <textarea style="overflow: hidden; resize: none; padding-left: 0px; width: 100%; border-radius: 25px; padding: 5px 15px; outline: none; border: 1px solid #c2c2c2;" name="edit-comment"></textarea>
         `);
-        $(document).find('[name="edit-comment"]').focus();
+        $(document).find('[name="edit-comment"]').val(comment).focus();
+        $(this).remove();
+
     })
 
     $(document).on('keydown', '[name="edit-comment"]', function(event){
         var textarea_height = $(this).prop('scrollHeight');
-        var x = $(this).val().trim();
+        var comment = $(this).val().trim();
+        var comment_id = $(this).parents('.comment-reply-wrapper').find('[name="comment-id"]').val()
         if (textarea_height > 45){
             $(this).css('height', textarea_height);
         }
+        if (event.which === 32 && !comment){
+            return false;
+        }
         if(event.keyCode === 13){
-            var comment = $('[name="edit-comment"]').val().trim();
-            var comment_id = $(this).parents('.comment-reply-wrapper').find('[name="comment-id"]').val()
-            $.ajax({
+            if (!comment){
+                event.preventDefault();
+            }else{
+                $.ajax({
                     url: "{% url 'social:edit-comment' %}",
                     type: "POST",
                     data: {
@@ -1325,14 +1395,17 @@
                         'csrfmiddlewaretoken': '{{ csrf_token }}',
                     },
                     success: function(data){
-                        $('[name="edit-comment"]').remove();
                         $(document).find('#comment-id-'+ comment_id).find('.comment-message-container').prepend(`
-                            <span class="comment-message" style="padding: 5px 10px; background: #31708f; color: #fff; border-radius: 25px;">${data.edited_comment}</span>
+                            <span class="comment-message" style="padding: 5px 10px; color: #31708f; border-radius: 25px;">${data.edited_comment}</span>
                         `);
+                        $('[name="edit-comment"]').parent().append(`
+                            <i class="glyphicon glyphicon-pencil edit-comment pointer" style="color: #31708f; font-size: 14px; vertical-align: middle; padding: 5px;" aria-hidden="true"></i>
+                        `);
+                        $('[name="edit-comment"]').remove();
                     },
                 });
                 return false;
-           
+            }
         }
     })
 
@@ -1341,9 +1414,10 @@
         var reply = $(this).prev().text().trim();
         $(this).prev().remove();
         $(this).parent().prepend(`
-            <textarea autofocus style="overflow: hidden; resize: none; padding-left: 0px; width: 90%; border-radius: 25px; padding: 5px 15px; outline: none; border: 1px solid #c2c2c2;" name="edit-reply">${reply}</textarea>
+            <textarea style="overflow: hidden; resize: none; padding-left: 0px; width: 100%; border-radius: 25px; padding: 5px 15px; outline: none; border: 1px solid #c2c2c2;" name="edit-reply"></textarea>
         `);
-        $(document).find('[name="edit-comment"]').focus();
+        $(document).find('[name="edit-reply"]').val(reply).focus();
+        $(this).remove();
     })
 
     $(document).on('keydown', '[name="edit-reply"]', function(event){
@@ -1369,22 +1443,25 @@
                         'csrfmiddlewaretoken': '{{ csrf_token }}',
                     },
                     success: function(data){
-                        $('[name="edit-reply"]').remove();
-                        $(document).find('#reply-id-'+ reply_id).find('.reply-message-container').prepend(`
-                            <span class="reply-message" style="padding: 5px 10px; background: #bce8f1; color: #000; border-radius: 25px;">${data.edited_reply}</span>
+                        $('[name="edit-reply"]').parent().append(`
+                            <i class="glyphicon glyphicon-pencil edit-reply pointer" style="font-size: 14px; vertical-align: middle; color: #31708f; padding: 5px;" aria-hidden="true"></i>
                         `);
-                        
+                        $(document).find('#reply-id-'+ reply_id).find('.reply-message-container').prepend(`
+                            <span class="reply-message" style="padding: 5px 10px; color: #31708f; border-radius: 25px;">${data.edited_reply}</span>
+                        `);
+                        $('[name="edit-reply"]').remove();
                     },
                     
                 });
+                return false;
             }
         }
     })
 
 
-   (function(){
+   {% comment %} (function(){
        alert('problem section: autofocusing on comment need to be specific 2.restrict user to type space and submit empty comment/reply. 3. delete reply remaining git push:OKOK');
-   }())
+   }()) {% endcomment %}
 
 </script>
 
