@@ -10,77 +10,78 @@
     MAIN CONTENT
     *********************************************************************************************************************************************************** -->
     <!--main content start-->
-    <section id="main-content">
+    <section id="main-content" style='overflow: hidden;'>
         <section class="wrapper">
             <!--<div class="row">-->
                 <div class="col-lg-9 main-chart">
                     <!--.>&lt;!&ndash; /row mt &ndash;&gt;-->
 
-                    <div class="row">
-                        <h3 style="display: inline;">Categories</h3>
+                    <div class="row" style="overflow: hidden;">
+                        <h3 style="" class="show-all-categories">Categories</h3>
                         <i title="Create new category" class="pointer fa fa-plus add-category" style="padding:5px; color: #31708f; margin: 0px 0px 10px 0px; font-size:20px;" aria-hidden="true"></i>
-                        <form class="create-category" name="create-category" style="display: none;" method="post" action="{% url 'social:create-category' %}">
+                        <form class="create-category" name="create-category" style="display: none; margin-bottom: 5px;" method="post" action="{% url 'social:create-category' %}">
                             {% csrf_token %}
-                            <div class="form-group">
-                                <p><input type="text" required name="category-name" class="form-control" placeholder="Category name"></p>
-                                <p><input type="text" required name="subcategory-name" class="form-control" placeholder="Subcategory name"></p>
-                                <p><button class="btn btn-sm btn-primary" type="submit" style="margin-top:10px;">Create category</button></p>
+                            <div style="display: inline-block; box-sizing: border-box; width: 35%;  overflow: hidden;">
+                                <input type="text" required name="category-name" class="form-control" placeholder="Category name">
+                                </div>
+                            <div style="display: inline-block; box-sizing: border-box; width: 35%;  overflow: hidden;">
+                                <input type="text" required name="subcategory-name" class="form-control" placeholder="Subcategory name">
+                            </div>
+                            <div id="create-btn" style="cursor: pointer; color: #fff;  padding: 7px;text-align: center; display: inline-block; box-sizing: border-box; width: 25%; background-color: #428bca; border: 1px solid #357ebd; border-radius: 3px; overflow: hidden;">
+                                Create category
                             </div>
                         </form>
-                        <div class="row category-container">
-                            <a href="{% url 'social:category' 'my_blogs' %}">
-                                <div class="category-thumbnail {% if higlight_category == 'my_blogs'%} higlight_category {% endif %} col-md-2 col-lg-2 col-sm-2 text-center">
-                                    {{ 'My blogs'|title }}
-                                </div>
-                            </a>
+                        <div class="error-box">
+                        
+                        </div>
+                        <div class="category-container" style="display: none; overflow: hidden; box-sizing: border-box;">
                             {% for each_category in categories_post %}
-                                <a href="{% url 'social:category' each_category %}">
-                                    <div class="category-thumbnail {% if higlight_category == each_category%} higlight_category {% endif %} col-md-2 col-lg-2 col-sm-2 text-center">
-                                        {{ each_category|title }}
-                                    </div>
-                                </a>
+                                <div class="category-thumbnail {% if higlight_category == each_category%} higlight_category {% endif %} text-center">
+                                    <a href="{% url 'social:category' each_category %}">
+                                     {{ each_category|title }}
+                                </a> 
+                                </div>
                                 {% empty %}
-                                    <div class="row">
-                                        <div class="col-sm-12 col-md-12 col-lg-12">
-                                            <h3 class="text-center">:(</h3>
-                                            <h6 class="text-center">No categories so far !</h6>
-                                        </div>
+                                    <div>
+                                        <h3 class="text-center">:(</h3>
+                                        <h6 class="text-center">No categories so far !</h6>
                                     </div>
                             {% endfor %}
                         </div>
-                        {% if categories_post|length  >= 4 %}
-                            <h6 class="category-expansion pointer" style="display: inline;">Show all categories</h6>
-                        {% endif %}
                     </div>
 
 
-                    <div class="row mt">
+                    <div class="row" style="margin-top: 5px;">
                         <!-- SERVER STATUS PANELS -->
                         <!--.&lt;!&ndash; /col-md-4&ndash;&gt;-->
+                        {% if key %}
+                            <h4>Category : {{ key|title }}</h4>
+                        {% endif %}
                         <div class="col-md-12 col-sm-12 mb" >
                             <i title="Create new post" class="pointer fa fa-plus add-blog" style="padding:5px; color: #31708f; margin: 0px 0px 10px 0px; font-size:20px;" aria-hidden="true"></i>
 
                             <form name="post-create-form" class="post-create-form" style="display: none;" method="post" action="{% url 'social:post-create' %}">
                                 {% csrf_token %}
                                 <div class="form-group">
-                                    <p>
-                                        <select required name="category" class="form-control" >
+                                    <div style="overflow: hidden; box-sizing: border-box; margin-bottom: 10px;">
+                                        <select required name="category" class="pull-left cat-sub-cat" style="">
                                             <option selected value="None">Select Category</option>
                                             {% for category in categories_post %}
                                                 <option value="{{ category }}">{{ category|title }}</option>
                                             {% endfor %}
                                         </select>
-                                    </p>
-                                    <p>
-                                        <select required name="subcategory" class="form-control"  placeholder="Subcategory">
+                                        <select required name="subcategory" class="pull-left cat-sub-cat"  placeholder="Subcategory">
                                             <option selected value="None">Select Subcategory</option>
                                         </select>
-                                    </p>
+                                        <span style="clear: both;"></span>
+                                    </div>
+                                    
                                     <p><input required type="text" name="post-title" class="form-control" placeholder="Post Title"></p>
                                     <p><textarea required style="resize:none;" name="post-content" class="form-control" rows="3" placeholder="What's on your mind!"></textarea></p>
                                     <p><button class="btn btn-sm btn-primary" type="submit" style="margin-top:10px;">POST</button></p>
                                 </div>
                             </form>
+                            <div class="post-error-box"></div>
 
                             <!-- 
                             <div class="row mtbox">
@@ -155,7 +156,13 @@
                                                         <strong id="post-author">
                                                                 {{ post.author.first_name | title }} {{ post.author.last_name | title }}</strong> :
                                                             <span id="post-published">
+                                                            {% check_timestamp post.published_date|timesince as timestamp %}
+                                                            {% if timestamp == 'just now'%}
+                                                                <small>just now</small>
+                                                            {% else %}
                                                                 <small>{{ post.published_date|timesince }} ago</small>
+                                                            {% endif %}
+                                                                
                                                             </span>
                                                     </div>
                                                 </div>
@@ -230,7 +237,7 @@
                                                     {% endif %}    
                                                 </ul>
                                                 <!--comment and replies start-->
-                                                    <div class="comment-reply-banner" style="overflow: hidden; margin-top: 10px; display: none; background: #fff; color: #666; box-shadow: 1px 1px 5px #31708f; padding: 10px 20px;">
+                                                    <div class="comment-reply-banner">
                                                         <div class="comment-header mb-10" style="overflow: hidden;">
                                                             <h5 class="comment-plus inline">
                                                                 {% if post.comment_set.all %}
@@ -241,21 +248,20 @@
                                                             </h5>
                                                             <i class="fa fa-plus add-comment pointer" aria-hidden="true"></i>
                                                         </div>
-                                                        <div class="comment-form-wrapper row mb-10" style="display: none; overflow: hidden; box-sizing: border-box;">
+                                                        <div class="comment-form-wrapper row mb-10" style="">
                                                             <form id="comment-form-{{ post.id }}" name="comment-form" method="post">
                                                                 {% csrf_token %}
                                                                 <input type="hidden" name="post-id" value="{{ post.id }}">
                                                                 <div class="col-xs-12 col-sm-12 col-md-12 " style="">
-                                                                    <textarea maxlength="1024" name="comment-textarea" style="border-top-right-radius: 0px; resize: none;" class="form-control" placeholder="Comment here..."></textarea>
+                                                                    <textarea maxlength="1024" name="comment-textarea" style="" class="form-control" placeholder="Comment here..."></textarea>
                                                                 </div>
                                                             </form>
                                                         </div>
-                                                        <div class="comment-banner" style='overflow: hidden'>
+                                                        <div class="comment-banner" style=''>
                                                             {% get_comments post.comment_set.all as ordered_comments %}
-                                                            
                                                             {% for comment in ordered_comments %}
                                                                 {% newer comment.commented_at|timesince as newer_comment %}
-                                                                <div class="comment-reply-wrapper" id="comment-id-{{ comment.id }}" style="border: 1px solid #ccc; {% if newer_comment %} box-shadow: 1px 1px 10px #c2c2c2; {% endif %} padding: 5px 15px 0px 15px; margin-bottom: 15px;">
+                                                                <div class="comment-reply-wrapper" id="comment-id-{{ comment.id }}" style=" {% if newer_comment %}margin-bottom: 15px; box-shadow: 1px 1px 10px #c2c2c2; {% endif %}">
                                                                     <div class="comment-actions">
                                                                         <ul style="margin-bottom: 0px;">
                                                                             <li> 
@@ -279,7 +285,7 @@
                                                                                     {% endif %}
                                                                                 </em>
                                                                             </li>
-                                                                            <li class="reply-or-replies pointer">
+                                                                            <li class="reply-or-replies pointer comment-actions">
                                                                                 {% if comment.reply_set.count %}
                                                                                     Replies
                                                                                     {% else %}
@@ -287,19 +293,19 @@
                                                                                 {% endif %}
                                                                             </li>
                                                                                 {% if post.author == request.user or request.user == comment.user %}
-                                                                                <li class="delete-comment pointer">
+                                                                                <li class="delete-comment pointer comment-actions">
                                                                                     <i class="fa fa-trash" aria-hidden="true"></i>
                                                                                 </li>
                                                                             {% endif %}
                                                                         </ul>
                                                                     </div>
-                                                                    <div class="comment-message-container" style="overflow: hidden; width: 95%;  border-radius: 25px; color: #000; word-wrap: break-word; display: inline-block; margin-left: 20px; padding: 10px;">
-                                                                        <span class="comment-message" style="white-space: normal; padding: 5px 10px; color: #31708f; ">{{ comment.message}}</span>
+                                                                    <div class="comment-message-container" style="">
+                                                                        <span class="comment-message" style="">{{ comment.message}}</span>
                                                                         {% if post.author == request.user or request.user == comment.user %}
                                                                             <i class="glyphicon glyphicon-pencil edit-comment pointer" style="font-size: 14px; color: #31708f; vertical-align: middle; padding: 5px;" aria-hidden="true"></i>
                                                                         {% endif %}
                                                                     </div>
-                                                                    <div class="reply-form-wrapper row mb-10" style="display: none; overflow: hidden; box-sizing: border-box; margin-left: 20px; margin-bottom: 10px;">
+                                                                    <div class="reply-form-wrapper row mb-10" style="">
                                                                         <form name="reply-form" method="post">
                                                                             {% csrf_token %}
                                                                             <input type="hidden" name="comment-id" value="{{ comment.id }}">
@@ -322,7 +328,7 @@
                                                                         {% get_replies comment.reply_set.all as ordered_replies %}
                                                                         {% for reply in ordered_replies %}
                                                                         {% newer reply.replied_at|timesince as newer_reply %}
-                                                                            <div class="reply-wrapper mb" id="reply-id-{{ reply.id }}" style="overflow: hidden; width: 90%;border-radius: 25px; word-wrap: break-word; margin-left: 10px; padding: 10px 15px 0px 15px;  {% if newer_reply %} box-shadow: 1px 1px 10px #c2c2c2; {% endif %}">
+                                                                            <div class="reply-wrapper" id="reply-id-{{ reply.id }}" style="{% if newer_reply %} box-shadow: 1px 1px 10px #c2c2c2; margin-bottom: 15px;{% endif %}">
                                                                                 <input type="hidden" name="reply-id" value="{{ reply.id }}">
                                                                                 <div class="reply-actions">
                                                                                     <ul style="margin-bottom: 0px; overflow: hidden">
@@ -354,7 +360,7 @@
                                                                                         {% endif %}
                                                                                     </ul>
                                                                                 </div>
-                                                                                <div class="reply-message-container" style="word-wrap: break-word; width: 95%; display: inline-block; margin-left: 15px; border-radius: 25px; overflow: hidden; padding: 10px;">
+                                                                                <div class="reply-message-container" style="">
                                                                                     <span class="reply-message" style="padding: 5px 10px; white-space: normal; color: #31708f;  ">{{ reply.message}}</span>
                                                                                     {% if post.author == request.user or request.user == comment.user or request.user == reply.user %}
                                                                                         <i class="glyphicon glyphicon-pencil edit-reply pointer" style="color: #31708f; font-size: 14px; vertical-align: middle; padding: 5px;" aria-hidden="true"></i>
@@ -828,6 +834,7 @@
                 if (data.total_comments == 0){
                     $('#post-id-' + post_id).find('.comment-plus').html('<span class="be-the-first-commenter">Be the first to comment</span>');
                     $('#post-id-' + post_id).find('.expand-comments').parent().remove();
+                    $('#post-id-' + post_id).find('#comment-count').text('');
                 }
                 else if(data.total_comments == 1){
                     $('#post-id-' + post_id).find('.expand-comments').parent().remove();
@@ -928,7 +935,7 @@
     // replying comments
         function add_reply_to_page(comment_id, data){
             $('#comment-id-' + comment_id).find('.reply-container').find('.reply-header').after(`
-                <div class="reply-wrapper mb" id="reply-id-${data.reply_id}" style="overflow: hidden; width: 90%; margin-left: 10px; padding: 10px 15px 0px 15px;  {% if newer_reply %} box-shadow: 1px 1px 10px #c2c2c2; {% endif %}">
+                <div class="reply-wrapper" id="reply-id-${data.reply_id}" style="overflow: hidden; width: 90%; margin-left: 10px; padding: 10px 15px 0px 15px; margin-bottom: 15px; box-shadow: 1px 1px 10px #c2c2c2;">
                     <input type="hidden" name="reply-id" value="${data.reply_id}">
                     <div class="reply-actions">
                         <ul style="margin-bottom: 0px; overflow: hidden">
@@ -958,6 +965,17 @@
                     </div>
                 </div>
             `);
+            if (data.total_replies == 2){
+                $('.reply-container').append(`
+                    <div style="overflow: hidden; margin-bottom: 5px;">
+                        <span class="pointer expand-replies" style="">Show less</span>
+                    </div>
+                `);
+            }
+            if (data.total_replies > 5){
+                $('.expand-replies').text('Show all replies');
+                $('.expand-replies').trigger('click');
+            }
             var replies = $("#comment-id-" + comment_id).find('.reply-container').children('.reply-wrapper');
             replies.slice(0,1).show();
         }
@@ -1020,7 +1038,7 @@
             //$("#post-id-" + id).find(".comment-count").text(data.total_comments);
             $('#post-id-' + id).find('#comment-count').text(data.total_comments);
             $("#post-id-" + id).find(".comment-banner").prepend(`
-                <div class="comment-reply-wrapper" id="comment-id-${data.comment_id}" style="box-shadow: 1px 1px 10px #c2c2c2; padding: 5px 15px 0px 15px; margin-bottom: 15px;">
+                <div class="comment-reply-wrapper" id="comment-id-${data.comment_id}" style="border: 1px solid rgb(204, 204, 204);box-shadow: 1px 1px 10px #c2c2c2; padding: 5px 15px 0px 15px; margin-bottom: 15px;">
                     <div class="comment-actions">
                         <ul style="margin-bottom: 0px;">
                             <li> 
@@ -1073,7 +1091,18 @@
                     </div>
                 </div>    
             `);
-             
+            if (data.total_comments == 2){
+                $('.comment-banner').append(`
+                    <div style="overflow: hidden;">
+                        <span class="pointer expand-comments" style="">Show less</span>
+                    </div>
+                `);
+            }
+            if (data.total_comments > 5){
+                $('.expand-comments').text('Show all commnets');
+                $('.expand-comments').trigger('click');
+            }
+            
             var comments = $("#post-id-" + id).find('.comment-banner').children('.comment-reply-wrapper');
             comments.slice(0,1).show();
         }
@@ -1340,24 +1369,9 @@
     });
 
 
-    $(document).ready(function(){
-        $(".category-thumbnail").slice(5).hide();
-    }); 
-
 
     $(document).on('mouseenter mouseleave', ".post-div", function(){
         $(this).find(".post-actions").fadeToggle();
-    });
-
-
-    $(".category-expansion").click(function(){
-        if ($(this).text().trim() == 'Show less'){
-            $(this).text("Show all categories");
-            $(".category-thumbnail").slice(5).fadeOut();
-        }else{
-            $(this).text("Show less");
-            $(".category-thumbnail").slice().fadeIn();
-        }
     });
 
     

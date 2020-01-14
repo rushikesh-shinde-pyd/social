@@ -500,12 +500,14 @@ def blog(request, *args, **kwargs):
         context['total_pages'] = paginator_obj.num_pages
         context['categories_post'] = sorted(categories_for_thumbnails)
     # context['comment-count'] = 
+    context['key'] = category
     return render(request,'blogs.html', context)
 
 
 @login_required
 def create_category(request):
     if request.method == 'POST':
+        print('method arrived')
         category = request.POST.get('category-name').lower()
         subcategory = request.POST.get('subcategory-name').lower()
         print(request.POST)

@@ -74,7 +74,7 @@ var Script = function () {
 // custom scrollbar
     $("#sidebar").niceScroll({styler:"fb",cursorcolor:"#4ECDC4", cursorwidth: '3', cursorborderradius: '10px', background: '#404040', spacebarenabled:false, cursorborder: ''});
 
-    $("html").niceScroll({styler:"fb",cursorcolor:"#4ECDC4", cursorwidth: '6', cursorborderradius: '10px', background: '#404040', spacebarenabled:false,  cursorborder: '', zindex: '1000'});
+    // $("html").niceScroll({styler:"fb",cursorcolor:"#4ECDC4", cursorwidth: '6', cursorborderradius: '10px', background: '#404040', spacebarenabled:false,  cursorborder: '', zindex: '1000'});
 
 // widget tools
 
@@ -123,19 +123,30 @@ $('form[name="create-category"]').submit(function(event){
     $(".category-error").remove();
     var category = $('[name="category-name"]');
     var subcategory = $('[name="subcategory-name"]');
+    var error = $('.error-box');
     var ele_indices = [];
-    if (!category.val().trim()){
-        category.after('<span class="category-error text-danger">Invalid category!</span>');
-    }
-    if (!subcategory.val().trim()){
-        subcategory.after('<span class="category-error text-danger">Invalid subcategory!</span>');
-    }
-    $(this).find(ele_indices[0]).focus();
-    if (ele_indices.length > 0 ){
+    if (category.val() && subcategory.val()){
+        error.hide();
+    }else{
+        error.show();
+        if (!category.val().trim()){
+            error.append('<span class="category-error text-danger">Invalid category!<br></span>');
+        }
+        if (!subcategory.val().trim()){
+            error.append('<span class="category-error text-danger">Invalid subcategory!<br></span>');
+        }
+        $(this).find(ele_indices[0]).focus();
+        if (ele_indices.length > 0 ){
+            event.preventDefault();
+        }
         event.preventDefault();
     }
 });
 
+
+$(document).on('click', '#create-btn', function(){
+    $('form[name="create-category"]').trigger('submit');
+})
 
 // post creation form validation
 $('form[name="post-create-form"]').submit(function(event){
@@ -144,29 +155,44 @@ $('form[name="post-create-form"]').submit(function(event){
     var subcategory = $('[name="subcategory"]');
     var title = $('[name="post-title"]');
     var content = $('[name="post-content"]');
+    var error = $('.post-error-box');
     var ele_indices = [];
-    if (category.val() == "None"){
-        category.after('<span class="category-error text-danger">Select category!</span>');
-        ele_indices.push($(category));
-    }
-    if (subcategory.val() == "None"){
-        subcategory.after('<span class="category-error text-danger">Select subcategory!</span>');
-        ele_indices.push($(subcategory));
-    }
-    if (!title.val().trim()){
-        title.after('<span class="category-error text-danger">Enter valid input!</span>');
-        ele_indices.push($(title));
-    }
-    if (!content.val().trim()){
-        content.after('<span class="category-error text-danger">Enter valid input!</span>');
-        ele_indices.push($(content));
-    }
-    $(this).find(ele_indices[0]).focus();
-    if (ele_indices.length > 0 ){
+    
+    if ((category.val() != "None") && (subcategory.val() != "None") && title.val().trim() && content.val().trim()){
+        error.hide();
+    }else{
+        error.show();
+        if (category.val() == "None"){
+            error.append('<span class="category-error text-danger">Select category!<br/></span>');
+            ele_indices.push($(category));
+        }
+        if (subcategory.val() == "None"){
+            error.append('<span class="category-error text-danger">Select subcategory!<br/></span>');
+            ele_indices.push($(subcategory));
+        }
+        if (!title.val().trim()){
+            error.append('<span class="category-error text-danger">Enter valid input!<br/></span>');
+            ele_indices.push($(title));
+        }
+        if (!content.val().trim()){
+            error.append('<span class="category-error text-danger">Enter valid input!<br/></span>');
+            ele_indices.push($(content));
+        }
+        $(this).find(ele_indices[0]).focus();
+        if (ele_indices.length > 0 ){
+            event.preventDefault();
+        }
         event.preventDefault();
     }
-
 });
+
+
+$(document).on('keydown', ':text, textarea', function(event){
+    if (event.keyCode === 32 && !$(this).val().length) {
+        event.preventDefault();
+    }
+    
+})
 
 
 // ****************search form****************
@@ -185,14 +211,14 @@ $(".search-form").submit(function(event){
 });
 
 
-$(document).ready(function(){
+(function(){
     $('.filter').click(function(event){
         // $('.filter').siblings().slideUp();
         // $(this).siblings().slideToggle();
         $('.filter').not($(this)).siblings().slideUp();
         $(this).siblings().slideToggle();
     })
-});
+})();
 
 // toggle gender filter
 // $("#gender-toogle").click(function(){
@@ -264,22 +290,6 @@ $(document).on('click', '.add-reply', function(event){
 });
 
 
-$(document).on('keydown', '[name="reply-textarea"]', function(event){
-    var reply_btn = $('[name="reply-btn"]');
-    if (event.which === 32 && !$(this).val().length){
-        reply_btn.attr('disabled', true);
-        event.preventDefault();
-    }else{
-        reply_btn.attr('disabled', false);
-    }
-});
-
-$(document).on('keyup', '[name="reply-textarea"]', function(event){
-    var reply_btn = $('[name="reply-btn"]');
-    if ($(this).val().trim().length === 0){
-        reply_btn.attr('disabled', true);
-    }
-});
 
 // $('.reply-or-replies').click(function(event){
 //         var replies = $(this).parents('.comment-reply-wrapper').children('.reply-wrapper');
@@ -384,3 +394,15 @@ $(document).on('click', '.expand-comments', function(){
 //     })
 //   })(jQuery);
 
+
+
+$(document).on('click', '.show-all-categories', function(){
+    $('.category-container').slideToggle();
+});
+
+
+
+
+(function(){
+    alert('take look at post update->imp delete too git push-->OKOK');
+})();
