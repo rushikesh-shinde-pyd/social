@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
+{% load c_filters %}
 {% block title %} <title>Profile - Social Module</title>{% endblock %}
 
 {% block content %}
@@ -61,7 +62,7 @@
                                 </div>
                                 <div class="user-details-nav">
                                     <ul>
-                                        <li><a href="{% url 'social:friend-list' %}"><h5 style="display: inline-block;">Friends </h5><span style="margin-left: 5px; color: #c2c2c2;" id="friends-count">0</span></a></li>
+                                        <li><a href="{% url 'social:friend-list' %}"><h5 style="display: inline-block;">Friend {{ friend_list.count|pluralize }} </h5><span style="margin-left: 5px; color: #c2c2c2;" id="friends-count">{{ friend_list.count }}</span></a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -92,97 +93,157 @@
 
                     </div><!-- /row -->
 
-
                     <div class="row">
-                        <!-- TWITTER PANEL -->
-                    <div class="col-md-12 col-sm-12">
-                        <div class="panel panel-info ">
-                            <div class="panel-body">
-                                <div class="row">
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">First Name </label>:
-                                        {{ user.first_name|title }}
-                                    </div>
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">Last Name </label>:
-                                        {{ user.last_name|title }}
-                                    </div>
+                        <div class="col-md-12 col-sm-12 mb">
+                            <div>
+                                <h4>You have {{ non_friend_list.count }} new friend requests</h4>
+                                <div class="friend-container">
+                                    {% for friend_obj in non_friend_list %}
+                                        <div class="non-friend-div-id-{{ friend_obj.pk }} not-friends">
+                                            {% use_time_stamp friend_obj.request_to.profile.timestamp|timesince as user_status %}
+                                            <input type="hidden" name="not-friend-id" value="{{ friend_obj.pk }}">
+                                            <div class="profile-image-container">
+                                            {% if friend_obj.request_from.profile.image %} 
+                                                    <a href="{% url 'social:friend-profile' friend_obj.request_from.first_name friend_obj.request_from.last_name friend_obj.request_from.pk %}">
+                                                        <img src="{{friend_obj.request_from.profile.image.url}}" style="border-radius: 100%; max-height:100%; max-width:100%;">
+                                                    </a>
+                                                {% else %}
+                                                <a href="{% url 'social:friend-profile' friend_obj.request_from.first_name friend_obj.request_from.last_name friend_obj.request_from.pk %}">
+                                                    <img 
+                                                        {% if friend_obj.request_from.profile.gender == 'male'%} 
+                                                            src="{% static 'img/male_user.png' %}" 
+                                                        {% else %}
+                                                            src="{% static 'img/female_user.png' %}"
+                                                        {% endif %} 
+                                                    style="border-radius: 100%; max-height:100%; max-width:100%;">
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                        <div class="profile-info-container">
+                                            <h4 style="margin-bottom:5px; display: inline;"><a href="{% url 'social:friend-profile' friend_obj.request_from.first_name friend_obj.request_from.last_name friend_obj.request_from.pk %}">{{friend_obj.request_from.first_name|title}} {{friend_obj.request_from.last_name|title}}</a></h4>
+                                            {% get_age friend_obj.request_from.profile.birth_date as age %}
+                                            <h4 style="margin-bottom:5px; display: inline;">
+                                                <a href="{% url 'social:friend-profile' friend_obj.request_from.first_name friend_obj.request_from.last_name friend_obj.request_from.pk %}">
+                                            </h4>
+                                            {% if user_status == 'online' %}
+                                                <i class="fa fa-circle" style="padding: 0px 5px; color:#00e03c;" aria-hidden="true"></i></br>
+                                                {% else %}
+                                                <br>
+                                            {% endif %}
+                                            
+                                            {% if friend_obj.request_from.profile.gender %}<span>{{age}} yrs</span>&nbsp;{% endif%}
+                                            {% if friend_obj.request_from.profile.gender %}
+                                                {% if friend_obj.request_from.profile.gender == 'male' %}
+                                                    <i class="fa fa-mars" style="color: #2e7eff;"></i>
+                                                {% endif%}
+                                                {% if friend_obj.request_from.profile.gender == 'female' %}
+                                                    <i class="fa fa-venus" style="color: pink"></i>
+                                                {% endif%}
+                                                {% if friend_obj.request_from.profile.gender == 'other' %}
+                                                    <span>
+                                                        {{ friend_obj.request_from.profile.gender }}
+                                                    </span>
+                                                {% endif%}
+                                                </br>
+                                            {% endif%}
+                                            {% if friend_obj.request_from.profile.city %}<span>from {{friend_obj.request_from.profile.country|title}}</span>{% endif %}
+                                             <ul>
+                                                <li>
+                                                    <input type="hidden" name="friend-id" value="{{ friend_obj.request_from.pk }}">
+                                                    <a class="request-approve btn btn-success" href="{% url 'social:request-approve' friend_obj.request_from.pk %}" role="button" style="padding:3px 6px;">Approve</a>
+                                                </li>
+                                                <li>
+                                                    <a class="request-delete btn btn-danger" href="{% url 'social:undo-request' friend_obj.request_from.pk %}" role="button" style="padding:3px 6px;">Remove</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        </div>
+                                        
+                                    {% endfor %}
                                 </div>
-                                <div class="row">
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">Email Id </label>:
-                                        {{ user.email }}
-                                    </div>
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">Username</label>:
-                                        {{ user.username }}
-                                    </div>
+                            </div>
+
+                           
+
+                        </div>
+                    </div><!-- /row -->
+
+
+                     <div class="row">
+                        <div class="col-md-12 col-sm-12 mb">
+                            <div>
+                                <h4>You have {{ friend_list.count }} new friend requests</h4>
+                                <div class="not-friend-container">
+                                    {% for friend in friend_list %}
+                                        <div class="not-friend-div-id-{{ friend.pk }} not-friends">
+                                            {% use_time_stamp request.timestamp|timesince as user_status %}
+                                            <input type="hidden" name="not-friend-id" value="{{ friend.pk }}">
+                                            <div class="profile-image-container">
+                                            {% if friend_obj.request_from.profile.image %} 
+                                                    <a href="{% url 'social:friend-profile' friend.request_from.first_name friend.request_from.last_name friend.request_from.pk %}">
+                                                        <img src="{{friend.request_from.profile.image.url}}" style="border-radius: 100%; max-height:100%; max-width:100%;">
+                                                    </a>
+                                                {% else %}
+                                                <a href="{% url 'social:friend-profile' friend.request_from.first_name friend.request_from.last_name friend.request_from.pk %}">
+                                                    <img 
+                                                        {% if friend.request_from.profile.gender == 'male'%} 
+                                                            src="{% static 'img/male_user.png' %}" 
+                                                        {% else %}
+                                                            src="{% static 'img/female_user.png' %}"
+                                                        {% endif %} 
+                                                    style="border-radius: 100%; max-height:100%; max-width:100%;">
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                        <div class="profile-info-container">
+                                            <h4 style="margin-bottom:5px; display: inline;"><a href="{% url 'social:friend-profile' friend.request_from.first_name friend.request_from.last_name friend.request_from.pk %}">{{friend.request_from.first_name|title}} {{friend.request_from.last_name|title}}</a></h4>
+                                            {% get_age friend.request_from.profile.birth_date as age %}
+                                            <h4 style="margin-bottom:5px; display: inline;">
+                                            <a href="{% url 'social:friend-profile' friend.request_from.first_name friend.request_from.last_name friend.request_from.pk %}">
+                                            {{user_obj.user.first_name|title}} {{user_obj.user.last_name|title}}</a></h4>
+                                            {% if user_status == 'online' %}
+                                                <i class="fa fa-circle" style="padding: 0px 5px; color:#00e03c;" aria-hidden="true"></i></br>
+                                                {% else %}
+                                                <br>
+                                            {% endif %}
+                                            
+                                            {% if friend.request_from.profile.gender %}<span>{{age}} yrs</span>&nbsp;{% endif%}
+                                            {% if friend.request_from.profile.gender %}
+                                                {% if friend.request_from.profile.gender == 'male' %}
+                                                    <i class="fa fa-mars" style="color: #2e7eff;"></i>
+                                                {% endif%}
+                                                {% if friend.request_from.profile.gender == 'female' %}
+                                                    <i class="fa fa-venus" style="color: pink"></i>
+                                                {% endif%}
+                                                {% if friend.request_from.profile.gender == 'other' %}
+                                                    <span>
+                                                        {{ friend.request_from.profile.gender }}
+                                                    </span>
+                                                {% endif%}
+                                                </br>
+                                            {% endif%}
+                                            {% if friend.request_from.profile.city %}<span>from {{friend.request_from.profile.country|title}}</span>{% endif %}
+                                            <ul>
+                                                <li>
+                                                    <input type="hidden" name="friend-id" value="{{ friend_obj.request_from.pk }}">
+                                                    <a class="request-approve btn btn-primary" href="{% url 'social:request-approve' friend.request_from.pk %}" role="button" style="padding:3px 6px;">Message</a>
+                                                </li>
+                                                <li>
+                                                    <a class="request-delete btn btn-primary" href="{% url 'social:undo-request' friend.request_from.pk %}" role="button" style="padding:3px 6px;">Unfriend</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        </div>
+                                        
+                                    {% endfor %}
                                 </div>
-                                <div class="row">
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">Gender </label>:
-                                        {{ user.profile.gender|title }}
-                                    </div>
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">Birth Date</label>:
-                                        {{ user.profile.birth_date }}
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">City </label>:
-                                        {{ user.profile.city|title }}
-                                    </div>
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">State</label>:
-                                        {{ user.profile.state|title }}
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">Country </label>:
-                                        {{ user.profile.country|title }}
-                                    </div>
-                                    <div class="col-sm-6 form-group">
-                                        <label class="col-sm-4" style="color:black;">Address</label>:
-                                        {{ user.profile.fullAddress|title }}
-                                    </div>
-                                </div><hr/>
+                            </div>
 
+                            {% for x in not_friends %}
+                               
+                            {% endfor %}
 
-                            <div class="form-buttons-w">
-
-                                <div class="col-sm-6 text"><a class="btn btn-primary btn-sm" href="{% url 'social:editProfile' %}">
-                                <i class="fa fa-edit"></i> <span>Edit Profile</span></a></div></div>
-
-                            </div><! -- /darkblue panel -->
-                        </div><!-- /col-md-4 -->
-                    </div>
-
-                        <!--<div class="col-md-4 mb">-->
-                            <!--&lt;!&ndash; INSTAGRAM PANEL &ndash;&gt;-->
-                            <!--<div class="instagram-panel pn">-->
-                                <!--<i class="fa fa-instagram fa-4x"></i>-->
-                                <!--<p>@THISISYOU<br/>-->
-                                    <!--5 min. ago-->
-                                <!--</p>-->
-                                <!--<p><i class="fa fa-comment"></i> 18 | <i class="fa fa-heart"></i> 49</p>-->
-                            <!--</div>-->
-                        <!--</div>&lt;!&ndash; /col-md-4 &ndash;&gt;-->
-
-                        <!--<div class="col-md-4 col-sm-4 mb">-->
-                            <!--&lt;!&ndash; REVENUE PANEL &ndash;&gt;-->
-                            <!--<div class="darkblue-panel pn">-->
-                                <!--<div class="darkblue-header">-->
-                                    <!--<h5>REVENUE</h5>-->
-                                <!--</div>-->
-                                <!--<div class="chart mt">-->
-                                    <!--<div class="sparkline" data-type="line" data-resize="true" data-height="75" data-width="90%" data-line-width="1" data-line-color="#fff" data-spot-color="#fff" data-fill-color="" data-highlight-line-color="#fff" data-spot-radius="4" data-data="[200,135,667,333,526,996,564,123,890,464,655]"></div>-->
-                                <!--</div>-->
-                                <!--<p class="mt"><b>$ 17,980</b><br/>Month Income</p>-->
-                            <!--</div>-->
-                        <!--</div>&lt;!&ndash; /col-md-4 &ndash;&gt;-->
-
+                        </div>
                     </div><!-- /row -->
 
                     <div class="row mt">
@@ -375,178 +436,33 @@
         </section>
     </section>
 
-    
-
-    <!--<h1 class="page-header">Album</h1>-->
-    <!-- FORM TO UPLOAD THE IMAGES -->
-    <!--<form method="post" enctype="multipart/form-data" id="formUpload">-->
-    <!--{% csrf_token %}-->
-    <!--{{ form }}-->
-    <!--</form>-->
-
-    <!-- MODAL TO CROP THE IMAGE -->
-    <!--
-    <div class="modal fade" id="modalCrop">
-        <div class="modal-dialog">
-            <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title">Crop the photo</h4>
-            </div>
-            <div class="modal-body">
-                <img src="" id="image" style="max-width: 100%;">
-            </div>
-            <div class="modal-footer">
-                <div class="btn-group pull-left" role="group">
-                <button type="button" class="btn btn-default js-zoom-in">
-                    <span class="glyphicon glyphicon-zoom-in"></span>
-                </button>
-                <button type="button" class="btn btn-default js-zoom-out">
-                    <span class="glyphicon glyphicon-zoom-out"></span>
-                </button>
-                </div>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Nevermind</button>
-                <button type="button" class="btn btn-primary js-crop-and-upload">Crop and upload</button>
-            </div>
-            </div>
-        </div>
-    </div>
-    -->
-
-
   
 {% endblock %}
 
 {% block custom_scripts %}
     <script type="application/javascript">
-        $(document).ready(function () {
-            $("#date-popover").popover({html: true, trigger: "manual"});
-            $("#date-popover").hide();
-            $("#date-popover").click(function (e) {
-                $(this).hide();
-            });
-
-            $("#my-calendar").zabuto_calendar({
-                action: function () {
-                    return myDateFunction(this.id, false);
+    
+    $(document).on('click', '.request-approve', function(event){
+            var $this = $(this);
+            var friend_id = $(this).parent().find('[name="not-friend-id"]').val();
+            event.preventDefault();
+            var ref = $(this).attr('href');
+            $.ajax({
+                url: ref,
+                datatype: 'json',
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
                 },
-                action_nav: function () {
-                    return myNavFunction(this.id);
-                },
-                ajax: {
-                    url: "show_data.php?action=1",
-                    modal: true
-                },
-                legend: [
-                    {type: "text", label: "Special event", badge: "00"},
-                    {type: "block", label: "Regular event", }
-                ]
-            });
-        });
-
-
-        function myNavFunction(id) {
-            $("#date-popover").hide();
-            var nav = $("#" + id).data("navigation");
-            var to = $("#" + id).data("to");
-            console.log('nav ' + nav + ' to: ' + to.month + '/' + to.year);
-        }
-    </script>
-
-    <script type="application/javascript">
-        // Get the modal to create new file
-        var modal = document.getElementById('myModal');
-
-        // Get the button that opens the modal
-        var btn = document.getElementById("pic");
-
-        // Get the <span> element that closes the modal
-        var span = document.getElementsByClassName("close")[0];
-        var create = document.getElementById("create_file");
-        create.onclick = function() {
-                    var fs = require('fs');
-
-                    fs.appendFile($('#filename').val(),'\n Write your code here.', function (err) {
-                        if (err) throw err;
-                        console.log('Created!');
-                    });
-                modal.style.display = "none";
-                $("#modalCrop").modal("show");
-        }
-
-        // When the user clicks the button, open the modal
-        {% comment %} btn.onclick = function() {
-            modal.style.display = "block";
-        } {% endcomment %}
-
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
-            modal.style.display = "none";
-        }
-
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function(event) {
-            if (event.target == modal) {
-            modal.style.display = "none";
-            }
-        }
-    </script>
-
-    <script type="application/javascript">
-        $(function () {
-            <!--/* SCRIPT TO OPEN THE MODAL WITH THE PREVIEW */-->
-            <!--$("#id_file").change(function () {-->
-            <!--if (this.files && this.files[0]) {-->
-                <!--var reader = new FileReader();-->
-                <!--reader.onload = function (e) {-->
-                <!--$("#image").attr("src", e.target.result);-->
-                <!--$("#modalCrop").modal("show");-->
-                <!--}-->
-                <!--reader.readAsDataURL(this.files[0]);-->
-            <!--}-->
-            <!--});-->
-
-            /* SCRIPTS TO HANDLE THE CROPPER BOX */
-            var $image = $("#image1");
-            var cropBoxData;
-            var canvasData;
-            $("#modalCrop").on("shown.bs.modal", function () {
-            $image.cropper({
-                viewMode: 1,
-                aspectRatio: 1/1,
-                minCropBoxWidth: 200,
-                minCropBoxHeight: 200,
-                ready: function () {
-                $image.cropper("setCanvasData", canvasData);
-                $image.cropper("setCropBoxData", cropBoxData);
+                success: function(data){
+                    $this.parents('.profile-info-container').append(`
+                        <span class="text-center" style="display: block; padding: 5px 10px; background: #c2c2c2;%">Request accepted</span>
+                    `)
+                    $this.parents('ul').remove();
+0
                 }
-            });
-            }).on("hidden.bs.modal", function () {
-            cropBoxData = $image.cropper("getCropBoxData");
-            canvasData = $image.cropper("getCanvasData");
-            $image.cropper("destroy");
-            });
+            })
+        })
 
-            $(".js-zoom-in").click(function () {
-            $image.cropper("zoom", 0.1);
-            });
-
-            $(".js-zoom-out").click(function () {
-            $image.cropper("zoom", -0.1);
-            });
-
-            /* SCRIPT TO COLLECT THE DATA AND POST TO THE SERVER */
-            $(".js-crop-and-upload").click(function () {
-            var cropData = $image.cropper("getData");
-            $("#id_x").val(cropData["x"]);
-            $("#id_y").val(cropData["y"]);
-            $("#id_height").val(cropData["height"]);
-            $("#id_width").val(cropData["width"]);
-            $("#formUpload").submit();
-            });
-        });
     </script>
-
 {% endblock %}

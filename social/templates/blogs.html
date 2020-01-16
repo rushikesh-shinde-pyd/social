@@ -167,14 +167,14 @@
                                                     </div>
                                                 </div>
                                                 <hr style="border-top: 1px solid #797979;margin-top:10px;margin-bottom:10px;">
-                                                <p id="post-text">
+                                                <div id="post-text">
                                                     {% if post.text|count_length > 500 %}
                                                         {{ post.text |show_more|title|linebreaks }}
                                                         <a href="{% url 'social:post-details' post.id %}"><i class="glyphicon glyphicon-new-window"></i></a>
                                                     {% else %}
                                                         {{ post.text|title|linebreaks  }}
                                                     {% endif %}
-                                                </p>
+                                                </div>
                                             </div>
                                             <div class="panel-heading" style="overflow: hidden;">
                                                 <ul class="dlikes list-group" >
@@ -706,11 +706,11 @@
                 <h4 class="modal-title" id="updateModalLabel">Post details</h4>
             </div>
             <div class="modal-body">
-                <form class="post-update-form" method="post">
+                <form name="post-update-form" method="post">
                     {% csrf_token %}
                     <div class="form-group">
                         <p><input type="text" id="update-post-title" class="form-control" placeholder="Post Title"></p>
-                        <p><textarea style="resize:none;" id="update-post-content" class="form-control" rows="3" placeholder="What's on your mind!"></textarea></p>
+                        <p><textarea name="update-post-content" style="resize:none;" id="update-post-content" class="form-control" rows="3" placeholder="What's on your mind!"></textarea></p>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary" >Save changes</button>
@@ -1194,24 +1194,33 @@
     }
 
 
+    $(document).on('keydown', '[name="update-post-content"]', function(event){
+        var textarea_height = $(this).prop('scrollHeight');
+        var comment = $(this).val().trim();
+        if (textarea_height > 45){
+            $(this).css('height', textarea_height);
+        }
+    });
+
     // post updation
     function update_to_page(id, data){
         $("#post-id-" + id).find("#post-title").text(data.title);
         $("#post-id-" + id).find("#post-text").text(data.text);
-        $("#post-id-" + id).find("#post-published").text({{data.published_date|timesince}});
+        //$("#post-id-" + id).find("#post-published").text({{data.published_date|timesince}});
+        $("#post-id-" + id).find("#post-published").text('just now');
     }
 
 
     function update_post(id){
         var title = $("#post-id-" + id).find("#post-title").text().trim();
         var content = $("#post-id-" + id).find("#post-text").text().trim();
-        $(".post-update-form").find("#update-post-title").val(title);
-        $(".post-update-form").find("#update-post-content").val(content);
+        $('[name="post-update-form"]').find("#update-post-title").val(title);
+        $('[name="post-update-form"]').find('[name="update-post-content"]').val(content);
 
-        $(".post-update-form").submit(function(event){
+        $('[name="post-update-form"]').submit(function(event){
             event.preventDefault();
-            var title = $(".post-update-form").find("#update-post-title").val().trim();
-            var content = $(".post-update-form").find("#update-post-content").val().trim();
+            var title = $(this).find("#update-post-title").val().trim();
+            var content = $(this).find("#update-post-content").val().trim();
             $.ajax({
                 url: "{% url 'social:ajax_requests' %}",
                 type: "POST",

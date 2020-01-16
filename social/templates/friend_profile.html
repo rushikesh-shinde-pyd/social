@@ -36,7 +36,17 @@
                                 </div>
                                 <div class=" goleft" style="margin:10px;">
                                     <div class="profile-pic">
-                                        <img src="{{ user_obj.image.url }}" width="100" class="">
+                                        <img
+                                            {% if user_obj.image %}
+                                                src="{{ user_obj.image.url }}" 
+                                            {% else %}
+                                                {% if user_obj.gender == 'male'%} 
+                                                    src="{% static 'img/male_user.png' %}" 
+                                                {% else %}
+                                                    src="{% static 'img/female_user.png' %}"
+                                                {% endif %} 
+                                            {% endif %}
+                                            width="100" class="">
                                     </div>
                                 </div>
                                 <div class="row" style="padding-bottom:10px;">
@@ -52,8 +62,8 @@
                                         {% endif %} 
                                     </div>
                                     <div class="col-md-6 text-left">
-                                        <a href="#" class="btn btn-primary" style="padding:3px 6px;">Add member<i class="pointer fa fa-user-plus" aria-hidden="true"></i></a>
-                                        <a href="#" class="btn btn-primary" style="padding:3px 6px;">Send message<i class="fa fa-envelope"></i></a>
+                                        <a href="#" role="button" class="btn btn-primary" style="padding:3px 6px;">Add member<i class="pointer fa fa-user-plus" aria-hidden="true"></i></a>
+                                        <a href="#" role="button" class="btn btn-primary" style="padding:3px 6px;">Send message<i class="fa fa-envelope"></i></a>
                                     </div>
                                     
                                 </div>

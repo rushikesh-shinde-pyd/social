@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect,reverse, get_object_or_404
 from django import template
-from social.models import Like, Dislike, Post, Comment, Profile
+from social.models import Like, Dislike, Post, Comment, Profile, Friendship, User
 from django.utils import timezone
 from django.template.defaultfilters import stringfilter
 import datetime
@@ -127,6 +127,18 @@ def check_timestamp(timestamp):
         return 'just now' 
     else:
         return timestamp
+
+
+@register.simple_tag
+def check_is_request_sent(request, friend):
+    f_obj = User.objects.get(id=friend)
+    obj = Friendship.objects.filter(request_from=request.user, request_to=f_obj)
+    print(obj)
+    # obj.refresh_from_db()
+    if obj:
+        return True
+    else:
+        return False
 
 
 

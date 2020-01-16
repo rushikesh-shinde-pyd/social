@@ -2409,6 +2409,16 @@ label {
     margin-right: 7px;
     float: left;
 }
+.profile-info-container{
+    float: left;
+}
+.profile-info-container> ul{
+    padding: 0px;
+    margin: 0px;
+}
+.profile-info-container ul li{
+    display: inline-block;
+}
 .no-pad{
     padding: 0px !important;
 }
@@ -2576,3 +2586,59 @@ label {
     cursor: pointer;
     color: #31708f;
 }
+.user-details-nav{
+    text-align: left;
+    background-color: #fff;
+    box-sizing: border-box;
+}
+.user-details-nav ul li{
+    display: inline-block;
+}
+.user-details-nav ul{
+    border: 1px solid #c2c2c2;
+    padding: 0px;
+    color: #31708f;
+}
+.user-details-nav ul > li a{
+    padding: 5px 10px;
+}
+.user-details-nav ul > li h5{
+    color: #31708f !important;
+}
+.user-details-nav ul > li{
+    border-right: 1px solid #c2c2c2;
+}
+
+/* loader styling for friend request */
+.loader {
+    border: 3px solid #f3f3f3;
+    border-radius: 100%;
+    border-top: 3px solid #3498db;
+    vertical-align: middle;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 2s linear infinite; 
+  }
+  
+  /* Safari */
+  @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .not-friends{
+      box-sizing: border-box;
+      border: 1px solid #c2c2c2;
+      /* display: inline-block; */
+      padding: 10px;
+      width: 49%;
+      margin: 1px;
+      min-height: 110px;
+      float: left;
+  }

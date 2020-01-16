@@ -43,4 +43,8 @@ urlpatterns = [
     path('edit-comment/', views.edit_comment, name="edit-comment"),
     path('edit-reply/', views.edit_reply, name="edit-reply"),
 
+    path('friend-list/', views.friend_list, name="friend-list"),
+    path('<int:pk>/add-friend/', views.add_friend, name="add-friend"),
+    path('<int:pk>/undo-request/', views.undo_request, name="undo-request"),
+    path('<int:pk>/request-approve/', views.request_approve, name="request-approve"),
 ]

@@ -20,6 +20,7 @@ class Profile(models.Model):
 
     def __str__(self):
         return f'{self.user.username} Profile'
+    
 
 
 @receiver(post_save, sender=User)
@@ -115,3 +116,16 @@ class Reply(models.Model):
         verbose_name_plural = 'replies'
         ordering = ['replied_at']
 
+
+class Friendship(models.Model):
+    request_from = models.ForeignKey(User, related_name='owner', on_delete=models.CASCADE)
+    request_to = models.ForeignKey(User, related_name='friend', on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(default=timezone.now, null=True)
+    is_friend = models.BooleanField(default=False)
+
+    def make_friend(self, *args, **kwargs):
+        self.is_friend = True
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.request_from.username + '->' +self.request_to.username

@@ -67,6 +67,21 @@
                                                 {% else %}
                                                 <br>
                                             {% endif %}
+                                            <ul>
+                                                <li>
+                                                    <input type="hidden" name="friend-id" value="{{ user_obj.pk }}">
+                                                    {% check_is_request_sent request user_obj.pk as req_sent %}
+                                                    {% if req_sent %}
+                                                    <a id="undo-request" href="{% url 'social:undo-request' user_obj.pk %}" role="button" class="btn btn-primary" style="padding:3px 6px;">Request sent<i class="pointer fa fa-check" aria-hidden="true"></i></a>
+                                                    {% else %}
+                                                        <a id="add-friend" href="{% url 'social:add-friend' user_obj.pk %}" role="button" class="btn btn-primary" style="padding:3px 6px;">Add member<i class="pointer fa fa-user-plus" aria-hidden="true"></i></a>
+                                                    {% endif %}
+                                                    
+                                                </li>
+                                                <li>
+                                                    <a href="#" role="button" class="btn btn-primary" style="padding:3px 6px;"><i class="fa fa-envelope"></i></a>
+                                                </li>
+                                            </ul>
                                             {% if user_obj.gender %}<span>{{age}} yrs</span>&nbsp;{% endif%}
                                             {% if user_obj.gender %}
                                                 {% if user_obj.gender == 'male' %}
@@ -367,5 +382,56 @@
 
 {% block custom_scripts %}
 
+    <script>
+        $(document).on('click', '#add-friend', function(event){
+            var $this = $(this);
+            var friend_id = $(this).parent().find('[name="friend-id"]').val();
+            event.preventDefault();
+            var ref = $(this).attr('href');
+            $.ajax({
+                url: ref,
+                datatype: 'json',
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success: function(data){
+                    $this.html('Add member <div class="loader"></div>');
+                    var timeoutId = setTimeout(function(){
+                        $this.html(`Request sent<div class="pointer fa fa-check" aria-hidden="true"></i>`)
+                        $this.attr({
+                            'href': '/' + friend_id + '/undo-request/',
+                            'id': 'undo-request'
+                        });
+                    }, 1000);
+                }
+            })
+        })
+
+         $(document).on('click', '#undo-request', function(event){
+            var $this = $(this);
+            var friend_id = $(this).parent().find('[name="friend-id"]').val();
+            event.preventDefault();
+            var ref = $(this).attr('href');
+            $.ajax({
+                url: ref,
+                datatype: 'json',
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success: function(data){
+                    $this.html('Request sent <div class="loader"></div>');
+                    var timeoutId = setTimeout(function(){
+                        $this.html(`Add member<div class="pointer fa fa-user-plus" aria-hidden="true">`);
+                        $this.attr({
+                            'href': '/' + friend_id + '/add-friend/',
+                            'id': 'add-friend'
+                        });
+                    }, 1000);
+                }
+            })
+        })
+    </script>
 
 {% endblock %}

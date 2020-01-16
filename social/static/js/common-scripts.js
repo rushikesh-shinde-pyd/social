@@ -121,6 +121,7 @@ var Script = function () {
 // create category form validation
 $('form[name="create-category"]').submit(function(event){
     $(".category-error").remove();
+    $('.post-error-box').hide();
     var category = $('[name="category-name"]');
     var subcategory = $('[name="subcategory-name"]');
     var error = $('.error-box');
@@ -150,12 +151,14 @@ $(document).on('click', '#create-btn', function(){
 
 // post creation form validation
 $('form[name="post-create-form"]').submit(function(event){
+    $('.error-box').hide();
     $(".category-error").remove();
+    var error = $('.post-error-box');
     var category = $('[name="category"]');
     var subcategory = $('[name="subcategory"]');
     var title = $('[name="post-title"]');
     var content = $('[name="post-content"]');
-    var error = $('.post-error-box');
+    
     var ele_indices = [];
     
     if ((category.val() != "None") && (subcategory.val() != "None") && title.val().trim() && content.val().trim()){
@@ -183,6 +186,7 @@ $('form[name="post-create-form"]').submit(function(event){
             event.preventDefault();
         }
         event.preventDefault();
+
     }
 });
 
@@ -401,8 +405,3 @@ $(document).on('click', '.show-all-categories', function(){
 });
 
 
-
-
-(function(){
-    alert('take look at post update->imp delete too git push-->OKOK');
-})();

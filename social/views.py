@@ -2,14 +2,14 @@ from django.shortcuts import render,redirect,reverse, get_object_or_404
 from django.contrib.auth import authenticate,login as auth_login,logout
 from .forms import SignUpForm,PhotoForm
 from django.contrib.auth.models import User
-from .models import (Profile, Post, Like, Dislike, Comment, Reply, Category, Subcategory)
+from .models import (Profile, Post, Like, Dislike, Comment, Reply, Category, Subcategory, Friendship)
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 from django.views.generic import View, ListView, DetailView
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 import datetime
 from django.utils.decorators import method_decorator
 from django.db.models import Q
@@ -593,3 +593,43 @@ def edit_reply(request):
         'edited_reply': obj.message
     }
     return JsonResponse(data)
+
+
+
+# *******************************************************
+# *********************Friends module********************
+# *******************************************************
+
+def friend_list(request, *args, **kwargs):
+    current_user = request.user #for more readability only
+    friend_list = Friendship.objects.filter((Q(request_from=current_user) | Q(request_to=current_user)) & Q(is_friend=True))
+    non_friend_list = Friendship.objects.filter(request_to=current_user, is_friend=False)
+    sent_request_list = Friendship.objects.filter(request_from=current_user, is_friend=False).order_by('-timestamp')
+    context = {
+        'friend_list': friend_list,
+        'non_friend_list': non_friend_list
+        }
+    print(context)
+    return render(request, 'friends_list.html', context)
+
+
+def add_friend(request, *args, **kwargs):
+    current_user = request.user #for more readability only
+    friend_obj = get_object_or_404(User, pk=kwargs.get('pk'))
+    Friendship.objects.get_or_create(request_from=current_user, request_to=friend_obj)
+    return JsonResponse({'request': 'sent'})
+
+
+def undo_request(request, *args, **kwargs):
+    current_user = request.user #for more readability only
+    friend = get_object_or_404(User, pk=kwargs.get('pk'))
+    obj = Friendship.objects.get(request_from=current_user, request_to=friend_obj)
+    obj.delete()
+    return JsonResponse({'request': 'canceled'})
+
+def request_approve(request, *args, **kwargs):
+    current_user = request.user #for more readability only
+    friend_obj = get_object_or_404(User, pk=kwargs.get('pk'))
+    obj = Friendship.objects.get(request_from=friend_obj, request_to=current_user)
+    obj.make_friend()
+    return JsonResponse({'request': 'approved'})
