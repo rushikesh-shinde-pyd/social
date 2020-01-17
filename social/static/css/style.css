@@ -2632,7 +2632,7 @@ label {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
-  .not-friends{
+  .friends, .not-friends{
       box-sizing: border-box;
       border: 1px solid #c2c2c2;
       /* display: inline-block; */
@@ -2642,3 +2642,15 @@ label {
       min-height: 110px;
       float: left;
   }
+  #non-friend-count{
+      background-color: #ff0000;
+      color: #fff;
+      display: inline-block;
+      padding: 5px;
+      border-radius: 25%;
+  }
+#non-friend-container{
+    display: none;
+    box-sizing: border-box;
+    overflow: hidden;
+}

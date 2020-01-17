@@ -96,13 +96,10 @@ def profile(request):
 @login_required()
 def editProfile(request):
     u_id = request.user.id
-    print('User id-',u_id)
     user = request.user
     if request.method == 'POST':
         d =request.POST.get
-        print(d)
         image = request.FILES.get('image')
-        print(image)
         form = PhotoForm(request.POST, request.FILES)
         if image:
             if form.is_valid():
@@ -114,31 +111,22 @@ def editProfile(request):
         first_name=d('first_name');last_name=d('last_name');gender=d('gender');email=d('email')
         birth_date = d('birth_date'); city = d('city'); state = d('state'); country = d('country');address = d('address')
         if first_name != '':
-            print(User.objects.filter(id=u_id).update(first_name=first_name))
             messages.success(request, 'Profile update successfully.')
         if last_name!= '':
-            print(User.objects.filter(id=u_id).update(last_name=last_name))
             messages.success(request, 'Profile update successfully.')
         if email != '':
-            print(User.objects.filter(id=u_id).update(email=email))
             messages.success(request, 'Profile update successfully.')
         if birth_date != '':
-            print(Profile.objects.filter(id=u_id).update(birth_date=birth_date))
             messages.success(request, 'Profile update successfully.')
         if gender != '':
-            print(Profile.objects.filter(id=u_id).update(gender=gender))
             messages.success(request, 'Profile update successfully.')
         if city != '':
-            print(Profile.objects.filter(id=u_id).update(city=city))
             messages.success(request, 'Profile update successfully.')
         if state != '':
-            print(Profile.objects.filter(id=u_id).update(state=state))
             messages.success(request, 'Profile update successfully.')
         if country != '':
-            print(Profile.objects.filter(id=u_id).update(country=country))
             messages.success(request, 'Profile update successfully.')
         if address != '':
-            print(Profile.objects.filter(id=u_id).update(fullAddress=address))
             messages.success(request, 'Profile update successfully.')
         return redirect('social:profile')
 
@@ -150,9 +138,7 @@ def forgot_password(request):
     if request.method == 'POST':
         u_email= request.POST.get('email')
         user = User.objects.filter(email=u_email).first()
-        print('User email-',user )
         if user is not None:
-            print('Username exits')
             subject = 'Your account details'
             message = 'Your username is '
             email_from = settings.EMAIL_HOST_USER
@@ -160,7 +146,6 @@ def forgot_password(request):
             send_mail(subject, message, email_from, recipient_list)
             messages.success(request, 'User email-id found.')
         else:
-            print('Not exits. please register.')
             messages.warning(request, 'User not register. Please register first.')
             return redirect('social:signup')
     return render(request,'registration/forgot_password.html')
@@ -386,7 +371,6 @@ def remove_comment(request):
         'deleted': True,
         'total_comments': post_obj.comment_set.all().count()
     }
-    print(data)
     return JsonResponse(data)
 
 
@@ -403,7 +387,6 @@ def remove_reply(request):
         'deleted': True,
         'total_replies': comment_obj.reply_set.all().count()
     }
-    print(data)
     return JsonResponse(data)
 
 
@@ -507,10 +490,8 @@ def blog(request, *args, **kwargs):
 @login_required
 def create_category(request):
     if request.method == 'POST':
-        print('method arrived')
         category = request.POST.get('category-name').lower()
         subcategory = request.POST.get('subcategory-name').lower()
-        print(request.POST)
         if category.strip() and subcategory.strip():
             try:
                 category_obj = Category.objects.get(category_name=category)
@@ -571,7 +552,7 @@ class FriendProfile(DetailView):
     # def get_context_object_name(self, queryset):
     #     return 'user'
 
-    
+  
 def edit_comment(request):
     comment_id = request.POST.get('comment_id')
     edited_comment = request.POST.get('edited_comment')
@@ -586,7 +567,6 @@ def edit_comment(request):
 def edit_reply(request):
     reply_id = request.POST.get('reply_id')
     edited_reply = request.POST.get('edited_reply')
-    print(reply_id, edited_reply)
     Reply.objects.filter(id=reply_id).update(message=edited_reply)
     obj = Reply.objects.get(id=reply_id)
     data = {
@@ -600,19 +580,22 @@ def edit_reply(request):
 # *********************Friends module********************
 # *******************************************************
 
+@login_required
 def friend_list(request, *args, **kwargs):
     current_user = request.user #for more readability only
-    friend_list = Friendship.objects.filter((Q(request_from=current_user) | Q(request_to=current_user)) & Q(is_friend=True))
-    non_friend_list = Friendship.objects.filter(request_to=current_user, is_friend=False)
+    friend_list_request_from = Friendship.objects.filter(Q(request_from=current_user) & Q(is_friend=True)).order_by('-timestamp')
+    friend_list_request_to = Friendship.objects.filter(Q(request_to=current_user) & Q(is_friend=True)).order_by('-timestamp')
+    non_friend_list = Friendship.objects.filter(request_to=current_user, is_friend=False).order_by('-timestamp')
     sent_request_list = Friendship.objects.filter(request_from=current_user, is_friend=False).order_by('-timestamp')
     context = {
-        'friend_list': friend_list,
+        'friend_list_request_from': friend_list_request_from,
+        'friend_list_request_to': friend_list_request_to,
         'non_friend_list': non_friend_list
         }
-    print(context)
     return render(request, 'friends_list.html', context)
 
 
+@login_required
 def add_friend(request, *args, **kwargs):
     current_user = request.user #for more readability only
     friend_obj = get_object_or_404(User, pk=kwargs.get('pk'))
@@ -620,13 +603,16 @@ def add_friend(request, *args, **kwargs):
     return JsonResponse({'request': 'sent'})
 
 
+@login_required
 def undo_request(request, *args, **kwargs):
     current_user = request.user #for more readability only
     friend = get_object_or_404(User, pk=kwargs.get('pk'))
-    obj = Friendship.objects.get(request_from=current_user, request_to=friend_obj)
+    obj = Friendship.objects.get(request_from=current_user, request_to=friend)
     obj.delete()
     return JsonResponse({'request': 'canceled'})
 
+
+@login_required
 def request_approve(request, *args, **kwargs):
     current_user = request.user #for more readability only
     friend_obj = get_object_or_404(User, pk=kwargs.get('pk'))
